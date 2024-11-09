@@ -11,12 +11,15 @@ namespace :hikes do
             log.puts "\n=== Import started at #{Time.current} ==="
 
             begin
-                # Skip first 4 empty lines and read headers
-                rows = CSV.read(csv_file, headers: true, skip_lines: /^,,,,,,,,,,,/)
+                rows = CSV.read(csv_file,
+                                headers: true,
+                                encoding: 'utf-8',
+                                col_sep: ',')
+
+                puts "Headers found: #{rows.headers.inspect}" # Pour debug
 
                 rows.each do |row|
                     begin
-                        # Convert date from DD/M/YYYY to YYYY-MM-DD
                         last_schedule = Date.strptime(row['Dernier Prog'], '%d/%m/%Y') rescue nil
 
                         hike = Hike.find_or_initialize_by(number: row['Numero'])
@@ -39,12 +42,14 @@ namespace :hikes do
                         end
                     rescue StandardError => e
                         log.puts "Error processing row #{row['Numero']}: #{e.message}"
+                        puts e.message # Pour debug
                     end
                 end
 
             rescue StandardError => e
                 log.puts "Fatal error during import: #{e.message}"
                 log.puts e.backtrace
+                puts e.message # Pour debug
             end
 
             log.puts "=== Import finished at #{Time.current} ==="
