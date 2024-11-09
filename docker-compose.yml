@@ -1,0 +1,28 @@
+services:
+  # Service for the Ruby on Rails web application
+  web:
+    user: "${UID}:${GID}"
+    build: .  # Build the service's image from the current directory
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'  # Command to start the Rails server
+    ports:
+      - "3000:3000"  # Expose ports for accessing the application
+    volumes:
+      - .:/app  # Mount the current directory inside the container
+    depends_on:
+      - db  # Specify dependency on the database service
+    environment:
+      DATABASE_URL: mysql2://root:password@db:3306/rails_7_with_docker  # Database connection parameters
+
+  # Service for the MariaDB database
+  db:
+    image: mariadb:latest  # Use the official MariaDB image
+    ports:
+      - "3307:3306"  # Expose port for accessing the database
+    volumes:
+      - mariadb_data:/var/lib/mysql  # Create a volume for storing database data
+    environment:
+      MYSQL_ROOT_PASSWORD: password  # Set the root password for MariaDB
+
+# Define a volume for storing MariaDB data
+volumes:
+  mariadb_data:

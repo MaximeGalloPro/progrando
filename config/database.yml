@@ -1,0 +1,22 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  collation: utf8mb4_unicode_ci
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: root
+  password: password
+  host: db
+
+development:
+  <<: *default
+  database: rails_7_with_docker_development
+
+test:
+  <<: *default
+  database: rails_7_with_docker_test
+
+production:
+  <<: *default
+  database: rails_7_with_docker_production
+  username: rails_7_with_docker
+  password: <%= ENV['RAILS_7_WITH_DOCKER_DATABASE_PASSWORD'] %>
