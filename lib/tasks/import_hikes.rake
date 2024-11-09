@@ -5,7 +5,7 @@ namespace :hikes do
     desc 'Import hikes from CSV file'
     task import: :environment do
         log_file = Rails.root.join('log', 'hikes_import.log')
-        csv_file = Rails.root.join('lib', 'data', 'prograndov1.6.csv')
+        csv_file = Rails.root.join('lib', 'data', 'progrando_hikes.csv')
 
         File.open(log_file, 'a') do |log|
             log.puts "\n=== Import started at #{Time.current} ==="

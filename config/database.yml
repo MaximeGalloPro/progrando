@@ -9,14 +9,14 @@ default: &default
 
 development:
   <<: *default
-  database: rails_7_with_docker_development
+  database: progrando
 
 test:
   <<: *default
-  database: rails_7_with_docker_test
+  database: progrando_test
 
 production:
   <<: *default
-  database: rails_7_with_docker_production
-  username: rails_7_with_docker
-  password: <%= ENV['RAILS_7_WITH_DOCKER_DATABASE_PASSWORD'] %>
+  database: progrando_production
+  username: progrando
+  password: <%= ENV['PROGRANDO_DATABASE_PASSWORD'] %>
