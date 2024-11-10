@@ -1,10 +1,3 @@
-# config/routes.rb
-Rails.application.routes.draw do
-    resources :hikes, only: [:index, :new, :create]
-    resources :hike_histories, only: [:new, :create]
-end
-
-# app/controllers/hikes_controller.rb
 class HikesController < ApplicationController
     def index
         @results = if params[:search].present?
