@@ -1,0 +1,154 @@
+<%# app/views/hikes/new.html.erb %>
+<div class="container py-4">
+    <h1 class="h2 mb-4">Ajouter un nouveau parcours</h1>
+
+    <%= form_with(model: @hike, local: true) do |f| %>
+        <% if @hike.errors.any? %>
+            <div class="alert alert-danger">
+                <h2 class="h6"><%= pluralize(@hike.errors.count, "erreur") %> :</h2>
+                <ul class="mb-0">
+                    <% @hike.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                    <% end %>
+                </ul>
+            </div>
+        <% end %>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :number, "Numéro", class: "form-label required" %>
+                    <%= f.number_field :number,
+                                       class: "form-control #{'is-invalid' if @hike.errors[:number].any?}" %>
+                    <% if @hike.errors[:number].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:number].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :starting_point, "Point de départ", class: "form-label required" %>
+                    <%= f.text_field :starting_point,
+                                     class: "form-control #{'is-invalid' if @hike.errors[:starting_point].any?}" %>
+                    <% if @hike.errors[:starting_point].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:starting_point].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :trail_name, "Nom du parcours", class: "form-label required" %>
+                    <%= f.text_field :trail_name,
+                                     class: "form-control #{'is-invalid' if @hike.errors[:trail_name].any?}" %>
+                    <% if @hike.errors[:trail_name].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:trail_name].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :difficulty, "Difficulté", class: "form-label required" %>
+                    <%= f.number_field :difficulty,
+                                       min: 1,
+                                       max: 5,
+                                       class: "form-control #{'is-invalid' if @hike.errors[:difficulty].any?}" %>
+                    <% if @hike.errors[:difficulty].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:difficulty].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :distance_km, "Distance (km)", class: "form-label required" %>
+                    <%= f.number_field :distance_km,
+                                       step: 0.1,
+                                       class: "form-control #{'is-invalid' if @hike.errors[:distance_km].any?}" %>
+                    <% if @hike.errors[:distance_km].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:distance_km].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :elevation_gain, "Dénivelé (m)", class: "form-label required" %>
+                    <%= f.number_field :elevation_gain,
+                                       class: "form-control #{'is-invalid' if @hike.errors[:elevation_gain].any?}" %>
+                    <% if @hike.errors[:elevation_gain].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:elevation_gain].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label required" %>
+                    <%= f.number_field :carpooling_cost,
+                                       class: "form-control #{'is-invalid' if @hike.errors[:carpooling_cost].any?}" %>
+                    <% if @hike.errors[:carpooling_cost].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:carpooling_cost].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :openrunner_ref, "Référence OpenRunner", class: "form-label required" %>
+                    <%= f.text_field :openrunner_ref,
+                                     class: "form-control #{'is-invalid' if @hike.errors[:openrunner_ref].any?}" %>
+                    <% if @hike.errors[:openrunner_ref].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:openrunner_ref].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <%= f.label :last_schedule, "Dernière programmation", class: "form-label required" %>
+                    <%= f.date_field :last_schedule,
+                                     class: "form-control #{'is-invalid' if @hike.errors[:last_schedule].any?}" %>
+                    <% if @hike.errors[:last_schedule].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike.errors[:last_schedule].join(', ') %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <%= f.submit "Enregistrer", class: "btn btn-primary" %>
+            <%= link_to "Retour", hikes_path, class: "btn btn-outline-secondary ms-2" %>
+        </div>
+    <% end %>
+</div>
+
+<% content_for :head do %>
+    <style>
+        .required:after {
+            content: " *";
+            color: red;
+        }
+    </style>
+<% end %>

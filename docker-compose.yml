@@ -11,7 +11,9 @@ services:
     depends_on:
       - db  # Specify dependency on the database service
     environment:
-      DATABASE_URL: mysql2://root:password@db:3306/progrando  # Database connection parameters
+      DATABASE_URL: mysql2://root:password@db:3306/progrando # Database connection parameters
+    tty: true
+    stdin_open: true
 
   # Service for the MariaDB database
   db:

@@ -1,15 +1,40 @@
+# app/models/hike.rb
 class Hike < ApplicationRecord
-    # Validations
-    validates :number, presence: true, uniqueness: true, numericality: { only_integer: true }
-    validates :day, presence: true, numericality: { only_integer: true }
-    validates :difficulty, numericality: { only_integer: true }, allow_nil: true
-    validates :carpooling_cost, numericality: { only_integer: true }, allow_nil: true
-    validates :distance_km, numericality: true, allow_nil: true
-    validates :elevation_gain, numericality: { only_integer: true }, allow_nil: true
-    validates :last_schedule, presence: true
+    has_many :hike_histories, foreign_key: :hike_number, primary_key: :number
 
-    # Callback to generate openrunner_url before save
+    validates :number, presence: true, uniqueness: true, numericality: { only_integer: true }
+    validates :difficulty, presence: true,
+              numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
+    validates :starting_point, presence: true
+    validates :trail_name, presence: true
+    validates :carpooling_cost,
+              numericality: { only_integer: true, greater_than_or_equal_to: 0 },
+              allow_blank: true
+    validates :distance_km,
+              numericality: { greater_than: 0 },
+              allow_blank: true
+    validates :elevation_gain,
+              numericality: { only_integer: true, greater_than_or_equal_to: 0 },
+              allow_blank: true
+    validates :openrunner_ref, presence: true,
+              numericality: { only_integer: true }
+
     before_save :generate_openrunner_url
+
+    scope :search_by_trail_name, ->(query) {
+        joins("LEFT JOIN (
+      SELECT
+        hike_number,
+        hiking_date,
+        guide_name,
+        ROW_NUMBER() OVER (PARTITION BY hike_number ORDER BY hiking_date DESC) as rn
+      FROM hike_histories
+    ) as last_hikes ON hikes.number = last_hikes.hike_number AND last_hikes.rn = 1")
+            .where("trail_name LIKE ?", "%#{query}%")
+            .select("hikes.*,
+            last_hikes.hiking_date as last_date,
+            last_hikes.guide_name as last_guide")
+    }
 
     private
 

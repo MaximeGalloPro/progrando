@@ -1,1 +1,50 @@
-toto
+<div class="container py-4">
+    <%= link_to "Ajouter une randonnée à l'historique",
+                new_hike_history_path,
+                class: "btn btn-primary mb-4 d-inline-block" %>
+    <%= link_to "Ajouter un nouveau parcours",
+                new_hike_path,
+                class: "btn btn-primary mb-4 d-inline-block", style: "float: right" %>
+    <%= form_with url: hikes_path, method: :get, local: true, class: "mb-4" do |f| %>
+        <div class="input-group">
+            <%= f.text_field :search,
+                             placeholder: "Rechercher une randonnée...",
+                             value: params[:search],
+                             class: "form-control" %>
+            <%= f.submit "Rechercher",
+                         class: "btn btn-outline-primary" %>
+        </div>
+    <% end %>
+
+    <% if @results.any? %>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">Randonnée</th>
+                    <th scope="col">Dernière date</th>
+                    <th scope="col">Dernier guide</th>
+                    <th scope="col">Lien</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% @results.each do |hike| %>
+                    <tr>
+                        <td><%= hike.trail_name %></td>
+                        <td><%= hike.last_date&.strftime("%d/%m/%Y") %></td>
+                        <td><%= hike.last_guide %></td>
+                        <td>
+                            <%= link_to "Voir",
+                                        hike.openrunner_url,
+                                        class: "btn btn-primary btn-sm", target: "_blank" %>
+                    </tr>
+                <% end %>
+                </tbody>
+            </table>
+        </div>
+    <% elsif params[:search].present? %>
+        <div class="alert alert-info" role="alert">
+            Aucun résultat trouvé pour "<%= params[:search] %>"
+        </div>
+    <% end %>
+</div>
