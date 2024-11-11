@@ -1,25 +1,32 @@
-# Use the official Ruby image as the base image
-FROM ruby:3.1.4
+FROM ruby:3.1.4-slim
 
-# Set the working directory inside the container
+# Installation des dépendances système
+RUN apt-get update -qq && \
+    apt-get install -y build-essential \
+                       libpq-dev \
+                       nodejs \
+                       default-libmysqlclient-dev \
+                       git \
+                       curl
+
+# Création du répertoire de l'application
 WORKDIR /app
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y nodejs && \
-    gem install bundler
-
-# Copy Gemfile and Gemfile.lock to the working directory
+# Installation des gems
 COPY Gemfile Gemfile.lock ./
+RUN bundle config set --local without 'development test' && \
+    bundle install
 
-# Install gems
-RUN bundle install
-
-# Copy the rest of the application code
+# Copie du code de l'application
 COPY . .
 
-# Expose port 3000 to the outside world
-EXPOSE 3000
+# Précompilation des assets
+RUN SECRET_KEY_BASE=dummy bundle exec rails assets:precompile RAILS_ENV=production
 
-# Start the Rails server
-CMD ["rails", "server", "-b", "0.0.0.0"]
+# Nettoyage
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Configuration des permissions
+RUN chmod +x /app/bin/* && \
+    chmod -R 755 /app/public/assets
