@@ -1,0 +1,52 @@
+<div class="container mt-4">
+    <div class="mb-3">
+        <%= link_to "← Retour", :back, class: "btn btn-outline-secondary" %>
+    </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Heure de départ</th>
+                    <th scope="col">Type de jour</th>
+                    <th scope="col">Difficulté</th>
+                    <th scope="col">Point de départ</th>
+                    <th scope="col">Nom du sentier</th>
+                    <th scope="col">Coût covoiturage</th>
+                    <th scope="col">Distance (km)</th>
+                    <th scope="col">Dénivelé</th>
+                    <th scope="col">Guide</th>
+                    <th scope="col">Téléphone guide</th>
+                    <th scope="col">Numéro randonnée</th>
+                    <th scope="col">URL Openrunner</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% @results.each do |result| %>
+                    <tr>
+                        <td><%= result.id %></td>
+                        <td><%= result.hiking_date %></td>
+                        <td><%= result.departure_time %></td>
+                        <td><%= result.day_type %></td>
+                        <td><%= result.difficulty %></td>
+                        <td><%= result.starting_point %></td>
+                        <td><%= result.trail_name %></td>
+                        <td><%= result.carpooling_cost %></td>
+                        <td><%= result.distance_km %></td>
+                        <td><%= result.elevation_gain %></td>
+                        <td><%= result.guide_name %></td>
+                        <td><%= result.guide_phone %></td>
+                        <td><%= result.hike_number %></td>
+                        <td>
+                            <%= link_to "Voir",
+                                        result.openrunner_url,
+                                        class: "btn btn-primary btn-sm", target: "_blank" %>
+                        </td>
+                    </tr>
+                <% end %>
+                </tbody>
+            </table>
+    </div>
+</div>

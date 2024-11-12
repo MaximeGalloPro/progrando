@@ -1,4 +1,9 @@
 class HikeHistoriesController < ApplicationController
+
+    def index
+        @results = HikeHistory.where(hike_number: params[:hike_number]).order(hiking_date: :desc)
+    end
+
     def new
         @hike_history = HikeHistory.new
         @hikes = Hike.order(:trail_name)

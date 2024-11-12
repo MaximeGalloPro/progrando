@@ -1,24 +1,31 @@
 version: '3'
+
 services:
   web:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    command: bash -c "rm -f /app/tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=mysql2://root:${DB_PASSWORD}@db:3306/progrando_production
       - RAILS_SERVE_STATIC_FILES=true
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3000:3000"  # Plus sécurisé, écoute uniquement en local
     volumes:
-      - .:/app
       - ./storage:/app/storage
-      - ./public/assets:/app/public/assets  # Ajoutez cette ligne
+      - ./public/assets:/app/public/assets
     depends_on:
-      - db
+      db:
+        condition: service_started
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   db:
-    image: mariadb:latest
+    image: mariadb:11.5.2  # Version spécifique pour la stabilité
     volumes:
       - mariadb_data:/var/lib/mysql
     environment:
@@ -26,6 +33,12 @@ services:
       - MYSQL_DATABASE=progrando_production
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"  # Plus sécurisé, écoute uniquement en local
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   mariadb_data:

@@ -1,0 +1,160 @@
+<%# app/views/stats/dashboard.html.erb %>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Tableau de bord des randonnées</h1>
+        <%= link_to "← Retour", :back, class: "btn btn-outline-secondary" %>
+    </div>
+
+    <%# Cartes de statistiques %>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Randonnées</h6>
+                    <h2 class="card-text"><%= @stats[:total_hikes] %></h2>
+                    <small class="text-muted">Sur l'année en cours</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Distance Totale</h6>
+                    <h2 class="card-text"><%= number_with_delimiter(@stats[:total_distance]) %> km</h2>
+                    <small class="text-muted">Distance cumulée</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Dénivelé Total</h6>
+                    <h2 class="card-text"><%= number_with_delimiter(@stats[:total_elevation]) %>m</h2>
+                    <small class="text-muted">Dénivelé cumulé</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Guides Actifs</h6>
+                    <h2 class="card-text"><%= @stats[:active_guides] %></h2>
+                    <small class="text-muted">Ce mois-ci</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%# Graphiques %>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Randonnées par mois</h5>
+                    <div style="height: 300px;">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Top Guides</h5>
+                    <div style="height: 300px;">
+                        <canvas id="guidesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%# Tableau récapitulatif %>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Dernières randonnées</h5>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Randonnée</th>
+                        <th>Guide</th>
+                        <th>Distance</th>
+                        <th>Dénivelé</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% @stats[:recent_hikes].each do |hike| %>
+                        <tr>
+                            <td><%= hike.hiking_date.strftime("%d/%m/%Y") %></td>
+                            <td><%= hike.trail_name %></td>
+                            <td><%= hike.guide_name %></td>
+                            <td><%= hike.distance_km %> km</td>
+                            <td><%= hike.elevation_gain %>m</td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuration commune pour les graphiques
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        };
+
+        // Graphique des randonnées mensuelles
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'line',
+            data: {
+                labels: <%= raw @stats[:monthly_stats].keys %>,
+                datasets: [{
+                    label: 'Nombre de randonnées',
+                    data: <%= raw @stats[:monthly_stats].values %>,
+                    borderColor: '#0d6efd',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Graphique des guides
+        new Chart(document.getElementById('guidesChart'), {
+            type: 'bar',
+            data: {
+                labels: <%= raw @stats[:guide_stats].keys %>,
+                datasets: [{
+                    label: 'Randonnées guidées',
+                    data: <%= raw @stats[:guide_stats].values %>,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: commonOptions
+        });
+    });
+</script>

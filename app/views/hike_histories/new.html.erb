@@ -52,8 +52,6 @@
                                          class: "form-control #{'is-invalid' if @hike_history.errors[:departure_time].any?}",
                                          value: @hike_history.departure_time.present? ? @hike_history.departure_time&.strftime("%H:%M") : Time.now %>
                     <% rescue %>
-                        <%= f.time_field :departure_time,
-                                         class: "form-control #{'is-invalid' if @hike_history.errors[:departure_time].any?}" %>
                     <% end %>
                     <% if @hike_history.errors[:departure_time].any? %>
                         <div class="invalid-feedback">

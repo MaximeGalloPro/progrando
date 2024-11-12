@@ -12,7 +12,11 @@ RUN apt-get update -qq && \
 # Création du répertoire de l'application
 WORKDIR /app
 
-# Installation des gems
+# Configuration des permissions bundle
+RUN mkdir -p /usr/local/bundle && \
+    chmod -R 777 /usr/local/bundle
+
+# Copie et installation des gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle config set --local without 'development test' && \
     bundle install
@@ -29,4 +33,15 @@ RUN apt-get clean && \
 
 # Configuration des permissions
 RUN chmod +x /app/bin/* && \
-    chmod -R 755 /app/public/assets
+    chmod -R 755 /app/public/assets && \
+    chmod -R 777 /app/tmp /app/log
+
+# Create start script
+RUN echo '#!/bin/bash\nrm -f /app/tmp/pids/server.pid\nexec bundle exec rails server -b 0.0.0.0 -e production' > /app/start.sh && \
+    chmod +x /app/start.sh
+
+# Expose port 3000
+EXPOSE 3000
+
+# Démarrage
+CMD ["/app/start.sh"]

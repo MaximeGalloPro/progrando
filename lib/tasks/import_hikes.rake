@@ -4,6 +4,27 @@ require 'csv'
 namespace :hikes do
     desc 'Import hikes from CSV file'
     task import: :environment do
+
+        def convert_num(value)
+            return nil if value.nil? || value.to_s.strip.empty?
+
+            # Première tentative : conversion directe en integer
+            begin
+                return value.to_i
+            rescue ArgumentError, TypeError
+                # Continue si la conversion directe échoue
+            end
+
+            # Deuxième tentative : extraire uniquement les chiffres
+            digits_only = value.to_s.gsub(/[^\d]/, '')
+
+            # Vérifier si on a des chiffres après le nettoyage
+            return digits_only.to_i if digits_only.present?
+
+            # En dernier recours
+            nil
+        end
+
         log_file = Rails.root.join('log', 'hikes_import.log')
         csv_file = Rails.root.join('lib', 'data', 'progrando_hikes.csv')
 
@@ -20,19 +41,17 @@ namespace :hikes do
 
                 rows.each do |row|
                     begin
-                        last_schedule = Date.strptime(row['Dernier Prog'], '%d/%m/%Y') rescue nil
 
                         hike = Hike.find_or_initialize_by(number: row['Numero'])
                         hike.assign_attributes(
                             day: row['D'],
-                            difficulty: row['Dif.'],
+                            difficulty: row['Dif.'] || 1,
                             starting_point: row['Depart de la randonnee'],
                             trail_name: row['Parcours'],
-                            carpooling_cost: row['C.V. *'],
-                            distance_km: row['Kl'],
-                            elevation_gain: row['m'],
-                            openrunner_ref: row['Ref Openrunner'],
-                            last_schedule: last_schedule
+                            carpooling_cost: convert_num(row['C.V. *']),
+                            distance_km: convert_num(row['Kl']),
+                            elevation_gain: convert_num(row['m']),
+                            openrunner_ref: convert_num(row['Ref Openrunner']) || 0,
                         )
 
                         if hike.save
