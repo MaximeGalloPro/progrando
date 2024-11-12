@@ -1,18 +1,33 @@
 <div class="container py-4">
+    <%= link_to "Statistiques", stats_dashboard_path, class: "btn btn-primary mb-4 d-inline-block"  %>
     <%= link_to "Ajouter une randonnée à l'historique",
                 new_hike_history_path,
                 class: "btn btn-primary mb-4 d-inline-block" %>
+
     <%= link_to "Ajouter un nouveau parcours",
                 new_hike_path,
                 class: "btn btn-primary mb-4 d-inline-block", style: "float: right" %>
+
     <%= form_with url: hikes_path, method: :get, local: true, class: "mb-4" do |f| %>
-        <div class="input-group">
-            <%= f.text_field :search,
-                             placeholder: "Rechercher une randonnée...",
-                             value: params[:search],
-                             class: "form-control" %>
-            <%= f.submit "Rechercher",
-                         class: "btn btn-outline-primary" %>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <%= f.text_field :trail_name,
+                                 placeholder: "Nom de la randonnée...",
+                                 value: params[:trail_name],
+                                 class: "form-control" %>
+            </div>
+            <div class="col-md-4">
+                <%= f.text_field :starting_point,
+                                 placeholder: "Point de départ...",
+                                 value: params[:starting_point],
+                                 class: "form-control" %>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex">
+                    <%= f.submit "Rechercher", class: "btn btn-outline-primary flex-grow-1" %>
+                    <%= link_to "Réinitialiser", hikes_path, class: "btn btn-outline-secondary ms-2" %>
+                </div>
+            </div>
         </div>
     <% end %>
 
@@ -22,6 +37,7 @@
                 <thead class="table-light">
                 <tr>
                     <th scope="col">Randonnée</th>
+                    <th scope="col">Point de départ</th>
                     <th scope="col">Dernière date</th>
                     <th scope="col">Dernier guide</th>
                     <th scope="col">Lien</th>
@@ -30,21 +46,27 @@
                 <tbody>
                 <% @results.each do |hike| %>
                     <tr>
+                        <% last_hike = HikeHistory.where(hike_number: hike.number)&.last %>
                         <td><%= hike.trail_name %></td>
-                        <td><%= hike.last_date&.strftime("%d/%m/%Y") %></td>
-                        <td><%= hike.last_guide %></td>
+                        <td><%= hike.starting_point %></td>
+                        <td><%= last_hike&.hiking_date&.strftime("%d/%m/%Y") %></td>
+                        <td><%= last_hike&.guide_name %></td>
                         <td>
                             <%= link_to "Voir",
                                         hike.openrunner_url,
                                         class: "btn btn-primary btn-sm", target: "_blank" %>
+                            <%= link_to "Historique",
+                                        hike_histories_path(hike_number: hike.number),
+                                        class: "btn btn-primary btn-sm"%>
+                        </td>
                     </tr>
                 <% end %>
                 </tbody>
             </table>
         </div>
-    <% elsif params[:search].present? %>
+    <% elsif params[:trail_name].present? || params[:starting_point].present? %>
         <div class="alert alert-info" role="alert">
-            Aucun résultat trouvé pour "<%= params[:search] %>"
+            Aucun résultat trouvé pour votre recherche
         </div>
     <% end %>
 </div>

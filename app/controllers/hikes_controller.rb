@@ -1,10 +1,13 @@
 class HikesController < ApplicationController
     def index
-        @results = if params[:search].present?
-                       Hike.search_by_trail_name(params[:search])
-                   else
-                       Hike.none
-                   end
+        @results = Hike.all
+
+        if params[:trail_name].present? || params[:starting_point].present?
+            @results = @results.where("trail_name LIKE ?", "%#{params[:trail_name]}%") if params[:trail_name].present?
+            @results = @results.where("starting_point LIKE ?", "%#{params[:starting_point]}%") if params[:starting_point].present?
+        else
+            @results = Hike.none
+        end
     end
 
     def new
