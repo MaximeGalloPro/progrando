@@ -1,4 +1,8 @@
 <%# app/views/stats/dashboard.html.erb %>
+<% content_for :head do %>
+    <meta name="turbo-visit-control" content="reload">
+<% end %>
+
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Tableau de bord des randonnées</h1>
@@ -105,9 +109,38 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    // Variable globale pour stocker les instances de graphiques
+    let charts = {
+        monthly: null,
+        guides: null
+    };
+
+    // Fonction pour nettoyer les graphiques existants
+    function cleanupCharts() {
+        if (charts.monthly instanceof Chart) {
+            charts.monthly.destroy();
+            charts.monthly = null;
+        }
+        if (charts.guides instanceof Chart) {
+            charts.guides.destroy();
+            charts.guides = null;
+        }
+    }
+
+    // Fonction pour initialiser les graphiques
+    function initializeCharts() {
+        // S'assurer que Chart.js est chargé
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js not loaded');
+            return;
+        }
+
+        // Nettoyer les graphiques existants
+        cleanupCharts();
+
         // Configuration commune pour les graphiques
         const commonOptions = {
             responsive: true,
@@ -127,34 +160,57 @@
             }
         };
 
-        // Graphique des randonnées mensuelles
-        new Chart(document.getElementById('monthlyChart'), {
-            type: 'line',
-            data: {
-                labels: <%= raw @stats[:monthly_stats].keys %>,
-                datasets: [{
-                    label: 'Nombre de randonnées',
-                    data: <%= raw @stats[:monthly_stats].values %>,
-                    borderColor: '#0d6efd',
-                    tension: 0.1,
-                    fill: false
-                }]
-            },
-            options: commonOptions
-        });
+        // Récupérer les éléments canvas
+        const monthlyChartEl = document.getElementById('monthlyChart');
+        const guidesChartEl = document.getElementById('guidesChart');
 
-        // Graphique des guides
-        new Chart(document.getElementById('guidesChart'), {
-            type: 'bar',
-            data: {
-                labels: <%= raw @stats[:guide_stats].keys %>,
-                datasets: [{
-                    label: 'Randonnées guidées',
-                    data: <%= raw @stats[:guide_stats].values %>,
-                    backgroundColor: '#0d6efd'
-                }]
-            },
-            options: commonOptions
-        });
-    });
+        if (monthlyChartEl) {
+            charts.monthly = new Chart(monthlyChartEl, {
+                type: 'line',
+                data: {
+                    labels: <%= raw @stats[:monthly_stats].keys %>,
+                    datasets: [{
+                        label: 'Nombre de randonnées',
+                        data: <%= raw @stats[:monthly_stats].values %>,
+                        borderColor: '#0d6efd',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: commonOptions
+            });
+        }
+
+        if (guidesChartEl) {
+            charts.guides = new Chart(guidesChartEl, {
+                type: 'bar',
+                data: {
+                    labels: <%= raw @stats[:guide_stats].keys %>,
+                    datasets: [{
+                        label: 'Randonnées guidées',
+                        data: <%= raw @stats[:guide_stats].values %>,
+                        backgroundColor: '#0d6efd'
+                    }]
+                },
+                options: commonOptions
+            });
+        }
+    }
+
+    // Gestionnaire d'événements pour Turbo et chargement initial
+    function setupCharts() {
+        // Attendre que Chart.js soit chargé
+        if (typeof Chart === 'undefined') {
+            setTimeout(setupCharts, 100);
+            return;
+        }
+        initializeCharts();
+    }
+
+    // Nettoyage avant la navigation Turbo
+    document.addEventListener('turbo:before-render', cleanupCharts);
+
+    // Initialisation après chargement de la page
+    document.addEventListener('turbo:load', setupCharts);
+    document.addEventListener('DOMContentLoaded', setupCharts);
 </script>
