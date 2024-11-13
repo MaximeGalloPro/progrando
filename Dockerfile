@@ -1,41 +1,54 @@
-# Use the official Ruby image as the base image
-FROM ruby:3.1.4
+FROM ruby:3.1.4-slim
 
-# Set the working directory inside the container
+# Installation des dépendances système
+RUN apt-get update -qq && \
+    apt-get install -y build-essential \
+                       libpq-dev \
+                       nodejs \
+                       default-libmysqlclient-dev \
+                       git \
+                       curl
+
+# Création du répertoire de l'application
 WORKDIR /app
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y nodejs && \
-    gem install bundler
-
-# Create and set permissions for bundle directory
+# Configuration des permissions bundle
 RUN mkdir -p /usr/local/bundle && \
     chmod -R 777 /usr/local/bundle
 
-# Copy Gemfile and Gemfile.lock to the working directory
+# Copie et installation des gems
 COPY Gemfile Gemfile.lock ./
-
-# Install gems
 RUN bundle install
 
-# Copy the rest of the application code
+# Copie du code de l'application
 COPY . .
 
-# Set permissions for the app directory
-RUN chmod -R 777 /app
+# Configuration des permissions
+RUN chmod +x /app/bin/* && \
+    chmod -R 777 /app/tmp /app/log /app/public
 
-# Expose port 3000 to the outside world
-EXPOSE 3000
+# Nettoyage
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Create start script
 COPY <<-"EOF" /app/start.sh
 #!/bin/bash
 rm -f /app/tmp/pids/server.pid
-rails server -b 0.0.0.0
+
+if [ "$RAILS_ENV" = "production" ]; then
+    # En production, on précompile les assets
+    SECRET_KEY_BASE=dummy bundle exec rails assets:precompile
+fi
+
+# Démarrage du serveur avec l'environnement approprié
+exec bundle exec rails server -b 0.0.0.0 -e ${RAILS_ENV:-development}
 EOF
 
 RUN chmod +x /app/start.sh
 
-# Start the Rails server using the start script
+# Expose port 3000
+EXPOSE 3000
+
+# Démarrage
 CMD ["/app/start.sh"]

@@ -1,37 +1,46 @@
 services:
-  # Service for the Ruby on Rails web application
   web:
-    user: "${UID}:${GID}"
     build: .
     command: bash -c "rm -f /app/tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
+    environment:
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - DATABASE_URL=mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}
+      - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES:-false}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_key}
     volumes:
       - .:/app
+      - ./storage:/app/storage
+      - ./public/assets:/app/public/assets
     depends_on:
       db:
         condition: service_started
-    environment:
-      DATABASE_URL: mysql2://root:password@db:3306/progrando
-      RAILS_ENV: development
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    user: "${UID:-1000}:${GID:-1000}"
     tty: true
     stdin_open: true
 
-  # Service for the MariaDB database
   db:
-    image: mariadb:11.5.2  # Version spécifique pour plus de stabilité
-    ports:
-      - "3307:3306"
+    image: mariadb:11.5.2
     volumes:
       - mariadb_data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: progrando
-      MYSQL_USER: progrando  # Optionnel: utilisateur dédié
-      MYSQL_PASSWORD: password  # Optionnel: mot de passe utilisateur
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-password}
+      - MYSQL_DATABASE=${DB_NAME:-progrando_${RAILS_ENV:-development}}
+      - MYSQL_USER=${DB_USER:-progrando}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-password}
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}"]
+      interval: 10s
       timeout: 5s
       retries: 5
 
