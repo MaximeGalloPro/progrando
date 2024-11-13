@@ -109,7 +109,9 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import 'chart';
+
     // Variable globale pour stocker les instances de graphiques
     let charts = {
         monthly: null,
@@ -183,7 +185,7 @@
             charts.guides = new Chart(guidesChartEl, {
                 type: 'bar',
                 data: {
-                    labels: <%= raw @stats[:guide_stats].keys %>,
+                    labels: <%= raw @stats[:guide_stats].keys.reject(&:blank?) %>,
                     datasets: [{
                         label: 'Randonnées guidées',
                         data: <%= raw @stats[:guide_stats].values %>,
