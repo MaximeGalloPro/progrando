@@ -16,6 +16,7 @@ WORKDIR /app
 RUN mkdir -p /usr/local/bundle && \
     chmod -R 777 /usr/local/bundle
 
+
 # Copie et installation des gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install

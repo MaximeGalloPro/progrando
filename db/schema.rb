@@ -11,7 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2024_11_09_212140) do
-  create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
     t.string "day_type"
@@ -32,7 +32,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_09_212140) do
     t.index ["hiking_date", "hike_number"], name: "index_hike_histories_on_hiking_date_and_hike_number", unique: true
   end
 
-  create_table "hikes", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "hikes", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.integer "number", null: false
     t.integer "day", null: false
     t.integer "difficulty"
@@ -42,7 +42,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_09_212140) do
     t.decimal "distance_km", precision: 5, scale: 2
     t.integer "elevation_gain"
     t.string "openrunner_ref"
-    t.date "last_schedule"
     t.string "openrunner_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
