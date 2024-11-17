@@ -43,11 +43,15 @@ services:
       - MYSQL_USER=${DB_USER:-progrando}
       - MYSQL_PASSWORD=${DB_PASSWORD:-password}
     restart: unless-stopped
+    command: bash -c "apt-get update && apt-get install -y mariadb-client && docker-entrypoint.sh mysqld"
     healthcheck:
-      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}", "-e", "SELECT 1;"]
+      test: [ "CMD", "/usr/bin/mariadb", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}", "-e", "SELECT 1;" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+
+
 
 volumes:
   mariadb_data:
