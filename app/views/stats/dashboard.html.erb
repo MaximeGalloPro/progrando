@@ -110,7 +110,16 @@
 </div>
 
 <script type="module">
-    import 'chart';
+    const DEBUG = true;
+    function log(message, data = null) {
+        if (DEBUG) {
+            if (data) {
+                console.log(`[Dashboard Debug] ${message}:`, data);
+            } else {
+                console.log(`[Dashboard Debug] ${message}`);
+            }
+        }
+    }
 
     // Variable globale pour stocker les instances de graphiques
     let charts = {
@@ -120,21 +129,31 @@
 
     // Fonction pour nettoyer les graphiques existants
     function cleanupCharts() {
+        log('Cleaning up charts...');
+        log('Current charts state:', charts);
+
         if (charts.monthly instanceof Chart) {
+            log('Destroying monthly chart');
             charts.monthly.destroy();
             charts.monthly = null;
         }
         if (charts.guides instanceof Chart) {
+            log('Destroying guides chart');
             charts.guides.destroy();
             charts.guides = null;
         }
+
+        log('Charts cleanup completed');
     }
 
     // Fonction pour initialiser les graphiques
     function initializeCharts() {
+        log('Initializing charts...');
+        log('Chart.js availability:', typeof Chart !== 'undefined');
+
         // S'assurer que Chart.js est chargé
         if (typeof Chart === 'undefined') {
-            console.error('Chart.js not loaded');
+            console.error('Chart.js not loaded - abandoning initialization');
             return;
         }
 
@@ -164,53 +183,99 @@
         const monthlyChartEl = document.getElementById('monthlyChart');
         const guidesChartEl = document.getElementById('guidesChart');
 
+        log('Canvas elements found:', {
+            monthlyChart: !!monthlyChartEl,
+            guidesChart: !!guidesChartEl
+        });
+
         if (monthlyChartEl) {
-            charts.monthly = new Chart(monthlyChartEl, {
-                type: 'line',
-                data: {
-                    labels: <%= raw @stats[:monthly_stats].keys %>,
-                    datasets: [{
-                        label: 'Nombre de randonnées',
-                        data: <%= raw @stats[:monthly_stats].values %>,
-                        borderColor: '#0d6efd',
-                        tension: 0.1,
-                        fill: false
-                    }]
-                },
-                options: commonOptions
+            log('Creating monthly chart with data:', {
+                labels: <%= raw @stats[:monthly_stats].keys %>,
+                values: <%= raw @stats[:monthly_stats].values %>
             });
+
+            try {
+                charts.monthly = new Chart(monthlyChartEl, {
+                    type: 'line',
+                    data: {
+                        labels: <%= raw @stats[:monthly_stats].keys %>,
+                        datasets: [{
+                            label: 'Nombre de randonnées',
+                            data: <%= raw @stats[:monthly_stats].values %>,
+                            borderColor: '#0d6efd',
+                            tension: 0.1,
+                            fill: false
+                        }]
+                    },
+                    options: commonOptions
+                });
+                log('Monthly chart created successfully');
+            } catch (error) {
+                console.error('Error creating monthly chart:', error);
+            }
         }
 
         if (guidesChartEl) {
-            charts.guides = new Chart(guidesChartEl, {
-                type: 'bar',
-                data: {
-                    labels: <%= raw @stats[:guide_stats].keys.reject(&:blank?) %>,
-                    datasets: [{
-                        label: 'Randonnées guidées',
-                        data: <%= raw @stats[:guide_stats].values %>,
-                        backgroundColor: '#0d6efd'
-                    }]
-                },
-                options: commonOptions
+            log('Creating guides chart with data:', {
+                labels: <%= raw @stats[:guide_stats].keys.reject(&:blank?) %>,
+                values: <%= raw @stats[:guide_stats].values %>
             });
+
+            try {
+                charts.guides = new Chart(guidesChartEl, {
+                    type: 'bar',
+                    data: {
+                        labels: <%= raw @stats[:guide_stats].keys.reject(&:blank?) %>,
+                        datasets: [{
+                            label: 'Randonnées guidées',
+                            data: <%= raw @stats[:guide_stats].values %>,
+                            backgroundColor: '#0d6efd'
+                        }]
+                    },
+                    options: commonOptions
+                });
+                log('Guides chart created successfully');
+            } catch (error) {
+                console.error('Error creating guides chart:', error);
+            }
         }
+
+        log('Charts initialization completed');
     }
 
-    // Gestionnaire d'événements pour Turbo et chargement initial
+    // Fonction pour s'assurer que le code est exécuté après chaque navigation Turbo
     function setupCharts() {
-        // Attendre que Chart.js soit chargé
-        if (typeof Chart === 'undefined') {
-            setTimeout(setupCharts, 100);
-            return;
-        }
+        log('Setting up charts...');
+        log('Chart.js availability:', typeof Chart !== 'undefined');
         initializeCharts();
     }
 
-    // Nettoyage avant la navigation Turbo
-    document.addEventListener('turbo:before-render', cleanupCharts);
+    // Utilisation d'une fonction d'initialisation globale
+    window.initDashboardCharts = function() {
+        log('Global initialization called');
+        setupCharts();
+    };
 
-    // Initialisation après chargement de la page
-    document.addEventListener('turbo:load', setupCharts);
-    document.addEventListener('DOMContentLoaded', setupCharts);
+    // Écouteurs d'événements pour Turbo
+    document.addEventListener('turbo:load', () => {
+        log('turbo:load event fired');
+        window.initDashboardCharts();
+    });
+
+    document.addEventListener('turbo:render', () => {
+        log('turbo:render event fired');
+        window.initDashboardCharts();
+    });
+
+    document.addEventListener('turbo:before-render', () => {
+        log('turbo:before-render event fired');
+        cleanupCharts();
+    });
+
+    // Initialisation au chargement initial de la page
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.initDashboardCharts);
+    } else {
+        window.initDashboardCharts();
+    }
 </script>
