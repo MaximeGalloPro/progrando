@@ -44,7 +44,7 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD:-password}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}"]
+      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}", "-e", "SELECT 1;"]
       interval: 10s
       timeout: 5s
       retries: 5
