@@ -1,10 +1,20 @@
 class HikesController < ApplicationController
 
     # app/controllers/hikes_controller.rb
+    # app/controllers/hikes_controller.rb
     def refresh_from_openrunner
         @hike = Hike.find(params[:id])
         UpdateHikeFromOpenrunnerJob.perform_later(@hike)
-        redirect_to hikes_path, notice: "Mise à jour des données depuis OpenRunner en cours..."
+
+        # Redirection avec les paramètres de recherche
+        redirect_back_options = { notice: "Mise à jour des données depuis OpenRunner en cours..." }
+
+        # Si on a un paramètre de recherche, on le conserve
+        if params[:search].present?
+            redirect_back_options[:search] = params[:search]
+        end
+
+        redirect_to hikes_path(redirect_back_options), status: :see_other
     end
 
     def index

@@ -1,3 +1,6 @@
+<% content_for :head do %>
+    <meta name="turbo-visit-control" content="reload">
+<% end %>
 <div class="container py-4">
     <%= link_to "Statistiques", stats_dashboard_path, class: "btn btn-primary mb-4 d-inline-block"  %>
     <%= link_to "Ajouter une randonnée à l'historique",
@@ -70,11 +73,18 @@
                                     <i class="fas fa-history"></i>
                                 <% end %>
 
-                                <%= button_to refresh_from_openrunner_hike_path(hike),
-                                              class: "btn btn-outline-dark btn-sm",
-                                              title: "Rafraîchir les données depuis OpenRunner",
-                                              data: { turbo_confirm: "Voulez-vous mettre à jour les données depuis OpenRunner ?" } do %>
-                                    <i class="fas fa-sync-alt"></i>
+                                <% if hike.updating? %>
+                                    <button class="btn btn-outline-dark btn-sm" disabled>
+                                        <i class="fas fa-sync-alt fa-spin"></i>
+                                    </button>
+                                <% else %>
+                                    <%= button_to refresh_from_openrunner_hike_path(hike),
+                                                  class: "btn btn-outline-dark btn-sm",
+                                                  title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
+                                                  data: { turbo: false },
+                                                  params: { search: params[:search] } do %>
+                                        <i class="fas fa-sync-alt"></i>
+                                    <% end %>
                                 <% end %>
                             </div>
                         </td>

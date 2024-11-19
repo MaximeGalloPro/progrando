@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_19_203517) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_19_214548) do
   create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
@@ -48,6 +48,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_19_203517) do
     t.integer "elevation_loss"
     t.integer "altitude_min"
     t.integer "altitude_max"
+    t.boolean "updating", default: false
+    t.datetime "last_update_attempt"
     t.index ["number"], name: "index_hikes_on_number", unique: true
   end
 

@@ -12,6 +12,7 @@ class UpdateHikeFromOpenrunnerJob < ApplicationJob
         Capybara.app_host = 'https://www.openrunner.com'
 
         browser = Capybara::Session.new(:selenium_headless)
+        hike.update(updating: true)
 
         begin
             puts "🔗 Mise à jour de la randonnée #{hike.trail_name}"
@@ -56,10 +57,19 @@ class UpdateHikeFromOpenrunnerJob < ApplicationJob
             end
 
             if updates.any?
+                updates[:last_update_attempt] = Time.current
+                updates[:updating] = false
                 hike.update(updates)
                 puts "✅ Mise à jour réussie avec: #{updates}"
+            else
+                hike.update(updating: false, last_update_attempt: Time.current)
+                puts "⚠️ Aucune donnée trouvée"
             end
 
+        rescue StandardError => e
+            puts "❌ Erreur lors de la mise à jour: #{e.message}"
+            hike.update(updating: false, last_update_attempt: Time.current)
+            raise e
         ensure
             browser.quit
         end
