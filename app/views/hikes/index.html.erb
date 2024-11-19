@@ -2,7 +2,7 @@
     <meta name="turbo-visit-control" content="reload">
 <% end %>
 <div class="container py-4">
-    <%= link_to "Statistiques", stats_dashboard_path, class: "btn btn-primary mb-4 d-inline-block"  %>
+    <%= link_to "Statistiques", stats_dashboard_path, class: "btn btn-primary mb-4 d-inline-block", data: {turbo: false}  %>
     <%= link_to "Ajouter une randonnée à l'historique",
                 new_hike_history_path,
                 class: "btn btn-primary mb-4 d-inline-block" %>
