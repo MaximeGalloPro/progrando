@@ -9,20 +9,9 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%# Multiples sources pour Font Awesome %>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">-->
+<!--    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
-
-    <%# Ajout d'un test visuel %>
-    <script>
-        window.addEventListener('load', function() {
-            console.log('Test Font Awesome loading:');
-            const testIcon = document.createElement('i');
-            testIcon.className = 'fas fa-sync-alt fa-spin';
-            console.log('Icon classes:', testIcon.className);
-            console.log('Icon computed style:', window.getComputedStyle(testIcon).fontFamily);
-        });
-    </script>
 </head>
 
 <body>
