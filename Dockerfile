@@ -7,7 +7,9 @@ RUN apt-get update -qq && \
                        nodejs \
                        default-libmysqlclient-dev \
                        git \
-                       curl
+                       curl && \
+    apt-get update && apt-get install -y chromium chromium-driver
+
 
 # Création du répertoire de l'application
 WORKDIR /app
