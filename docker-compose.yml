@@ -15,11 +15,14 @@ services:
       - DATABASE_URL=mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}
       - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES:-false}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_key}
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - .:/app
       - tmp_data:/app/tmp
     depends_on:
       db:
+        condition: service_started
+      redis:
         condition: service_started
     restart: unless-stopped
     healthcheck:
@@ -30,6 +33,39 @@ services:
     user: root
     tty: true
     stdin_open: true
+
+  sidekiq:
+    build: .
+    command: bundle exec sidekiq
+    environment:
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - DATABASE_URL=mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_key}
+    volumes:
+      - .:/app
+      - tmp_data:/app/tmp
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    user: root
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep '[s]idekiq'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   db:
     image: mariadb:11.5.2
@@ -59,3 +95,4 @@ services:
 volumes:
   mariadb_data:
   tmp_data:
+  redis_data:
