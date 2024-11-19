@@ -3,42 +3,87 @@ require 'date'
 
 namespace :hike_histories do
     desc 'Import hike histories from CSV file'
-    task import_histories: :environment do
+    task import: :environment do
         log_file = Rails.root.join('log', 'hike_histories_import.log')
         csv_file = Rails.root.join('lib', 'data', 'progrando_progs.csv')
 
         FRENCH_MONTHS = {
             'janvier' => 1,
-            'février' => 2,
             'fevrier' => 2,
+            'février' => 2,
             'mars' => 3,
             'avril' => 4,
             'mai' => 5,
             'juin' => 6,
             'juillet' => 7,
-            'août' => 8,
             'aout' => 8,
+            'août' => 8,
             'septembre' => 9,
             'octobre' => 10,
             'novembre' => 11,
-            'décembre' => 12,
-            'decembre' => 12
-        }
+            'decembre' => 12,
+            'décembre' => 12
+        }.freeze
+
+        def normalize_string(str)
+            # Convertir en minuscules et retirer les accents
+            str = str.to_s.downcase
+            {
+                'é' => 'e', 'è' => 'e', 'ê' => 'e',
+                'à' => 'a', 'â' => 'a',
+                'ï' => 'i', 'î' => 'i',
+                'û' => 'u', 'ù' => 'u',
+                'ô' => 'o',
+                'ç' => 'c'
+            }.each do |accent, sans_accent|
+                str = str.gsub(accent, sans_accent)
+            end
+            str
+        end
 
         def parse_date(date_value)
             return nil if date_value.blank?
-
-            # Si c'est déjà un objet Date, le retourner directement
             return date_value if date_value.is_a?(Date)
 
-            # Si c'est une string, tenter la conversion
             begin
+                # Regex modifiée pour accepter les caractères accentués
+                if date_value =~ /([[:alpha:]]+),\s+([[:alpha:]]+)\s+(\d{2}),\s+(\d{4})/
+                    month_name = normalize_string($2)
+                    day = $3.to_i
+                    year = $4.to_i
+
+                    # Debug
+                    puts "Original date: #{date_value}"
+                    puts "Normalized month: #{month_name}"
+                    puts "Month number: #{FRENCH_MONTHS[month_name]}"
+                    puts "Day: #{day}"
+                    puts "Year: #{year}"
+
+                    # Convert French month name to number
+                    month = FRENCH_MONTHS[month_name]
+
+                    if month
+                        begin
+                            return Date.new(year, month, day)
+                        rescue ArgumentError => e
+                            puts "Error creating date object: #{e.message}"
+                            nil
+                        end
+                    else
+                        puts "Month not found in dictionary: #{month_name}"
+                    end
+                else
+                    puts "Date format doesn't match pattern: #{date_value}"
+                end
+
+                # Fallback to default parsing
                 Date.parse(date_value.to_s)
             rescue ArgumentError, TypeError => e
-                puts "Error parsing date '#{date_value}': #{e.message}" # Debug
+                puts "Error parsing date '#{date_value}': #{e.message}"
                 nil
             end
         end
+
 
         def clean_number(str)
             return nil if str.blank?

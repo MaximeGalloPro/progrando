@@ -222,6 +222,7 @@ DEPENDENCIES
   byebug
   capybara
   debug
+  i18n
   importmap-rails
   jbuilder
   mysql2
