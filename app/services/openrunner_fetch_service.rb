@@ -57,7 +57,30 @@ class OpenrunnerFetchService
 
         result = {}
 
-        # Liste des éléments à récupérer
+        # Récupération du titre de la randonnée
+        puts "\n🔍 Fetching trail name..."
+        begin
+            trail_name = @browser.find('h1.text-route-detail-header').text.strip
+            result[:trail_name] = trail_name
+            puts "✅ Found trail name: #{trail_name}"
+        rescue Capybara::ElementNotFound => e
+            puts "⚠️ Could not find trail name: #{e.message}"
+        end
+
+        # Récupération du point de départ
+        puts "\n🔍 Fetching starting point..."
+        begin
+            location_element = @browser.all('.text-nav.font-semibold span.truncate').first
+            if location_element
+                starting_point = location_element.text.strip
+                result[:starting_point] = starting_point
+                puts "✅ Found starting point: #{starting_point}"
+            end
+        rescue Capybara::ElementNotFound => e
+            puts "⚠️ Could not find starting point: #{e.message}"
+        end
+
+        # Autres éléments techniques (existants)
         elements_to_fetch = {
             distance_km: ['Distance', :to_f],
             elevation_gain: ['Dénivelé +', :to_i],
@@ -66,7 +89,7 @@ class OpenrunnerFetchService
             altitude_max: ['Altitude max.', :to_i]
         }
 
-        puts "\n🔍 Starting to fetch elements..."
+        puts "\n🔍 Starting to fetch technical elements..."
         elements_to_fetch.each do |key, (text, conversion)|
             puts "\n👉 Fetching #{key}..."
             value = fetch_element(text, conversion)
@@ -78,6 +101,7 @@ class OpenrunnerFetchService
             end
         end
 
+        # Log final results
         puts "\n📊 Final data collected:"
         result.each { |k, v| puts "  #{k}: #{v}" }
 
@@ -115,9 +139,24 @@ class OpenrunnerFetchService
         puts "\n📄 Current page content:"
         puts "URL: #{@browser.current_url}"
         puts "Title: #{@browser.title}"
-        puts "Body text preview: #{@browser.text[0..200]}..."
-        puts "\n📄 Page source preview:"
-        puts @browser.html[0..500]
+
+        puts "\n📄 Important elements found:"
+        begin
+            title = @browser.find('h1.text-route-detail-header')&.text
+            puts "Title: #{title}"
+        rescue
+            puts "Title not found"
+        end
+
+        begin
+            locations = @browser.all('.text-nav.font-semibold span.truncate').map(&:text)
+            puts "Locations found: #{locations.join(' -> ')}"
+        rescue
+            puts "Locations not found"
+        end
+
+        puts "\n📄 Full HTML preview:"
+        puts @browser.html[0..1000]
     rescue StandardError => e
         puts "❌ Error while logging page content: #{e.message}"
     end
