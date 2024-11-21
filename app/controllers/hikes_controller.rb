@@ -1,7 +1,9 @@
 class HikesController < ApplicationController
 
-    # app/controllers/hikes_controller.rb
-    # app/controllers/hikes_controller.rb
+    def index
+        @results = fetch_hikes
+    end
+
     def refresh_from_openrunner
         @hike = Hike.find(params[:id])
         UpdateHikeFromOpenrunnerJob.perform_later(@hike)
@@ -17,33 +19,6 @@ class HikesController < ApplicationController
         redirect_to hikes_path(redirect_back_options), status: :see_other
     end
 
-    def index
-        @results = Hike
-                       .joins("LEFT JOIN (
-            SELECT hike_histories.*
-            FROM hike_histories
-            INNER JOIN (
-                SELECT hike_number, MAX(hiking_date) as max_date
-                FROM hike_histories
-                GROUP BY hike_number
-            ) latest
-            ON hike_histories.hike_number = latest.hike_number
-            AND hike_histories.hiking_date = latest.max_date
-        ) last_history ON hikes.number = last_history.hike_number")
-
-        if params[:search].present?
-            search_term = params[:search].strip
-            @results = @results
-                           .where("hikes.trail_name LIKE :search
-                   OR hikes.starting_point LIKE :search
-                   OR CAST(hikes.number AS CHAR) LIKE :search
-                   OR last_history.guide_name LIKE :search",
-                                  search: "%#{search_term}%")
-        end
-
-        @results = @results.order("last_history.hiking_date ASC").distinct
-    end
-
     def new
         @hike = Hike.new
     end
@@ -57,6 +32,17 @@ class HikesController < ApplicationController
         end
     end
 
+    def fetch_openrunner_details
+        details = OpenrunnerFetchService.fetch_details(params[:openrunner_ref])
+
+        if details[:error]
+            render json: { error: details[:error] }, status: :unprocessable_entity
+        else
+            render json: details
+        end
+    end
+
+
     private
 
     def hike_params
@@ -69,8 +55,23 @@ class HikesController < ApplicationController
             :carpooling_cost,
             :distance_km,
             :elevation_gain,
+            :elevation_loss,
+            :altitude_min,
+            :altitude_max,
             :openrunner_ref,
             :last_schedule
         )
+    end
+
+    def fetch_hikes
+        Hike.with_latest_history
+            .then { |scope| apply_search(scope) }
+            .order_by_latest_date
+            .distinct
+            .includes(:hike_histories)
+    end
+
+    def apply_search(scope)
+        params[:search].present? ? scope.search_by_term(params[:search]) : scope
     end
 end

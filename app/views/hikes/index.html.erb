@@ -48,7 +48,6 @@
                 <tbody>
                 <% @results.each do |hike| %>
                     <tr>
-                        <% last_hike = HikeHistory.where(hike_number: hike.number)&.last %>
                         <td><%= hike.trail_name %></td>
                         <td><%= hike.starting_point %></td>
                         <td><%= hike.distance_km %></td>
@@ -56,8 +55,8 @@
                         <td><%= hike.elevation_loss %></td>
                         <td><%= hike.altitude_min %></td>
                         <td><%= hike.altitude_max %></td>
-                        <td><%= last_hike&.hiking_date&.strftime("%d/%m/%Y") %></td>
-                        <td><%= last_hike&.guide_name %></td>
+                        <td><%= hike.last_hiking_date&.strftime("%d/%m/%Y") %></td>
+                        <td><%= hike.last_guide_name %></td>
                         <td class="text-nowrap">
                             <div class="btn-group">
                                 <%= link_to hike.openrunner_url,

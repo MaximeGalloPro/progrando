@@ -26,8 +26,8 @@ services:
         condition: service_started
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/hikes"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 60s
       timeout: 10s
       retries: 3
     user: root
@@ -52,7 +52,7 @@ services:
     user: root
     healthcheck:
       test: ["CMD-SHELL", "ps aux | grep '[s]idekiq'"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
 
@@ -87,7 +87,7 @@ services:
       "
     healthcheck:
       test: [ "CMD", "/usr/bin/mariadb", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}", "-e", "SELECT 1;" ]
-      interval: 10s
+      interval: 60s
       timeout: 5s
       retries: 5
       start_period: 30s
