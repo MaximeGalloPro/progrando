@@ -23,6 +23,19 @@ class HikesController < ApplicationController
         @hike = Hike.new
     end
 
+    def edit
+        @hike = Hike.find(params[:id])
+    end
+
+    def update
+        @hike = Hike.find(params[:id])
+        if @hike.update(hike_params)
+            redirect_to hikes_path, notice: 'Parcours mis à jour avec succès.'
+        else
+            render :edit, status: :unprocessable_entity
+        end
+    end
+
     def create
         @hike = Hike.new(hike_params)
         if @hike.save
@@ -42,6 +55,12 @@ class HikesController < ApplicationController
         end
     end
 
+    def destroy
+        @hike = Hike.find(params[:id])
+        @hike.destroy
+        redirect_to hikes_path, notice: 'Parcours supprimé avec succès.'
+    end
+
 
     private
 
@@ -59,7 +78,6 @@ class HikesController < ApplicationController
             :altitude_min,
             :altitude_max,
             :openrunner_ref,
-            :last_schedule
         )
     end
 

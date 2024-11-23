@@ -84,7 +84,6 @@ namespace :hike_histories do
             end
         end
 
-
         def clean_number(str)
             return nil if str.blank?
             str.gsub(',', '.').strip
@@ -131,26 +130,21 @@ namespace :hike_histories do
 
                         # Clean numbers
                         carpooling_cost = convert_num(row['* C.V.'])
-                        distance_km = convert_num(row['Kl'])
-                        elevation_gain = convert_num(row['➚m'])
 
+                        guide = Guide.find_or_initialize_by(phone: row['Tel.']&.strip)
+
+                        guide.assign_attributes(name: row['Animateur']&.strip)
+                        guide.save(validate: false)
                         history = HikeHistory.find_or_initialize_by(
                             hiking_date: parse_date(hiking_date),
-                            hike_number: row['N°']
-                        )
+                            openrunner_ref: convert_num(row['Ref']&.strip))
 
                         history.assign_attributes(
                             departure_time: row['Depart']&.strip,
                             day_type: row['Journee']&.strip,
-                            difficulty: row['Dif.'],
-                            starting_point: row['Depart de la randonnee']&.strip,
-                            trail_name: row['Parcours']&.strip,
                             carpooling_cost: carpooling_cost,
-                            distance_km: distance_km,
-                            elevation_gain: elevation_gain,
-                            guide_name: row['Animateur']&.strip,
-                            guide_phone: row['Tel.']&.strip,
-                            openrunner_ref: row['Ref']&.strip
+                            guide_id: guide&.id,
+                            hike_number: convert_num(row['N°'])
                         )
 
                         if history.save(validate: false)

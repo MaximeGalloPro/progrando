@@ -11,13 +11,18 @@ class StatsController < ApplicationController
             # Données pour les graphiques
             monthly_stats: fetch_monthly_stats,
             guide_stats: fetch_guide_stats,
-
-            # Données pour le tableau
-            recent_hikes: fetch_recent_hikes
         }
+        @last_hikes = fetch_last_hikes
     end
 
     private
+    def fetch_last_hikes
+        Hike.with_latest_history
+            .where('last_history.hiking_date < ?', Date.current)  # Utilise < au lieu de <=
+            .order('last_history.hiking_date DESC')
+            .limit(10)
+    end
+
 
     def fetch_total_hikes
         Hike.joins(<<~SQL)
@@ -83,9 +88,8 @@ class StatsController < ApplicationController
       ) last_history ON hikes.number = last_history.hike_number
     SQL
             .where('last_history.hiking_date >= ?', Date.current.beginning_of_month)
-            .select('last_history.guide_name')
             .distinct
-            .count('last_history.guide_name')
+            .count
     end
 
     def fetch_monthly_stats
@@ -118,28 +122,17 @@ class StatsController < ApplicationController
     end
 
     def fetch_guide_stats
-        Hike.joins(<<~SQL)
-      LEFT JOIN (
-        SELECT hh.*
-        FROM hike_histories hh
-        INNER JOIN (
-          SELECT hike_number, MAX(hiking_date) as latest_date
-          FROM hike_histories
-          GROUP BY hike_number
-        ) latest ON hh.hike_number = latest.hike_number
-        AND hh.hiking_date = latest.latest_date
-      ) last_history ON hikes.number = last_history.hike_number
-    SQL
-            .where('last_history.guide_name IS NOT NULL')
-            .where('last_history.hiking_date >= ?', 1.year.ago)
-            .group('last_history.guide_name')
-            .order('count_all DESC')
-            .limit(10)
-            .count
+        HikeHistory.joins(:guide)
+                   .where('hiking_date >= ?', 1.year.ago)
+                   .where.not(guides: { name: nil })
+                   .group('guides.name')
+                   .order('count_all DESC')
+                   .limit(10)
+                   .count
     end
 
     def fetch_recent_hikes
-        Hike.select('hikes.trail_name, hikes.distance_km, hikes.elevation_gain, hh.hiking_date, hh.guide_name')
+        Hike.select('hikes.trail_name, hikes.distance_km, hikes.elevation_gain, hh.hiking_date')
             .joins(<<~SQL)
       INNER JOIN hike_histories hh ON hikes.number = hh.hike_number
     SQL

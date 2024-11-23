@@ -2,14 +2,16 @@
     <meta name="turbo-visit-control" content="reload">
 <% end %>
 <div class="container py-4">
-    <%= link_to "Statistiques", stats_dashboard_path, class: "btn btn-primary mb-4 d-inline-block", data: {turbo: false}  %>
-    <%= link_to "Ajouter une randonnée à l'historique",
+    <%= link_to "Ajouter une randonnée passée",
                 new_hike_history_path,
-                class: "btn btn-primary mb-4 d-inline-block" %>
+                class: "btn btn-outline-primary mb-4 d-inline-block" %>
+    <%= link_to "Ajouter une randonnée à venir",
+                new_hike_history_path,
+                class: "btn btn-outline-primary mb-4 d-inline-block" %>
 
     <%= link_to "Ajouter un nouveau parcours",
                 new_hike_path,
-                class: "btn btn-primary mb-4 d-inline-block", style: "float: right" %>
+                class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right" %>
 
     <%= form_with url: hikes_path, method: :get, local: true, class: "mb-4" do |f| %>
         <div class="row g-3">
@@ -28,72 +30,6 @@
         </div>
     <% end %>
 
-    <% if @results.any? %>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-light">
-                <tr>
-                    <th scope="col">Randonnée</th>
-                    <th scope="col">Point de départ</th>
-                    <th scope="col">Distance (km)</th>
-                    <th scope="col">D+ (m)</th>
-                    <th scope="col">D- (m)</th>
-                    <th scope="col">Alt min (m)</th>
-                    <th scope="col">Alt max (m)</th>
-                    <th scope="col">Dernière date</th>
-                    <th scope="col">Dernier guide</th>
-                    <th scope="col">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <% @results.each do |hike| %>
-                    <tr>
-                        <td><%= hike.trail_name %></td>
-                        <td><%= hike.starting_point %></td>
-                        <td><%= hike.distance_km %></td>
-                        <td><%= hike.elevation_gain %></td>
-                        <td><%= hike.elevation_loss %></td>
-                        <td><%= hike.altitude_min %></td>
-                        <td><%= hike.altitude_max %></td>
-                        <td><%= hike.last_hiking_date&.strftime("%d/%m/%Y") %></td>
-                        <td><%= hike.last_guide_name %></td>
-                        <td class="text-nowrap">
-                            <div class="btn-group">
-                                <%= link_to hike.openrunner_url,
-                                            class: "btn btn-outline-dark btn-sm",
-                                            target: "_blank",
-                                            title: "Voir sur OpenRunner" do %>
-                                    <i class="fas fa-mountain"></i>
-                                <% end %>
+    <%= render partial: "list" %>
 
-                                <%= link_to hike_histories_path(hike_number: hike.number),
-                                            class: "btn btn-outline-dark btn-sm",
-                                            title: "Voir l'historique" do %>
-                                    <i class="fas fa-history"></i>
-                                <% end %>
-                                <% if hike.updating? %>
-                                    <button class="btn btn-outline-dark btn-sm" disabled>
-                                        <i class="fas fa-sync-alt fa-spin"></i>
-                                    </button>
-                                <% else %>
-                                    <%= button_to refresh_from_openrunner_hike_path(hike),
-                                                  class: "btn btn-outline-dark btn-sm",
-                                                  title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
-                                                  data: { turbo: false },
-                                                  params: { search: params[:search] } do %>
-                                        <i class="fas fa-sync-alt"></i>
-                                    <% end %>
-                                <% end %>
-                            </div>
-                        </td>
-                    </tr>
-                <% end %>
-                </tbody>
-            </table>
-        </div>
-    <% elsif params[:trail_name].present? || params[:starting_point].present? %>
-        <div class="alert alert-info" role="alert">
-            Aucun résultat trouvé pour votre recherche
-        </div>
-    <% end %>
 </div>

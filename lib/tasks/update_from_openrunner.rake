@@ -26,12 +26,11 @@ namespace :hikes do
             puts "\n✨ Traitement de la randonnée #{index}/#{total_hikes}: #{hike.trail_name}"
 
             begin
-                puts "🔗 Visite de #{hike.openrunner_url}"
-                browser.visit(hike.openrunner_url)
+                puts "🔗 Visite de https://www.openrunner.com/route-details/#{hike.openrunner_ref}"
+                browser.visit("https://www.openrunner.com/route-details/#{hike.openrunner_ref}")
 
                 # Attendre que les données soient chargées
                 sleep 5
-
                 puts "🔍 Recherche des données..."
 
                 # Extraction de toutes les données

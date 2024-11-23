@@ -9,8 +9,6 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%# Multiples sources pour Font Awesome %>
-<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">-->
-<!--    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 </head>
 
@@ -21,6 +19,76 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <% end %>
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm mb-4">
+    <div class="container">
+    <span class="navbar-brand fw-bold text-primary">
+      <i class="fas fa-mountain"></i> Randonnées
+    </span>
+        <div class="d-flex gap-3">
+            <%= link_to stats_dashboard_path,
+                        class: "btn #{current_page?(stats_dashboard_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
+                <i class="fas fa-chart-line"></i> Dashboard
+            <% end %>
+            <%= link_to hikes_path,
+                        class: "btn #{current_page?(hikes_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
+                <i class="fas fa-hiking"></i> Liste des randonnées
+            <% end %>
+        </div>
+    </div>
+</nav>
+<div class="container py-2">
+    <% todays_hike = Hike.todays_hike %>
+    <div class="card">
+        <div class="card-body p-2">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-calendar-day text-primary"></i>
+                <strong>Randonnée du jour</strong>
+                <% if todays_hike %>
+                    <% if todays_hike.difficulty_text.present? %>
+                        <span class="badge bg-primary ms-2"><%= todays_hike.difficulty_text %></span>
+                    <% end %>
+
+                    <% if todays_hike.starting_point.present? %>
+                        <i class="fas fa-map-marker-alt text-muted ms-2"></i>
+                        <span><%= todays_hike.starting_point %></span>
+                    <% end %>
+
+                    <% if todays_hike.departure_time.present? %>
+                        <i class="fas fa-clock text-muted ms-2"></i>
+                        <span><%= todays_hike.departure_time %></span>
+                    <% end %>
+
+                    <% if todays_hike.guide_name.present? %>
+                        <i class="fas fa-user text-muted ms-2"></i>
+                        <span><%= todays_hike.guide_name %></span>
+                    <% end %>
+
+                    <% if todays_hike.distance_km.present? %>
+                        <i class="fas fa-route text-muted ms-2"></i>
+                        <span><%= todays_hike.distance_km %> km</span>
+                    <% end %>
+
+                    <% if todays_hike.elevation_gain.present? %>
+                        <i class="fas fa-mountain text-muted ms-2"></i>
+                        <span><%= todays_hike.elevation_gain %>m D+</span>
+                    <% end %>
+
+                    <% if todays_hike.openrunner_ref.present? && todays_hike.openrunner_ref != "0" %>
+                        <%= link_to "https://www.openrunner.com/route-details/#{todays_hike.openrunner_ref}",
+                                    class: "btn btn-sm btn-outline-primary py-0 ms-auto",
+                                    target: "_blank" do %>
+                            <i class="fas fa-map"></i> OpenRunner
+                        <% end %>
+                    <% end %>
+                <% else %>
+                    <span class="text-muted">
+                        <i class="fas fa-info-circle"></i> Pas de randonnée programmée aujourd'hui
+                    </span>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>
 <%= yield %>
 </body>
 </html>

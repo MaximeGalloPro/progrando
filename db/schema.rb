@@ -10,22 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_19_214548) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_23_162100) do
+  create_table "guides", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "phone", null: false
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
     t.string "day_type"
-    t.integer "difficulty"
-    t.string "starting_point"
-    t.string "trail_name"
     t.decimal "carpooling_cost", precision: 5, scale: 2
-    t.decimal "distance_km", precision: 5, scale: 2
-    t.integer "elevation_gain"
-    t.string "guide_name"
-    t.string "guide_phone"
+    t.integer "guide_id"
     t.integer "hike_number"
     t.string "openrunner_ref"
-    t.string "openrunner_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["hike_number"], name: "index_hike_histories_on_hike_number"
@@ -42,7 +43,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_19_214548) do
     t.decimal "distance_km", precision: 5, scale: 2
     t.integer "elevation_gain"
     t.string "openrunner_ref"
-    t.string "openrunner_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "elevation_loss"

@@ -16,7 +16,7 @@ class UpdateHikeFromOpenrunnerJob < ApplicationJob
 
         begin
             puts "🔗 Mise à jour de la randonnée #{hike.trail_name}"
-            browser.visit(hike.openrunner_url)
+            browser.visit("https://www.openrunner.com/route-details/#{hike.openrunner_ref}")
             sleep 5
 
             updates = {}
