@@ -69,12 +69,15 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <%= f.label :departure_time, "Heure de départ", class: "form-label required" %>
-                <% begin %>
-                    <%= f.time_field :departure_time,
-                                     class: "form-control #{'is-invalid' if @hike_history.errors[:departure_time].any?}",
-                                     value: @hike_history.departure_time.present? ? @hike_history.departure_time&.strftime("%H:%M") : Time.now %>
-                <% rescue %>
-                <% end %>
+                <%= f.time_field :departure_time,
+                                 class: "form-control #{'is-invalid' if @hike_history.errors[:departure_time].any?}",
+                                 value: begin
+                                            @hike_history.departure_time.present? ?
+                                                @hike_history.departure_time.strftime("%H:%M") :
+                                                Time.current.strftime("%H:%M")
+                                        rescue
+                                            Time.current.strftime("%H:%M")
+                                        end %>
                 <% if @hike_history.errors[:departure_time].any? %>
                     <div class="invalid-feedback">
                         <%= @hike_history.errors[:departure_time]&.join(', ') %>
@@ -82,7 +85,7 @@
                 <% end %>
             </div>
         </div>
-
+        
         <div class="col-md-6">
             <div class="mb-3">
                 <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label required" %>

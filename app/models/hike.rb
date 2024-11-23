@@ -108,11 +108,22 @@ class Hike < ApplicationRecord
 
     # app/models/hike.rb
     # Ajoutez cette méthode de classe
+    # app/models/hike.rb
     def self.todays_hike
+        today_hike = joins(:hike_histories)
+                         .where('hike_histories.hiking_date = ?', Date.current)
+                         .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, guides.name as guide_name')
+                         .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
+                         .first
+
+        return today_hike if today_hike.present?
+
+        # Si pas de randonnée aujourd'hui, on cherche la prochaine
         joins(:hike_histories)
-            .where('hike_histories.hiking_date = ?', Date.current)
+            .where('hike_histories.hiking_date > ?', Date.current)
             .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, guides.name as guide_name')
             .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
+            .order('hike_histories.hiking_date ASC')
             .first
     end
 end

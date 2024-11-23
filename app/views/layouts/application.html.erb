@@ -42,7 +42,16 @@
         <div class="card-body p-2">
             <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-calendar-day text-primary"></i>
-                <strong>Randonnée du jour</strong>
+                <strong>
+                    <% if todays_hike&.hiking_date == Date.current %>
+                        Randonnée du jour
+                    <% else %>
+                        Prochaine randonnée
+                        <% if todays_hike&.hiking_date.present? %>
+                            (<%= l(todays_hike.hiking_date, format: :long) %>)
+                        <% end %>
+                    <% end %>
+                </strong>
                 <% if todays_hike %>
                     <% if todays_hike.difficulty_text.present? %>
                         <span class="badge bg-primary ms-2"><%= todays_hike.difficulty_text %></span>
@@ -82,7 +91,7 @@
                     <% end %>
                 <% else %>
                     <span class="text-muted">
-                        <i class="fas fa-info-circle"></i> Pas de randonnée programmée aujourd'hui
+                        <i class="fas fa-info-circle"></i> Aucune randonnée programmée
                     </span>
                 <% end %>
             </div>

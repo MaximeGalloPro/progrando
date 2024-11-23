@@ -84,7 +84,7 @@
                                     <i class="fas fa-ban text-danger"></i>
                                 </button>
                             <% else %>
-                                <%= button_to refresh_from_openrunner_hike_path(hike),
+                                <%= button_to refresh_from_openrunner_hike_path(hike, redirect_path: hikes_path),
                                               class: "btn btn-outline-dark btn-sm",
                                               title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
                                               data: { turbo: false },
