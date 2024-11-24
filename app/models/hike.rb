@@ -115,7 +115,11 @@ class Hike < ApplicationRecord
     end
 
     def last_hiking_date
-        self['hiking_date']
+        latest_history&.hiking_date
+    end
+
+    def last_guide_name
+        latest_history&.guide&.name
     end
 
     private
