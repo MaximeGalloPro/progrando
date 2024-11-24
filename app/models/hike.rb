@@ -1,50 +1,58 @@
 class Hike < ApplicationRecord
     # Associations
-    has_many :hike_histories, foreign_key: :hike_number, primary_key: :number
+    has_many :hike_histories, foreign_key: :hike_id
     has_many :guides, through: :hike_histories
+    has_one :latest_history, -> { order(hiking_date: :desc) },
+            class_name: 'HikeHistory',
+            foreign_key: :hike_id
+
+    # Callbacks
+    before_validation :convert_distance_separator
 
     # Validations
-    validates :number, presence: true, uniqueness: true, numericality: { only_integer: true }
     validates :difficulty, presence: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
     validates :starting_point, presence: true
     validates :trail_name, presence: true
-    validates :carpooling_cost,
-              numericality: { only_integer: true, greater_than_or_equal_to: 0 },
-              allow_blank: true
-    validates :distance_km,
-              numericality: { greater_than: 0 },
-              allow_blank: true
-    validates :elevation_gain,
-              numericality: { only_integer: true, greater_than_or_equal_to: 0 },
-              allow_blank: true
-    validates :openrunner_ref, presence: true,
+    validates :openrunner_ref,
+              presence: true,
               numericality: { only_integer: true }
+
 
     # Scopes de base
     scope :ordered_by_trail_name, -> { order(:trail_name) }
     scope :by_difficulty, ->(level) { where(difficulty: level) }
-    scope :recent_first, -> { order(last_schedule: :desc) }
 
-    # Scope pour la jointure avec l'historique le plus récent
-    scope :with_latest_history, -> {
-        select('hikes.*, last_history.hiking_date, last_history.id as last_history_id, guides.name as guide_name')
-            .joins(<<~SQL.squish)
-                LEFT JOIN (
-                  SELECT hh.*
-                  FROM hike_histories hh
-                  INNER JOIN (
-                    SELECT hike_number, MAX(hiking_date) as latest_date
-                    FROM hike_histories
-                    GROUP BY hike_number
-                  ) latest ON hh.hike_number = latest.hike_number
-                  AND hh.hiking_date = latest.latest_date
-                ) last_history ON hikes.number = last_history.hike_number
-                LEFT JOIN guides ON guides.id = last_history.guide_id
-            SQL
+    # Scopes avec latest_history
+    scope :with_latest_history, -> { includes(:latest_history) }
+    scope :order_by_latest_date, -> {
+        joins(:latest_history)
+            .order('hike_histories.hiking_date DESC')
     }
 
+    # Scopes temporels
+    scope :this_year, -> {
+        joins(:latest_history)
+            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_year)
+            .distinct
+    }
+
+    scope :this_month, -> {
+        joins(:latest_history)
+            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_month)
+            .distinct
+    }
+
+    scope :past_hikes, -> {
+        joins(:latest_history)
+            .where('hike_histories.hiking_date < ?', Date.current)
+            .order('hike_histories.hiking_date DESC')
+    }
+
+    # Scope de recherche
     scope :search_by_term, ->(term) {
+        return all if term.blank?
+
         normalized_term = term.strip
         date_pattern = normalized_term.match(/(\d{1,2})\/(\d{4})/)
 
@@ -54,38 +62,47 @@ class Hike < ApplicationRecord
             start_date = Date.new(year, month, 1)
             end_date = start_date.end_of_month
 
-            where("DATE(last_history.hiking_date) BETWEEN ? AND ?", start_date, end_date)
+            joins(:latest_history)
+                .where("hike_histories.hiking_date BETWEEN ? AND ?", start_date, end_date)
         else
             wild_term = "%#{normalized_term}%"
             where(
                 "hikes.trail_name LIKE :term OR
          hikes.starting_point LIKE :term OR
-         CAST(hikes.number AS CHAR) LIKE :term LIKE :term",
+         CAST(hikes.number AS CHAR) LIKE :term",
                 term: wild_term
             )
         end
     }
 
-    # Scope pour l'ordre par date de dernière randonnée
-    scope :order_by_latest_date, -> {
-        order(Arel.sql("CASE WHEN last_history.hiking_date IS NULL THEN 1 ELSE 0 END, last_history.hiking_date ASC"))
-    }
-
-    # Scope pour filtrer par période
-    scope :scheduled_between, ->(start_date, end_date) {
-        where(last_schedule: start_date..end_date)
-    }
-
-    # Scopes pour les statistiques
+    # Scopes statistiques
     scope :with_elevation, -> { where.not(elevation_gain: nil) }
     scope :with_distance, -> { where.not(distance_km: nil) }
     scope :by_difficulty_range, ->(min, max) { where(difficulty: min..max) }
 
-    # Méthodes d'instance
-    # def last_hike
-    #     hike_histories.order(hiking_date: :desc).first
-    # end
+    # Méthodes de classe
+    def self.todays_hike
+        today_query = joins(:hike_histories)
+                          .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, guides.name as guide_name')
+                          .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
 
+        today_hike = today_query
+                         .where('hike_histories.hiking_date = ?', Date.current)
+                         .first
+
+        return today_hike if today_hike.present?
+
+        today_query
+            .where('hike_histories.hiking_date > ?', Date.current)
+            .order('hike_histories.hiking_date ASC')
+            .first
+    end
+
+    def self.total_distance
+        sum(:distance_km)
+    end
+
+    # Méthodes d'instance
     def difficulty_text
         case difficulty
         when 1 then "Facile"
@@ -97,33 +114,14 @@ class Hike < ApplicationRecord
         end
     end
 
-    # Méthodes de classe
-    def self.total_distance
-        sum(:distance_km)
-    end
-
     def last_hiking_date
         self['hiking_date']
     end
 
-    # app/models/hike.rb
-    # Ajoutez cette méthode de classe
-    # app/models/hike.rb
-    def self.todays_hike
-        today_hike = joins(:hike_histories)
-                         .where('hike_histories.hiking_date = ?', Date.current)
-                         .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, guides.name as guide_name')
-                         .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
-                         .first
+    private
 
-        return today_hike if today_hike.present?
-
-        # Si pas de randonnée aujourd'hui, on cherche la prochaine
-        joins(:hike_histories)
-            .where('hike_histories.hiking_date > ?', Date.current)
-            .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, guides.name as guide_name')
-            .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
-            .order('hike_histories.hiking_date ASC')
-            .first
+    def convert_distance_separator
+        self.distance_km = distance_km.to_s.gsub(',', '.') if distance_km.present?
     end
+
 end

@@ -53,11 +53,11 @@ namespace :hike_histories do
                     year = $4.to_i
 
                     # Debug
-                    puts "Original date: #{date_value}"
-                    puts "Normalized month: #{month_name}"
-                    puts "Month number: #{FRENCH_MONTHS[month_name]}"
-                    puts "Day: #{day}"
-                    puts "Year: #{year}"
+                    # puts "Original date: #{date_value}"
+                    # puts "Normalized month: #{month_name}"
+                    # puts "Month number: #{FRENCH_MONTHS[month_name]}"
+                    # puts "Day: #{day}"
+                    # puts "Year: #{year}"
 
                     # Convert French month name to number
                     month = FRENCH_MONTHS[month_name]
@@ -138,17 +138,19 @@ namespace :hike_histories do
                         history = HikeHistory.find_or_initialize_by(
                             hiking_date: parse_date(hiking_date),
                             openrunner_ref: convert_num(row['Ref']&.strip))
-
+                        hike_id = Hike.find_by(number: convert_num(row['Ref']))&.id
+                        hike_id = Hike.find_by(number: convert_num(row['N°']))&.id if hike_id.nil?
                         history.assign_attributes(
                             departure_time: row['Depart']&.strip,
                             day_type: row['Journee']&.strip,
                             carpooling_cost: carpooling_cost,
                             guide_id: guide&.id,
-                            hike_number: convert_num(row['N°'])
+                            hike_id: hike_id,
                         )
 
                         if history.save(validate: false)
-                            log.puts "Successfully imported history for hike ##{history.hike_number} on #{history.hiking_date}"
+                            puts "Successfully imported history for hike ##{history.hike_id} on #{history.hiking_date}"
+                            log.puts "Successfully imported history for hike ##{history.hike_id} on #{history.hiking_date}"
                         else
                             log.puts "Error importing history for hike ##{row['N°']}: #{history.errors.full_messages.join(', ')}"
                         end

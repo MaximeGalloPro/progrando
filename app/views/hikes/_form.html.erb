@@ -35,18 +35,18 @@
     </div>
 
     <div class="row g-3">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <%= f.label :number, "Numéro", class: "form-label required" %>
-                <%= f.number_field :number,
+<!--        <div class="col-md-6">-->
+<!--            <div class="mb-3">-->
+                <%#= f.label :number, "Numéro", class: "form-label required" %>
+                <%#= f.number_field :number,
                                    class: "form-control #{'is-invalid' if @hike.errors[:number].any?}" %>
-                <% if @hike.errors[:number].any? %>
-                    <div class="invalid-feedback">
-                        <%= @hike.errors[:number].join(', ') %>
-                    </div>
-                <% end %>
-            </div>
-        </div>
+                <%# if @hike.errors[:number].any? %>
+<!--                    <div class="invalid-feedback">-->
+                        <%#= @hike.errors[:number].join(', ') %>
+<!--                    </div>-->
+                <%# end %>
+<!--            </div>-->
+<!--        </div>-->
 
         <div class="col-md-6">
             <div class="mb-3">
@@ -77,7 +77,9 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <%= f.label :distance_km, "Distance (km)", class: "form-label required" %>
-                <%= f.number_field :distance_km, class: "form-control #{'is-invalid' if @hike.errors[:distance_km].any?}" %>
+                <%= f.number_field :distance_km,
+                                   class: "form-control #{'is-invalid' if @hike.errors[:distance_km].any?}",
+                                   step: "0.01" %>
                 <% if @hike.errors[:distance_km].any? %>
                     <div class="invalid-feedback">
                         <%= @hike.errors[:distance_km].join(', ') %>

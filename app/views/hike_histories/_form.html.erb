@@ -13,14 +13,14 @@
     <div class="row g-3">
         <div class="col-md-6">
             <div class="mb-3">
-                <%= f.label :hike_number, "Randonnée", class: "form-label required" %>
+                <%= f.label :hike_id, "Randonnée", class: "form-label required" %>
                 <div class="d-flex gap-2">
-                    <%= f.collection_select :hike_number,
+                    <%= f.collection_select :hike_id,
                                             @hikes,
-                                            :number,
+                                            :id,  # Utilisation de l'id standard
                                             ->(hike) { "#{hike.trail_name} (#{hike.starting_point})" },
                                             { prompt: "Sélectionnez une randonnée" },
-                                            { class: "form-select #{'is-invalid' if @hike_history.errors[:hike_number].any?}" } %>
+                                            { class: "form-select #{'is-invalid' if @hike_history.errors[:hike_id].any?}" } %>
                     <%= link_to new_hike_path,
                                 class: "btn btn-outline-dark",
                                 style: "white-space: nowrap;",
@@ -28,9 +28,9 @@
                         <i class="fas fa-plus"></i>
                     <% end %>
                 </div>
-                <% if @hike_history.errors[:hike_number].any? %>
+                <% if @hike_history.errors[:hike_id].any? %>
                     <div class="invalid-feedback">
-                        <%= @hike_history.errors[:hike_number].join(', ') %>
+                        <%= @hike_history.errors[:hike_id].join(', ') %>
                     </div>
                 <% end %>
             </div>

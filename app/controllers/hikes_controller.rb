@@ -49,6 +49,7 @@ class HikesController < ApplicationController
 
     def create
         @hike = Hike.new(hike_params)
+        byebug
         if @hike.save
             redirect_to hikes_path, notice: 'Parcours ajouté avec succès.'
         else
@@ -76,9 +77,8 @@ class HikesController < ApplicationController
     private
 
     def hike_params
-        params.require(:hike).permit(
+        params_with_converted_distance = params.require(:hike).permit(
             :number,
-            :day,
             :difficulty,
             :starting_point,
             :trail_name,
@@ -89,7 +89,13 @@ class HikesController < ApplicationController
             :altitude_min,
             :altitude_max,
             :openrunner_ref,
-        )
+            )
+
+        if params_with_converted_distance[:distance_km].present?
+            params_with_converted_distance[:distance_km].gsub!(',', '.')
+        end
+
+        params_with_converted_distance
     end
 
     def fetch_hikes

@@ -7,14 +7,14 @@ class CreateHikeHistories < ActiveRecord::Migration[7.0]
                 t.string :day_type
                 t.decimal :carpooling_cost, precision: 5, scale: 2
                 t.integer :guide_id
-                t.integer :hike_number
+                t.integer :hike_id
                 t.string :openrunner_ref
 
                 t.timestamps
             end
         end
 
-        add_index :hike_histories, :hike_number unless index_exists?(:hike_histories, :hike_number)
-        add_index :hike_histories, [:hiking_date, :hike_number], unique: true unless index_exists?(:hike_histories, [:hiking_date, :hike_number], unique: true)
+        add_index :hike_histories, :hike_id unless index_exists?(:hike_histories, :hike_id)
+        add_index :hike_histories, [:hiking_date, :hike_id], unique: true unless index_exists?(:hike_histories, [:hiking_date, :hike_id], unique: true)
     end
 end
