@@ -49,7 +49,6 @@ class HikesController < ApplicationController
 
     def create
         @hike = Hike.new(hike_params)
-        byebug
         if @hike.save
             redirect_to hikes_path, notice: 'Parcours ajouté avec succès.'
         else
