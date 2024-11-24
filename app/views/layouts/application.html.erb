@@ -46,55 +46,73 @@
     <% todays_hike = Hike.todays_hike %>
     <div class="card">
         <div class="card-body p-2">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-calendar-day text-primary"></i>
-                <strong>
-                    <% if todays_hike&.hiking_date == Date.current %>
-                        Randonnée du jour
-                    <% else %>
-                        Prochaine randonnée
-                        <% if todays_hike&.hiking_date.present? %>
-                            (<%= l(todays_hike.hiking_date, format: :long) %>)
+            <div class="d-flex flex-column flex-lg-row gap-2">
+                <%# En-tête - Toujours en haut %>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-calendar-day text-primary"></i>
+                    <strong>
+                        <% if todays_hike&.hiking_date == Date.current %>
+                            Randonnée du jour
+                        <% else %>
+                            Prochaine randonnée
+                            <% if todays_hike&.hiking_date.present? %>
+                                (<%= l(todays_hike.hiking_date, format: :long) %>)
+                            <% end %>
                         <% end %>
+                    </strong>
+                    <% if todays_hike&.difficulty_text.present? %>
+                        <span class="badge bg-primary"><%= todays_hike.difficulty_text %></span>
                     <% end %>
-                </strong>
+                </div>
+
                 <% if todays_hike %>
-                    <% if todays_hike.difficulty_text.present? %>
-                        <span class="badge bg-primary ms-2"><%= todays_hike.difficulty_text %></span>
-                    <% end %>
-
-                    <% if todays_hike.starting_point.present? %>
-                        <i class="fas fa-map-marker-alt text-muted ms-2"></i>
-                        <span><%= todays_hike.starting_point %></span>
-                    <% end %>
-
-                    <% if todays_hike.departure_time.present? %>
-                        <i class="fas fa-clock text-muted ms-2"></i>
-                        <span><%= todays_hike.departure_time %></span>
-                    <% end %>
-
-                    <% if todays_hike.guide_name.present? %>
-                        <i class="fas fa-user text-muted ms-2"></i>
-                        <span><%= todays_hike.guide_name %></span>
-                    <% end %>
-
-                    <% if todays_hike.distance_km.present? %>
-                        <i class="fas fa-route text-muted ms-2"></i>
-                        <span><%= todays_hike.distance_km %> km</span>
-                    <% end %>
-
-                    <% if todays_hike.elevation_gain.present? %>
-                        <i class="fas fa-mountain text-muted ms-2"></i>
-                        <span><%= todays_hike.elevation_gain %>m D+</span>
-                    <% end %>
-
-                    <% if todays_hike.openrunner_ref.present? && todays_hike.openrunner_ref != "0" %>
-                        <%= link_to "https://www.openrunner.com/route-details/#{todays_hike.openrunner_ref}",
-                                    class: "btn btn-sm btn-outline-primary py-0 ms-auto",
-                                    target: "_blank" do %>
-                            <i class="fas fa-map"></i> OpenRunner
+                    <%# Informations détaillées - Flexbox responsive %>
+                    <div class="d-flex flex-wrap gap-3 align-items-center flex-grow-1">
+                        <% if todays_hike.starting_point.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-map-marker-alt text-muted"></i>
+                                <span><%= todays_hike.starting_point %></span>
+                            </div>
                         <% end %>
-                    <% end %>
+
+                        <% if todays_hike.departure_time.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-clock text-muted"></i>
+                                <span><%= todays_hike.departure_time %></span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.guide_name.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-user text-muted"></i>
+                                <span><%= todays_hike.guide_name %></span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.distance_km.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-route text-muted"></i>
+                                <span><%= todays_hike.distance_km %> km</span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.elevation_gain.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-mountain text-muted"></i>
+                                <span><%= todays_hike.elevation_gain %>m D+</span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.openrunner_ref.present? && todays_hike.openrunner_ref != "0" %>
+                            <div class="ms-auto">
+                                <%= link_to "https://www.openrunner.com/route-details/#{todays_hike.openrunner_ref}",
+                                            class: "btn btn-sm btn-outline-primary",
+                                            target: "_blank" do %>
+                                    <i class="fas fa-map"></i> OpenRunner
+                                <% end %>
+                            </div>
+                        <% end %>
+                    </div>
                 <% else %>
                     <span class="text-muted">
                         <i class="fas fa-info-circle"></i> Aucune randonnée programmée
@@ -104,6 +122,24 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Ajustements pour petits écrans */
+    @media (max-width: 768px) {
+        .card-body .gap-2 {
+            gap: 0.75rem !important;
+        }
+
+        .d-flex.flex-wrap {
+            justify-content: space-between;
+        }
+
+        /* Optionnel: ajuster la taille du texte sur mobile */
+        .card-body {
+            font-size: 0.9rem;
+        }
+    }
+</style>
 <%= yield %>
 </body>
 </html>
