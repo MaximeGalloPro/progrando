@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :guides
   resources :hikes do
     member do
       post :refresh_from_openrunner

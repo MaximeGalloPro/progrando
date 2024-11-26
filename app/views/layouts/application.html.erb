@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fr.js"></script>
 
@@ -27,9 +27,13 @@
 <% end %>
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm mb-4">
     <div class="container">
-    <span class="navbar-brand fw-bold text-primary">
-      <i class="fas fa-mountain"></i> Randonnées
-    </span>
+        <%= link_to stats_dashboard_path,
+                    class: "text-decoration-none" do %>
+            <span class="navbar-brand fw-bold text-primary">
+                <i class="fas fa-mountain"></i> Randonnées
+            </span>
+        <% end %>
+
         <div class="d-flex gap-3">
             <%= link_to stats_dashboard_path,
                         class: "btn #{current_page?(stats_dashboard_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>

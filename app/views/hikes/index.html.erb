@@ -13,6 +13,10 @@
                 new_hike_path,
                 class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right" %>
 
+    <%= link_to "Gérer les guides",
+                guides_path,
+                class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right; margin-right:0.2rem" %>
+
     <%= form_with url: hikes_path, method: :get, local: true, class: "mb-4" do |f| %>
         <div class="row g-3">
             <div class="col-md-8">
