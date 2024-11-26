@@ -33,7 +33,7 @@ namespace :hikes do
                         logger.info "  - Migrating histories from hike ##{hike.id} (#{hike.trail_name})"
 
                         # Migrer les historiques vers le hike conservé
-                        HikeHistory.where(hike_id: hike.number).update_all(hike_id: hike_to_keep.number)
+                        HikeHistory.where(hike_id: hike.number).update_all(hike_id: hike_to_keep.id)
 
                         # Supprimer le hike doublon
                         logger.info "  - Removing duplicate hike ##{hike.id}"
@@ -76,7 +76,7 @@ namespace :hikes do
                 hikes = Hike.where(openrunner_ref: ref)
                 logger.info "\nOpenrunner ref #{ref}:"
                 hikes.each do |hike|
-                    histories_count = HikeHistory.where(hike_id: hike.number).count
+                    histories_count = HikeHistory.where(hike_id: hike.id).count
                     logger.info "- #{hike.trail_name} (ID: #{hike.id}, Histories: #{histories_count})"
                 end
             end
