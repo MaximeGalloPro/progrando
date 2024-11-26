@@ -1,24 +1,145 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Rails7WithDocker</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <%= javascript_importmap_tags %>
-  </head>
+    <%# Multiples sources pour Font Awesome %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fr.js"></script>
 
-  <body>
-  <% flash.each do |type, message| %>
-      <div class="alert <%= type == 'notice' ? 'alert-success' : 'alert-danger' %> alert-dismissible fade show" role="alert">
-          <%= message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-  <% end %>
-    <%= yield %>
-  </body>
+</head>
+
+<body>
+<% flash.each do |type, message| %>
+    <div class="alert <%= type == 'notice' ? 'alert-success' : 'alert-danger' %> alert-dismissible fade show" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<% end %>
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm mb-4">
+    <div class="container">
+    <span class="navbar-brand fw-bold text-primary">
+      <i class="fas fa-mountain"></i> Randonnées
+    </span>
+        <div class="d-flex gap-3">
+            <%= link_to stats_dashboard_path,
+                        class: "btn #{current_page?(stats_dashboard_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
+                <i class="fas fa-chart-line"></i> Dashboard
+            <% end %>
+            <%= link_to hikes_path,
+                        class: "btn #{current_page?(hikes_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
+                <i class="fas fa-hiking"></i> Liste des randonnées
+            <% end %>
+        </div>
+    </div>
+</nav>
+<div class="container py-2">
+    <% todays_hike = Hike.todays_hike %>
+    <div class="card">
+        <div class="card-body p-2">
+            <div class="d-flex flex-column flex-lg-row gap-2">
+                <%# En-tête - Toujours en haut %>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-calendar-day text-primary"></i>
+                    <strong>
+                        <% if todays_hike&.hiking_date == Date.current %>
+                            Randonnée du jour
+                        <% else %>
+                            Prochaine randonnée
+                            <% if todays_hike&.hiking_date.present? %>
+                                (<%= l(todays_hike.hiking_date, format: :long) %>)
+                            <% end %>
+                        <% end %>
+                    </strong>
+                    <% if todays_hike&.difficulty_text.present? %>
+                        <span class="badge bg-primary"><%= todays_hike.difficulty_text %></span>
+                    <% end %>
+                </div>
+
+                <% if todays_hike %>
+                    <%# Informations détaillées - Flexbox responsive %>
+                    <div class="d-flex flex-wrap gap-3 align-items-center flex-grow-1">
+                        <% if todays_hike.starting_point.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-map-marker-alt text-muted"></i>
+                                <span><%= todays_hike.starting_point %></span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.departure_time.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-clock text-muted"></i>
+                                <span><%= todays_hike.departure_time %></span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.guide_name.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-user text-muted"></i>
+                                <span><%= todays_hike.guide_name %></span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.distance_km.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-route text-muted"></i>
+                                <span><%= todays_hike.distance_km %> km</span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.elevation_gain.present? %>
+                            <div class="d-flex align-items-center gap-1">
+                                <i class="fas fa-mountain text-muted"></i>
+                                <span><%= todays_hike.elevation_gain %>m D+</span>
+                            </div>
+                        <% end %>
+
+                        <% if todays_hike.openrunner_ref.present? && todays_hike.openrunner_ref != "0" %>
+                            <div class="ms-auto">
+                                <%= link_to "https://www.openrunner.com/route-details/#{todays_hike.openrunner_ref}",
+                                            class: "btn btn-sm btn-outline-primary",
+                                            target: "_blank" do %>
+                                    <i class="fas fa-map"></i> OpenRunner
+                                <% end %>
+                            </div>
+                        <% end %>
+                    </div>
+                <% else %>
+                    <span class="text-muted">
+                        <i class="fas fa-info-circle"></i> Aucune randonnée programmée
+                    </span>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ajustements pour petits écrans */
+    @media (max-width: 768px) {
+        .card-body .gap-2 {
+            gap: 0.75rem !important;
+        }
+
+        .d-flex.flex-wrap {
+            justify-content: space-between;
+        }
+
+        /* Optionnel: ajuster la taille du texte sur mobile */
+        .card-body {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+<%= yield %>
+</body>
 </html>

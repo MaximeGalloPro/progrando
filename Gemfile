@@ -71,3 +71,10 @@ group :test do
 
 end
 gem 'byebug'
+gem 'nokogiri'
+gem 'sidekiq'
+
+# Pour l'extraction de données
+gem 'httparty'
+gem 'capybara'
+gem 'selenium-webdriver'

@@ -1,46 +1,131 @@
-# app/models/hike.rb
 class Hike < ApplicationRecord
-    has_many :hike_histories, foreign_key: :hike_number, primary_key: :number
+    # Associations
+    has_many :hike_histories, foreign_key: :hike_id
+    has_many :guides, through: :hike_histories
+    has_one :latest_history, -> { order(hiking_date: :desc) },
+            class_name: 'HikeHistory',
+            foreign_key: :hike_id
 
-    validates :number, presence: true, uniqueness: true, numericality: { only_integer: true }
+    # Callbacks
+    before_validation :convert_distance_separator
+
+    # Validations
     validates :difficulty, presence: true,
               numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
     validates :starting_point, presence: true
     validates :trail_name, presence: true
-    validates :carpooling_cost,
-              numericality: { only_integer: true, greater_than_or_equal_to: 0 },
-              allow_blank: true
-    validates :distance_km,
-              numericality: { greater_than: 0 },
-              allow_blank: true
-    validates :elevation_gain,
-              numericality: { only_integer: true, greater_than_or_equal_to: 0 },
-              allow_blank: true
-    validates :openrunner_ref, presence: true,
+    validates :openrunner_ref,
+              presence: true,
               numericality: { only_integer: true }
 
-    before_save :generate_openrunner_url
 
-    scope :search_by_trail_name, ->(query) {
-        joins("LEFT JOIN (
-      SELECT
-        hike_number,
-        hiking_date,
-        guide_name,
-        ROW_NUMBER() OVER (PARTITION BY hike_number ORDER BY hiking_date DESC) as rn
-      FROM hike_histories
-    ) as last_hikes ON hikes.number = last_hikes.hike_number AND last_hikes.rn = 1")
-            .where("trail_name LIKE ?", "%#{query}%")
-            .select("hikes.*,
-            last_hikes.hiking_date as last_date,
-            last_hikes.guide_name as last_guide")
+    # Scopes de base
+    scope :ordered_by_trail_name, -> { order(:trail_name) }
+    scope :by_difficulty, ->(level) { where(difficulty: level) }
+
+    # Scopes avec latest_history
+    scope :with_latest_history, -> { includes(:latest_history) }
+    scope :order_by_latest_date, -> {
+        joins(:latest_history)
+            .order('hike_histories.hiking_date DESC')
     }
+
+    # Scopes temporels
+    scope :this_year, -> {
+        joins(:latest_history)
+            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_year)
+            .distinct
+    }
+
+    scope :this_month, -> {
+        joins(:latest_history)
+            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_month)
+            .distinct
+    }
+
+    scope :past_hikes, -> {
+        joins(:latest_history)
+            .where('hike_histories.hiking_date < ?', Date.current)
+            .order('hike_histories.hiking_date DESC')
+    }
+
+    # Scope de recherche
+    scope :search_by_term, ->(term) {
+        return all if term.blank?
+
+        normalized_term = term.strip
+        date_pattern = normalized_term.match(/(\d{1,2})\/(\d{4})/)
+
+        if date_pattern
+            month = date_pattern[1].to_i
+            year = date_pattern[2].to_i
+            start_date = Date.new(year, month, 1)
+            end_date = start_date.end_of_month
+
+            joins(:latest_history)
+                .where("hike_histories.hiking_date BETWEEN ? AND ?", start_date, end_date)
+        else
+            wild_term = "%#{normalized_term}%"
+            where(
+                "hikes.trail_name LIKE :term OR
+         hikes.starting_point LIKE :term OR
+         CAST(hikes.number AS CHAR) LIKE :term",
+                term: wild_term
+            )
+        end
+    }
+
+    # Scopes statistiques
+    scope :with_elevation, -> { where.not(elevation_gain: nil) }
+    scope :with_distance, -> { where.not(distance_km: nil) }
+    scope :by_difficulty_range, ->(min, max) { where(difficulty: min..max) }
+
+    # Méthodes de classe
+    def self.todays_hike
+        today_query = joins(:hike_histories)
+                          .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, guides.name as guide_name')
+                          .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
+
+        today_hike = today_query
+                         .where('hike_histories.hiking_date = ?', Date.current)
+                         .first
+
+        return today_hike if today_hike.present?
+
+        today_query
+            .where('hike_histories.hiking_date > ?', Date.current)
+            .order('hike_histories.hiking_date ASC')
+            .first
+    end
+
+    def self.total_distance
+        sum(:distance_km)
+    end
+
+    # Méthodes d'instance
+    def difficulty_text
+        case difficulty
+        when 1 then "Facile"
+        when 2 then "Moyen"
+        when 3 then "Difficile"
+        when 4 then "Très difficile"
+        when 5 then "Extrême"
+        else "Non défini"
+        end
+    end
+
+    def last_hiking_date
+        latest_history&.hiking_date
+    end
+
+    def last_guide_name
+        latest_history&.guide&.name
+    end
 
     private
 
-    def generate_openrunner_url
-        if openrunner_ref.present? && openrunner_ref.match?(/\A\d+\z/)
-            self.openrunner_url = "https://www.openrunner.com/route-details/#{openrunner_ref}"
-        end
+    def convert_distance_separator
+        self.distance_km = distance_km.to_s.gsub(',', '.') if distance_km.present?
     end
+
 end

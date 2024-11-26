@@ -7,11 +7,10 @@ class CreateHikes < ActiveRecord::Migration[7.0]
                 t.integer :difficulty
                 t.string :starting_point
                 t.string :trail_name
-                t.integer :carpooling_cost
-                t.decimal :distance_km, precision: 5, scale: 2
-                t.integer :elevation_gain
+                t.float :carpooling_cost
+                t.float :distance_km
+                t.float :elevation_gain
                 t.string :openrunner_ref
-                t.string :openrunner_url
 
                 t.timestamps
             end

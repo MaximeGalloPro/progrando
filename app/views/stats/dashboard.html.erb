@@ -25,7 +25,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title text-muted">Distance Totale</h6>
-                    <h2 class="card-text"><%= number_with_delimiter(@stats[:total_distance]) %> km</h2>
+                    <h2 class="card-text"><%= number_with_delimiter(@stats[:total_distance].round(2)) %> km</h2>
                     <small class="text-muted">Distance cumulée</small>
                 </div>
             </div>
@@ -35,7 +35,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title text-muted">Dénivelé Total</h6>
-                    <h2 class="card-text"><%= number_with_delimiter(@stats[:total_elevation]) %>m</h2>
+                    <h2 class="card-text"><%= number_with_delimiter(@stats[:total_elevation]) %> km</h2>
                     <small class="text-muted">Dénivelé cumulé</small>
                 </div>
             </div>
@@ -77,41 +77,135 @@
         </div>
     </div>
 
-    <%# Tableau récapitulatif %>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Dernières randonnées</h5>
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
+    <h3>Les 10 derniéres randonnées</h3>
+
+    <% if @last_hikes.any? %>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">Randonnée</th>
+                    <th scope="col">Point de départ</th>
+                    <th scope="col">Distance (km)</th>
+                    <th scope="col">D+ (m)</th>
+                    <th scope="col">D- (m)</th>
+                    <th scope="col">Alt min (m)</th>
+                    <th scope="col">Alt max (m)</th>
+                    <th scope="col">Difficulté</th>
+                    <th scope="col">Dernière date</th>
+                    <th scope="col">Dernier guide</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% @last_hikes.each do |hike| %>
                     <tr>
-                        <th>Date</th>
-                        <th>Randonnée</th>
-                        <th>Guide</th>
-                        <th>Distance</th>
-                        <th>Dénivelé</th>
+                        <td><%= hike.trail_name %></td>
+                        <td><%= hike.starting_point %></td>
+                        <td><%= hike.distance_km %></td>
+                        <td><%= hike.elevation_gain %></td>
+                        <td><%= hike.elevation_loss %></td>
+                        <td><%= hike.altitude_min %></td>
+                        <td><%= hike.altitude_max %></td>
+                        <td><%= hike.difficulty_text %></td>
+                        <td><%= hike.last_hiking_date&.strftime("%d/%m/%Y") %></td>
+                        <td><%= hike['guide_name'] %></td>
+                        <td class="text-nowrap">
+                            <div class="btn-group">
+                                <% if hike.updating? %>
+                                    <button class="btn btn-outline-dark btn-sm" disabled>
+                                        <i class="fas fa-sync-alt fa-spin"></i>
+                                    </button>
+                                <% elsif hike.openrunner_ref.blank? or hike.openrunner_ref == 0 or hike.openrunner_ref == "0" %>
+                                    <button class="btn btn-outline-dark btn-sm" disabled title="Pas de référence OpenRunner">
+                                        <i class="fas fa-ban text-danger" title="Pas de référence OpenRunner"></i>
+                                    </button>
+                                <% else %>
+                                    <%= link_to "https://www.openrunner.com/route-details/#{hike.openrunner_ref}",
+                                                class: "btn btn-outline-dark btn-sm",
+                                                target: "_blank",
+                                                title: "Voir sur OpenRunner" do %>
+                                        <i class="fas fa-mountain"></i>
+                                    <% end %>
+                                <% end %>
+
+                                <%= link_to hike_histories_path(hike_id: hike.id),
+                                            class: "btn btn-outline-dark btn-sm",
+                                            title: "Voir l'historique" do %>
+                                    <i class="fas fa-history"></i>
+                                <% end %>
+                                <%= link_to edit_hike_path(hike),
+                                            class: "btn btn-outline-dark btn-sm",
+                                            title: "Editer" do %>
+                                    <i class="fas fa-pen"></i>
+                                <% end %>
+                                <%= button_to hike_path(hike),
+                                              method: :delete,
+                                              class: "btn btn-outline-dark btn-sm delete-hike",
+                                              title: "Supprimer",
+                                              form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event)" },
+                                              form_class: 'button_to' do %>
+                                    <i class="fas fa-trash"></i>
+                                <% end %>
+                                <script>
+                                    function confirmDelete(event) {
+                                        event.preventDefault();
+                                        if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
+                                            event.target.submit();
+                                        }
+                                        return false;
+                                    }
+                                </script>
+                                <% if hike.updating? %>
+                                    <button class="btn btn-outline-dark btn-sm" disabled>
+                                        <i class="fas fa-sync-alt fa-spin"></i>
+                                    </button>
+                                <% elsif hike.openrunner_ref.blank? or hike.openrunner_ref == 0 or hike.openrunner_ref == "0" %>
+                                    <button class="btn btn-outline-dark btn-sm" disabled title="Pas de référence OpenRunner">
+                                        <i class="fas fa-ban text-danger" title="Pas de référence OpenRunner"></i>
+                                    </button>
+                                <% else %>
+                                    <%= button_to refresh_from_openrunner_hike_path(hike, redirect_path: stats_dashboard_path),
+                                                  class: "btn btn-outline-dark btn-sm",
+                                                  title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
+                                                  data: { turbo: false },
+                                                  params: { search: params[:search] } do %>
+                                        <i class="fas fa-sync-alt"></i>
+                                    <% end %>
+                                <% end %>
+                            </div>
+                        </td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    <% @stats[:recent_hikes].each do |hike| %>
-                        <tr>
-                            <td><%= hike.hiking_date.strftime("%d/%m/%Y") %></td>
-                            <td><%= hike.trail_name %></td>
-                            <td><%= hike.guide_name %></td>
-                            <td><%= hike.distance_km %> km</td>
-                            <td><%= hike.elevation_gain %>m</td>
-                        </tr>
-                    <% end %>
-                    </tbody>
-                </table>
-            </div>
+                <% end %>
+                </tbody>
+            </table>
         </div>
-    </div>
+    <% elsif params[:trail_name].present? || params[:starting_point].present? %>
+        <div class="alert alert-info" role="alert">
+            Aucun résultat trouvé pour votre recherche
+        </div>
+    <% end %>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 <script>
+    // Debug logger avec timestamp pour mieux suivre l'ordre des événements
+    const DEBUG = true;
+
+    function log(message, data = null) {
+        if (DEBUG) {
+            const timestamp = new Date().toISOString().substr(11, 8);
+            if (data) {
+                console.log(`[Dashboard Debug ${timestamp}] ${message}:`, data);
+            } else {
+                console.log(`[Dashboard Debug ${timestamp}] ${message}`);
+            }
+        }
+    }
+
+    // Log initial pour vérifier le chargement du script
+    log('Script loaded');
+    log('Window.Chart availability:', typeof window.Chart !== 'undefined');
+
     // Variable globale pour stocker les instances de graphiques
     let charts = {
         monthly: null,
@@ -120,11 +214,15 @@
 
     // Fonction pour nettoyer les graphiques existants
     function cleanupCharts() {
-        if (charts.monthly instanceof Chart) {
+        log('Cleaning up charts...');
+
+        if (charts.monthly instanceof window.Chart) {
+            log('Destroying monthly chart');
             charts.monthly.destroy();
             charts.monthly = null;
         }
-        if (charts.guides instanceof Chart) {
+        if (charts.guides instanceof window.Chart) {
+            log('Destroying guides chart');
             charts.guides.destroy();
             charts.guides = null;
         }
@@ -132,8 +230,11 @@
 
     // Fonction pour initialiser les graphiques
     function initializeCharts() {
-        // S'assurer que Chart.js est chargé
-        if (typeof Chart === 'undefined') {
+        log('Initializing charts...');
+        log('Window.Chart availability:', typeof window.Chart !== 'undefined');
+
+        // Vérifier si Chart.js est chargé
+        if (typeof window.Chart === 'undefined') {
             console.error('Chart.js not loaded');
             return;
         }
@@ -160,57 +261,115 @@
             }
         };
 
-        // Récupérer les éléments canvas
+        // Récupérer et logger l'état des éléments canvas
         const monthlyChartEl = document.getElementById('monthlyChart');
         const guidesChartEl = document.getElementById('guidesChart');
 
-        if (monthlyChartEl) {
-            charts.monthly = new Chart(monthlyChartEl, {
-                type: 'line',
-                data: {
-                    labels: <%= raw @stats[:monthly_stats].keys %>,
-                    datasets: [{
-                        label: 'Nombre de randonnées',
-                        data: <%= raw @stats[:monthly_stats].values %>,
-                        borderColor: '#0d6efd',
-                        tension: 0.1,
-                        fill: false
-                    }]
-                },
-                options: commonOptions
-            });
-        }
+        log('Canvas elements state:', {
+            monthlyChart: {
+                exists: !!monthlyChartEl,
+                parentNode: monthlyChartEl?.parentNode?.tagName,
+                width: monthlyChartEl?.width,
+                height: monthlyChartEl?.height
+            },
+            guidesChart: {
+                exists: !!guidesChartEl,
+                parentNode: guidesChartEl?.parentNode?.tagName,
+                width: guidesChartEl?.width,
+                height: guidesChartEl?.height
+            }
+        });
 
+        if (monthlyChartEl) {
+            try {
+                log('Creating monthly chart');
+                charts.monthly = new window.Chart(monthlyChartEl, {
+                    type: 'line',
+                    data: {
+                        labels: <%= raw @stats[:monthly_stats].keys %>,
+                        datasets: [{
+                            label: 'Nombre de randonnées',
+                            data: <%= raw @stats[:monthly_stats].values %>,
+                            borderColor: '#0d6efd',
+                            tension: 0.1,
+                            fill: false
+                        }]
+                    },
+                    options: commonOptions
+                });
+                log('Monthly chart created successfully');
+            } catch (error) {
+                console.error('Error creating monthly chart:', error);
+            }
+        }
         if (guidesChartEl) {
-            charts.guides = new Chart(guidesChartEl, {
-                type: 'bar',
-                data: {
-                    labels: <%= raw @stats[:guide_stats].keys %>,
-                    datasets: [{
-                        label: 'Randonnées guidées',
-                        data: <%= raw @stats[:guide_stats].values %>,
-                        backgroundColor: '#0d6efd'
-                    }]
-                },
-                options: commonOptions
-            });
+            try {
+                log('Creating guides chart');
+                charts.guides = new window.Chart(guidesChartEl, {
+                    type: 'bar',
+                    data: {
+                        labels: <%= raw @stats[:guide_stats].keys.reject(&:blank?) %>,
+                        datasets: [{
+                            label: 'Randonnées guidées',
+                            data: <%= raw @stats[:guide_stats].values %>,
+                            backgroundColor: '#0d6efd'
+                        }]
+                    },
+                    options: commonOptions
+                });
+                log('Guides chart created successfully');
+            } catch (error) {
+                console.error('Error creating guides chart:', error);
+            }
         }
     }
 
-    // Gestionnaire d'événements pour Turbo et chargement initial
+    // Fonction pour s'assurer que le code est exécuté après chaque navigation Turbo
     function setupCharts() {
-        // Attendre que Chart.js soit chargé
-        if (typeof Chart === 'undefined') {
-            setTimeout(setupCharts, 100);
-            return;
+        log('Setting up charts...');
+        // Vérifie si le script Chart.js est encore en cours de chargement
+        if (typeof window.Chart === 'undefined') {
+            log('Chart.js not loaded yet, checking script tags...');
+            // Vérifie si le script est présent dans le DOM
+            const chartScripts = document.querySelectorAll('script[src*="chart"]');
+            log('Found Chart.js script tags:', chartScripts.length);
         }
         initializeCharts();
     }
 
-    // Nettoyage avant la navigation Turbo
-    document.addEventListener('turbo:before-render', cleanupCharts);
+    // Utilisation d'une fonction d'initialisation globale
+    window.initDashboardCharts = function () {
+        log('Global initialization called');
+        setupCharts();
+    };
 
-    // Initialisation après chargement de la page
-    document.addEventListener('turbo:load', setupCharts);
-    document.addEventListener('DOMContentLoaded', setupCharts);
+    // Écouteurs d'événements pour Turbo et chargement initial
+    document.addEventListener('turbo:load', () => {
+        log('turbo:load event fired');
+        window.initDashboardCharts();
+    });
+
+    document.addEventListener('turbo:render', () => {
+        log('turbo:render event fired');
+        window.initDashboardCharts();
+    });
+
+    document.addEventListener('turbo:before-render', () => {
+        log('turbo:before-render event fired');
+        cleanupCharts();
+    });
+
+    // S'assurer que l'initialisation se fait même si turbo:load ne se déclenche pas
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.initDashboardCharts);
+    } else {
+        window.initDashboardCharts();
+    }
+</script>
+
+<script>
+    document.addEventListener('turbo:load', function () {
+        console.log('Turbo est actif');
+    });
+    console.log('Page chargée normalement');
 </script>
