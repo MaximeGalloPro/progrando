@@ -1,6 +1,14 @@
                                   Prefix Verb   URI Pattern                                                                                       Controller#Action
+                                  guides GET    /guides(.:format)                                                                                 guides#index
+                                         POST   /guides(.:format)                                                                                 guides#create
+                               new_guide GET    /guides/new(.:format)                                                                             guides#new
+                              edit_guide GET    /guides/:id/edit(.:format)                                                                        guides#edit
+                                   guide GET    /guides/:id(.:format)                                                                             guides#show
+                                         PATCH  /guides/:id(.:format)                                                                             guides#update
+                                         PUT    /guides/:id(.:format)                                                                             guides#update
+                                         DELETE /guides/:id(.:format)                                                                             guides#destroy
             refresh_from_openrunner_hike POST   /hikes/:id/refresh_from_openrunner(.:format)                                                      hikes#refresh_from_openrunner
-           fetch_openrunner_details_hike GET    /hikes/:id/fetch_openrunner_details(.:format)                                                     hikes#fetch_openrunner_details
+          fetch_openrunner_details_hikes GET    /hikes/fetch_openrunner_details(.:format)                                                         hikes#fetch_openrunner_details
                                    hikes GET    /hikes(.:format)                                                                                  hikes#index
                                          POST   /hikes(.:format)                                                                                  hikes#create
                                 new_hike GET    /hikes/new(.:format)                                                                              hikes#new

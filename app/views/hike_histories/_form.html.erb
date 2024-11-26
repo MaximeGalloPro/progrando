@@ -37,7 +37,7 @@
         </div>
 
         <script>
-            $(document).ready(function() {
+            $(document).ready(function () {
                 console.log('Select2 is ready!');
                 $('.select2').select2({
                     language: 'fr',
@@ -56,8 +56,8 @@
 
             /* Hauteur du select et alignement avec Bootstrap */
             .select2-container .select2-selection {
-                min-height: calc(1.5em + 0.75rem + 2px);  /* Même hauteur que .form-control */
-                padding: 0.375rem 0.75rem;                /* Même padding que .form-control */
+                min-height: calc(1.5em + 0.75rem + 2px); /* Même hauteur que .form-control */
+                padding: 0.375rem 0.75rem; /* Même padding que .form-control */
             }
 
             /* Alignement du texte */
@@ -68,25 +68,33 @@
 
             /* Position de la flèche */
             .select2-container .select2-selection--single .select2-selection__arrow {
-                height: 100%;  /* Hauteur complète */
-                right: 0.75rem;  /* Alignement à droite */
+                height: 100%; /* Hauteur complète */
+                right: 0.75rem; /* Alignement à droite */
             }
         </style>
 
         <div class="col-md-6">
             <div class="mb-3">
                 <%= f.label :guide_id, "Guide", class: "form-label required" %>
-                <%= f.collection_select :guide_id,
-                                        @guides,
-                                        :id,
-                                        ->(guide) { "#{guide.name} - #{guide.phone}" },
-                                        { prompt: "Sélectionnez un guide" },
-                                        { class: "form-select #{'is-invalid' if @hike_history.errors[:guide_id].any?}" } %>
-                <% if @hike_history.errors[:guide_id].any? %>
-                    <div class="invalid-feedback">
-                        <%= @hike_history.errors[:guide_id].join(', ') %>
-                    </div>
-                <% end %>
+                <div class="d-flex gap-2">
+                    <%= f.collection_select :guide_id,
+                                            @guides,
+                                            :id,
+                                            ->(guide) { "#{guide.name} - #{guide.phone}" },
+                                            { prompt: "Sélectionnez un guide" },
+                                            { class: "form-select #{'is-invalid' if @hike_history.errors[:guide_id].any?}" } %>
+                    <% if @hike_history.errors[:guide_id].any? %>
+                        <div class="invalid-feedback">
+                            <%= @hike_history.errors[:guide_id].join(', ') %>
+                        </div>
+                    <% end %>
+                    <%= link_to new_guide_path,
+                                class: "btn btn-outline-dark",
+                                style: "white-space: nowrap;",
+                                title: "Ajouter un nouveau guide" do %>
+                        <i class="fas fa-plus"></i>
+                    <% end %>
+                </div>
             </div>
         </div>
 
