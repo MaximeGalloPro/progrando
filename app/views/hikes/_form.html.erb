@@ -129,11 +129,38 @@
 
         <div class="col-md-6">
             <div class="mb-3">
+                <%= f.label :day, "Type", class: "form-label" %>
+                <%= f.select :day,
+                             [
+                                 ['Sélectionnez un type de repas', ''],
+                                 ['Apéro', 'apero'],
+                                 ['Petit déjeuner', 'petit_dejeuner'],
+                                 ['Déjeuner', 'dejeuner'],
+                                 ['Dîner', 'diner'],
+                                 ['Pique-nique', 'picnic']
+                             ],
+                             {},
+                             { class: "form-select #{'is-invalid' if @hike.errors[:meal_type].any?}" }
+                %>
+                <% if @hike.errors[:meal_type].any? %>
+                    <div class="invalid-feedback">
+                        <%= @hike.errors[:meal_type].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
                 <%= f.label :difficulty, "Difficulté", class: "form-label required" %>
-                <%= f.number_field :difficulty,
-                                   min: 1,
-                                   max: 5,
-                                   class: "form-control #{'is-invalid' if @hike.errors[:difficulty].any?}" %>
+                <div class="d-flex align-items-center">
+                    <%= f.range_field :difficulty,
+                                      min: 1,
+                                      max: 5,
+                                      class: "form-range me-2 #{'is-invalid' if @hike.errors[:difficulty].any?}",
+                                      style: "width: 70%;" %>
+                    <span id="difficultyValue" class="ms-2"></span>
+                </div>
                 <% if @hike.errors[:difficulty].any? %>
                     <div class="invalid-feedback">
                         <%= @hike.errors[:difficulty].join(', ') %>
@@ -142,9 +169,32 @@
             </div>
         </div>
 
+        <script>
+            const difficultyInput = document.querySelector('input[type="range"]');
+            const difficultyValue = document.getElementById('difficultyValue');
+
+            const updateDifficultyLabel = (value) => {
+                const labels = {
+                    1: 'Très facile',
+                    2: 'Facile',
+                    3: 'Moyen',
+                    4: 'Difficile',
+                    5: 'Très difficile'
+                };
+                difficultyValue.textContent = labels[value];
+            };
+
+            difficultyInput.addEventListener('input', (e) => {
+                updateDifficultyLabel(e.target.value);
+            });
+
+            // Initialiser la valeur au chargement
+            updateDifficultyLabel(difficultyInput.value);
+        </script>
+
         <div class="col-md-6">
             <div class="mb-3">
-                <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label required" %>
+                <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label" %>
                 <%= f.number_field :carpooling_cost,
                                    class: "form-control #{'is-invalid' if @hike.errors[:carpooling_cost].any?}" %>
                 <% if @hike.errors[:carpooling_cost].any? %>

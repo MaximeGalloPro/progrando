@@ -133,7 +133,7 @@
 
         <div class="col-md-6">
             <div class="mb-3">
-                <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label required" %>
+                <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label" %>
                 <%= f.number_field :carpooling_cost,
                                    step: 0.5,
                                    class: "form-control #{'is-invalid' if @hike_history.errors[:carpooling_cost].any?}" %>

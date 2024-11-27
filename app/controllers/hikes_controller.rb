@@ -49,6 +49,7 @@ class HikesController < ApplicationController
 
     def create
         @hike = Hike.new(hike_params)
+        byebug
         if @hike.save
             redirect_to hikes_path, notice: 'Parcours ajouté avec succès.'
         else
@@ -67,7 +68,7 @@ class HikesController < ApplicationController
     end
 
     def destroy
-        @hike = Hike.find(params[:id])
+        @hike = Hike.find_by(id: params[:id])
         @hike.destroy
         redirect_to hikes_path, notice: 'Parcours supprimé avec succès.'
     end

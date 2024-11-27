@@ -26,7 +26,7 @@ class Hike < ApplicationRecord
     # Scopes avec latest_history
     scope :with_latest_history, -> { includes(:latest_history) }
     scope :order_by_latest_date, -> {
-        joins(:latest_history)
+        left_joins(:latest_history)
             .order('hike_histories.hiking_date DESC')
     }
 

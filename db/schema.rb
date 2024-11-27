@@ -34,8 +34,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_23_162100) do
   end
 
   create_table "hikes", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
-    t.integer "number", null: false
-    t.integer "day", null: false
+    t.integer "number"
+    t.integer "day"
     t.integer "difficulty"
     t.string "starting_point"
     t.string "trail_name"
@@ -50,7 +50,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_23_162100) do
     t.integer "altitude_max"
     t.boolean "updating", default: false
     t.datetime "last_update_attempt"
-    t.index ["number"], name: "index_hikes_on_number", unique: true
   end
 
 end

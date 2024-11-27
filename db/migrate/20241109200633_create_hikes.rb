@@ -2,8 +2,8 @@ class CreateHikes < ActiveRecord::Migration[7.0]
     def change
         unless table_exists?(:hikes)
             create_table :hikes do |t|
-                t.integer :number, null: false, index: { unique: true }
-                t.integer :day, null: false
+                t.integer :number
+                t.integer :day
                 t.integer :difficulty
                 t.string :starting_point
                 t.string :trail_name

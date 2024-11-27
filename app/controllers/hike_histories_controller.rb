@@ -8,6 +8,12 @@ class HikeHistoriesController < ApplicationController
                               .order(hiking_date: :desc)
     end
 
+    def destroy
+        @hike_history = HikeHistory.find(params[:id])
+        @hike_history.destroy
+        redirect_to hikes_path, notice: 'Historique de randonnée supprimé avec succès.'
+    end
+
     def update
         @hike_history = HikeHistory.find(params[:id])
 
