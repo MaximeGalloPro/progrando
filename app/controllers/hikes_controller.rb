@@ -2,6 +2,7 @@ class HikesController < ApplicationController
 
     def index
         @results = fetch_hikes
+        @results = @results.sort_by { |hike| hike.last_hiking_date || Date.new(1, 1, 1) }.reverse
     end
 
     def refresh_from_openrunner
