@@ -66,8 +66,6 @@ end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "capybara"
-  gem "selenium-webdriver"
 
 end
 gem 'byebug'
@@ -78,3 +76,4 @@ gem 'sidekiq'
 gem 'httparty'
 gem 'capybara'
 gem 'selenium-webdriver'
+gem 'browser'
