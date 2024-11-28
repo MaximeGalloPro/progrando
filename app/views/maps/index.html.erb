@@ -24,81 +24,83 @@
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-<script>
-    const map = L.map('map').setView([48.8566, 2.3522], 13);
+<script type="module">
+    const map = L.map('map').setView([42.5056, 8.8583], 10); // Vue centrée sur la Corse
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    let points = [];
-    let markers = [];
+    let startPoint = null;
+    let endPoint = null;
     let currentRoute;
+    let startMarker = null;
+    let endMarker = null;
 
-    async function getRoute(points) {
-        if (points.length < 2) return;
+    const apiKey = '5b3ce3597851110001cf6248d56a72cc718348038c651734f42f7749'; // Remplacez par votre clé API
 
-        let routePoints = [...points];
-        if (points.length >= 2) {
-            routePoints.push(points[0]);
+    async function getRoute(start, end) {
+        if (!start || !end) {
+            console.log("Les deux points ne sont pas encore définis.");
+            return;
         }
 
-        const coordinates = routePoints.map(point => `${point[1]},${point[0]}`).join(';');
-        const url = `https://router.project-osrm.org/route/v1/foot/${coordinates}?overview=full&geometries=geojson`;
+        const startStr = `${start[1]},${start[0]}`; // lng, lat
+        const endStr = `${end[1]},${end[0]}`;       // lng, lat
+        const url = `https://api.openrouteservice.org/v2/directions/foot-hiking?api_key=${apiKey}&start=${startStr}&end=${endStr}`;
 
         try {
             const response = await fetch(url);
             const data = await response.json();
 
+            // Vérification des erreurs ou absence de données
+            if (!data.features || data.features.length === 0) {
+                console.error('Aucune route trouvée dans la réponse :', data);
+                return;
+            }
+
             if (currentRoute) {
                 map.removeLayer(currentRoute);
             }
 
-            currentRoute = L.geoJSON(data.routes[0].geometry, {
+            currentRoute = L.geoJSON(data.features[0].geometry, {
                 color: 'blue',
                 weight: 4
             }).addTo(map);
+
+            // Zoom sur la route générée
+            const bounds = L.geoJSON(data.features[0].geometry).getBounds();
+            map.fitBounds(bounds);
         } catch (error) {
-            console.error('Erreur:', error);
+            console.error('Erreur lors de la requête API:', error);
         }
     }
 
-    map.on('click', function(e) {
+    map.on('click', function (e) {
         const coord = e.latlng;
-        points.push([coord.lat, coord.lng]);
 
-        const markerNumber = points.length;
-        const numberIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: `
-               <div style='
-                   background-color: white;
-                   border: 2px solid #3388ff;
-                   border-radius: 50% 50% 0 50%;
-                   transform: rotate(45deg);
-                   width: 25px;
-                   height: 25px;
-                   display: flex;
-                   justify-content: center;
-                   align-items: center;
-               '>
-                   <span style='transform: rotate(-45deg);'>${markerNumber}</span>
-               </div>`,
-            iconSize: [25, 25],
-            iconAnchor: [12, 24]
-        });
+        // Définir le point de départ si pas encore défini
+        if (!startPoint) {
+            startPoint = [coord.lat, coord.lng];
+            if (startMarker) map.removeLayer(startMarker);
+            startMarker = L.marker(coord, {
+                title: "Point de départ"
+            }).addTo(map);
+            console.log("Point de départ défini :", startPoint);
+            return;
+        }
 
-        const marker = L.marker([coord.lat, coord.lng], {icon: numberIcon}).addTo(map);
-        markers.push(marker);
-        getRoute(points);
-    });
+        // Définir le point d'arrivée si le départ est déjà défini
+        if (!endPoint) {
+            endPoint = [coord.lat, coord.lng];
+            if (endMarker) map.removeLayer(endMarker);
+            endMarker = L.marker(coord, {
+                title: "Point d'arrivée"
+            }).addTo(map);
+            console.log("Point d'arrivée défini :", endPoint);
 
-    document.getElementById('undo').addEventListener('click', function() {
-        if (points.length > 0) {
-            points.pop();
-            const lastMarker = markers.pop();
-            map.removeLayer(lastMarker);
-            getRoute(points);
+            // Tracer la route une fois les deux points définis
+            getRoute(startPoint, endPoint);
         }
     });
 </script>

@@ -28,6 +28,8 @@ services:
     user: root
     tty: true
     stdin_open: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   sidekiq:
     build: .
@@ -47,6 +49,8 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 
 volumes:
