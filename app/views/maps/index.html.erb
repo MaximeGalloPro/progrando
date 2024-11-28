@@ -1,5 +1,14 @@
 <div class="container py-4">
-    <button id="undo" class="btn btn-primary mb-2">Supprimer le dernier point</button>
+    <div class="mb-2">
+        <button id="undo" class="btn btn-primary">Supprimer le dernier point</button>
+        <button id="addStart" class="btn btn-success">Ajouter point départ (Mazan)</button>
+        <button id="addEnd" class="btn btn-danger">Ajouter point arrivée (St-Andéol)</button>
+        <button id="addMiddle" class="btn btn-warning">Ajouter point intermédiaire</button>
+        <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="closeLoopCheckbox" />
+            <label class="form-check-label" for="closeLoopCheckbox">Activer la fermeture de la boucle</label>
+        </div>
+    </div>
     <div id="map-container">
         <div id="map"></div>
     </div>
@@ -25,35 +34,35 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script type="module">
-    const map = L.map('map').setView([42.5056, 8.8583], 10); // Vue centrée sur la Corse
+    const map = L.map('map').setView([44.0556, 5.1283], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    let startPoint = null;
-    let endPoint = null;
+    const points = []; // Tableau pour stocker les points
+    let markers = [];  // Tableau pour stocker les marqueurs
     let currentRoute;
-    let startMarker = null;
-    let endMarker = null;
 
-    const apiKey = '5b3ce3597851110001cf6248d56a72cc718348038c651734f42f7749'; // Remplacez par votre clé API
+    const apiKey = '5b3ce3597851110001cf6248d56a72cc718348038c651734f42f7749';
 
-    async function getRoute(start, end) {
-        if (!start || !end) {
-            console.log("Les deux points ne sont pas encore définis.");
+    async function getRoute(points) {
+        if (points.length < 2) {
+            console.error('Au moins deux points sont nécessaires pour calculer un itinéraire.');
             return;
         }
 
-        const startStr = `${start[1]},${start[0]}`; // lng, lat
-        const endStr = `${end[1]},${end[0]}`;       // lng, lat
-        const url = `https://api.openrouteservice.org/v2/directions/foot-hiking?api_key=${apiKey}&start=${startStr}&end=${endStr}`;
+        const url = `https://api.openrouteservice.org/v2/directions/foot-hiking/geojson?api_key=${apiKey}`;
+        const coordinates = points.map(point => [point[1], point[0]]);
 
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coordinates })
+            });
             const data = await response.json();
 
-            // Vérification des erreurs ou absence de données
             if (!data.features || data.features.length === 0) {
                 console.error('Aucune route trouvée dans la réponse :', data);
                 return;
@@ -63,44 +72,79 @@
                 map.removeLayer(currentRoute);
             }
 
-            currentRoute = L.geoJSON(data.features[0].geometry, {
-                color: 'blue',
-                weight: 4
+            currentRoute = L.geoJSON(data, {
+                style: { color: 'blue', weight: 4 }
             }).addTo(map);
 
-            // Zoom sur la route générée
-            const bounds = L.geoJSON(data.features[0].geometry).getBounds();
+            const bounds = currentRoute.getBounds();
             map.fitBounds(bounds);
         } catch (error) {
             console.error('Erreur lors de la requête API:', error);
         }
     }
 
+    function addPoint(lat, lng, label) {
+        const point = [lat, lng];
+        points.push(point);
+        const marker = L.marker([lat, lng], { title: label }).addTo(map);
+        markers.push(marker);
+
+        // Vérifie si trois points sont ajoutés pour fermer la boucle (si activée)
+        const closeLoop = document.getElementById('closeLoopCheckbox').checked;
+        if (points.length === 3 && closeLoop) {
+            addClosingPoint();
+        }
+
+        if (points.length >= 2) {
+            getRoute(points);
+        }
+    }
+
+    function addClosingPoint() {
+        if (points.length < 3) return;
+
+        const firstPoint = points[0];
+        points.push(firstPoint); // Ajoute le premier point à la fin du tableau
+        const marker = L.marker(firstPoint, {
+            title: "Point de départ (fermeture de la boucle)"
+        }).addTo(map);
+        markers.push(marker);
+
+        getRoute(points); // Met à jour la route avec le point de fermeture
+    }
+
+    function removeLastPoint() {
+        if (points.length === 0) return;
+
+        points.pop();
+        const marker = markers.pop();
+        map.removeLayer(marker);
+
+        if (points.length >= 2) {
+            getRoute(points);
+        } else if (currentRoute) {
+            map.removeLayer(currentRoute);
+        }
+    }
+
     map.on('click', function (e) {
-        const coord = e.latlng;
+        const { lat, lng } = e.latlng;
+        addPoint(lat, lng, `Point ${points.length + 1}`);
+    });
 
-        // Définir le point de départ si pas encore défini
-        if (!startPoint) {
-            startPoint = [coord.lat, coord.lng];
-            if (startMarker) map.removeLayer(startMarker);
-            startMarker = L.marker(coord, {
-                title: "Point de départ"
-            }).addTo(map);
-            console.log("Point de départ défini :", startPoint);
-            return;
-        }
+    document.getElementById('addStart').addEventListener('click', () => {
+        addPoint(44.0556, 5.1283, "Point de départ (Mazan)");
+    });
 
-        // Définir le point d'arrivée si le départ est déjà défini
-        if (!endPoint) {
-            endPoint = [coord.lat, coord.lng];
-            if (endMarker) map.removeLayer(endMarker);
-            endMarker = L.marker(coord, {
-                title: "Point d'arrivée"
-            }).addTo(map);
-            console.log("Point d'arrivée défini :", endPoint);
+    document.getElementById('addMiddle').addEventListener('click', () => {
+        addPoint(44.0603, 5.1307, "Point intermédiaire");
+    });
 
-            // Tracer la route une fois les deux points définis
-            getRoute(startPoint, endPoint);
-        }
+    document.getElementById('addEnd').addEventListener('click', () => {
+        addPoint(44.0650, 5.1331, "Point d'arrivée (St-Andéol)");
+    });
+
+    document.getElementById('undo').addEventListener('click', () => {
+        removeLastPoint();
     });
 </script>
