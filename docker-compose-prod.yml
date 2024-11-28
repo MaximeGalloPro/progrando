@@ -19,11 +19,6 @@ services:
     volumes:
       - .:/app
       - tmp_data:/app/tmp
-    depends_on:
-      db:
-        condition: service_started
-      redis:
-        condition: service_started
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3080"]
@@ -45,9 +40,6 @@ services:
     volumes:
       - .:/app
       - tmp_data:/app/tmp
-    depends_on:
-      - db
-      - redis
     restart: unless-stopped
     user: root
     healthcheck:
