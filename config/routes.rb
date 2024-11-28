@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+    root to: 'stats#dashboard'
   resources :maps
   resources :guides
   resources :hikes do
