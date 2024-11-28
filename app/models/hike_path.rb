@@ -1,0 +1,2 @@
+class HikePath < ApplicationRecord
+end

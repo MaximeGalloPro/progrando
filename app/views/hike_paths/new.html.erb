@@ -1,5 +1,14 @@
 <div class="container py-4">
-
+    <% if @hike_path&.errors&.any? %>
+        <div class="alert alert-danger">
+            <h2 class="h6"><%= pluralize(@hike_path&.errors&.count, "erreur") %> :</h2>
+            <ul class="mb-0">
+                <% @hike_path&.errors&.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                <% end %>
+            </ul>
+        </div>
+    <% end %>
     <div class="card rounded mt-3">
         <div class="card-header">
             <div class="d-flex justify-content-around text-center">
@@ -26,9 +35,13 @@
             </div>
         </div>
         <div class="card-body">
-
             <div class="mb-2">
                 <button id="undo" class="btn btn-outline-dark" style="float: right">Supprimer le dernier point</button>
+                <%= button_to "Sauvegarder le tracé",
+                              hike_paths_path,
+                              method: :post,
+                              params: { points: @points, hike_id: @hike&.id },
+                              class: "btn btn-outline-success" %>
                 <div class="form-check mt-2">
                     <input class="form-check-input" type="checkbox" id="closeLoopCheckbox"/>
                     <label class="form-check-label" for="closeLoopCheckbox">Activer la fermeture de la boucle</label>
@@ -74,6 +87,20 @@
     let currentRoute;
 
     const apiKey = '5b3ce3597851110001cf6248d56a72cc718348038c651734f42f7749';
+
+    const saveButton = document.querySelector('form[action="/hike_paths"]');
+    const pointsInput = document.createElement('input');
+    pointsInput.type = 'hidden';
+    pointsInput.name = 'points';
+    saveButton.appendChild(pointsInput);
+    <% unless @hike_path&.coordinates.blank? %>
+    let existingPoints = JSON.parse(<%= @hike_path.coordinates.to_json.html_safe %>);
+    if (Array.isArray(existingPoints)) {
+        existingPoints.forEach(point => {
+            addPoint(point[0], point[1], `Point ${points.length + 1}`);
+        });
+    }
+    <% end %>
 
     async function getRoute(points) {
         if (points.length < 2) {
@@ -173,6 +200,7 @@
     function addPoint(lat, lng, label) {
         const point = [lat, lng];
         points.push(point);
+        pointsInput.value = JSON.stringify(points);
         const marker = L.marker([lat, lng], {title: label}).addTo(map);
         markers.push(marker);
 

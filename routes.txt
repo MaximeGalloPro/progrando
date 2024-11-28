@@ -1,4 +1,13 @@
                                   Prefix Verb   URI Pattern                                                                                       Controller#Action
+                                    root GET    /                                                                                                 stats#dashboard
+                              hike_paths GET    /hike_paths(.:format)                                                                             hike_paths#index
+                                         POST   /hike_paths(.:format)                                                                             hike_paths#create
+                           new_hike_path GET    /hike_paths/new(.:format)                                                                         hike_paths#new
+                          edit_hike_path GET    /hike_paths/:id/edit(.:format)                                                                    hike_paths#edit
+                               hike_path GET    /hike_paths/:id(.:format)                                                                         hike_paths#show
+                                         PATCH  /hike_paths/:id(.:format)                                                                         hike_paths#update
+                                         PUT    /hike_paths/:id(.:format)                                                                         hike_paths#update
+                                         DELETE /hike_paths/:id(.:format)                                                                         hike_paths#destroy
                                   guides GET    /guides(.:format)                                                                                 guides#index
                                          POST   /guides(.:format)                                                                                 guides#create
                                new_guide GET    /guides/new(.:format)                                                                             guides#new

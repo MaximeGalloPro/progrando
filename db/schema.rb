@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_23_162100) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_28_221817) do
   create_table "guides", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "phone", null: false
@@ -31,6 +31,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_23_162100) do
     t.datetime "updated_at", null: false
     t.index ["hike_id"], name: "index_hike_histories_on_hike_id"
     t.index ["hiking_date", "hike_id"], name: "index_hike_histories_on_hiking_date_and_hike_id", unique: true
+  end
+
+  create_table "hike_paths", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
+    t.integer "hike_id"
+    t.text "coordinates"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "hikes", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
