@@ -1,9 +1,14 @@
 <div class="container py-4">
+    <div id="route-stats" class="mt-3">
+        <p><strong>Distance :</strong> <span id="distance">0 km</span></p>
+        <p><strong>Dénivelé + :</strong> <span id="elevation-gain">0 m</span></p>
+        <p><strong>Dénivelé - :</strong> <span id="elevation-loss">0 m</span></p>
+        <p><strong>Altitude min :</strong> <span id="min-altitude">0 m</span></p>
+        <p><strong>Altitude max :</strong> <span id="max-altitude">0 m</span></p>
+    </div>
+
     <div class="mb-2">
         <button id="undo" class="btn btn-primary">Supprimer le dernier point</button>
-<!--        <button id="addStart" class="btn btn-success">Ajouter point départ (Mazan)</button>-->
-<!--        <button id="addEnd" class="btn btn-danger">Ajouter point arrivée (St-Andéol)</button>-->
-<!--        <button id="addMiddle" class="btn btn-warning">Ajouter point intermédiaire</button>-->
         <div class="form-check mt-2">
             <input class="form-check-input" type="checkbox" id="closeLoopCheckbox" />
             <label class="form-check-label" for="closeLoopCheckbox">Activer la fermeture de la boucle</label>
@@ -59,9 +64,14 @@
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ coordinates })
+                body: JSON.stringify({
+                    coordinates,
+                    elevation: true // Demande des données d'altitude
+                })
             });
             const data = await response.json();
+
+            console.log("Réponse API OpenRouteService:", data); // Log des données brutes renvoyées
 
             if (!data.features || data.features.length === 0) {
                 console.error('Aucune route trouvée dans la réponse :', data);
@@ -78,10 +88,62 @@
 
             const bounds = currentRoute.getBounds();
             map.fitBounds(bounds);
+
+            // Calcul et affichage des statistiques
+            displayRouteStats(data);
         } catch (error) {
             console.error('Erreur lors de la requête API:', error);
         }
     }
+
+    function displayRouteStats(data) {
+        try {
+            // Extraction des coordonnées et des altitudes
+            const coordinates = data.features[0].geometry.coordinates;
+            const altitudes = coordinates.map(coord => coord[2]); // Altitudes
+
+            // Extraction des propriétés de l'itinéraire
+            const summary = data.features[0].properties.summary;
+            const properties = data.features[0].properties.segments[0];
+
+            // Calcul de la distance
+            const distance = summary.distance; // Distance en mètres
+            document.getElementById('distance').textContent = (distance / 1000).toFixed(2) + ' km';
+
+            // Calcul des dénivelés à partir des altitudes
+            let elevationGain = 0;
+            let elevationLoss = 0;
+
+            for (let i = 1; i < altitudes.length; i++) {
+                const diff = altitudes[i] - altitudes[i - 1];
+                if (diff > 0) {
+                    elevationGain += diff;
+                } else {
+                    elevationLoss -= diff;
+                }
+            }
+
+            document.getElementById('elevation-gain').textContent = Math.round(elevationGain) + ' m';
+            document.getElementById('elevation-loss').textContent = Math.round(elevationLoss) + ' m';
+
+            // Calcul des altitudes minimale et maximale
+            if (altitudes.length > 0) {
+                const minAltitude = Math.min(...altitudes);
+                const maxAltitude = Math.max(...altitudes);
+                document.getElementById('min-altitude').textContent = Math.round(minAltitude) + ' m';
+                document.getElementById('max-altitude').textContent = Math.round(maxAltitude) + ' m';
+            } else {
+                console.warn("Altitudes non trouvées dans les données.");
+                document.getElementById('min-altitude').textContent = "Non disponible";
+                document.getElementById('max-altitude').textContent = "Non disponible";
+            }
+        } catch (error) {
+            console.error("Erreur lors du traitement des statistiques :", error);
+        }
+    }
+
+
+
 
     function addPoint(lat, lng, label) {
         const point = [lat, lng];
@@ -131,18 +193,6 @@
         const { lat, lng } = e.latlng;
         addPoint(lat, lng, `Point ${points.length + 1}`);
     });
-
-    // document.getElementById('addStart').addEventListener('click', () => {
-    //     addPoint(44.0556, 5.1283, "Point de départ (Mazan)");
-    // });
-    //
-    // document.getElementById('addMiddle').addEventListener('click', () => {
-    //     addPoint(44.0603, 5.1307, "Point intermédiaire");
-    // });
-    //
-    // document.getElementById('addEnd').addEventListener('click', () => {
-    //     addPoint(44.0650, 5.1331, "Point d'arrivée (St-Andéol)");
-    // });
 
     document.getElementById('undo').addEventListener('click', () => {
         removeLastPoint();
