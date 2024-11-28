@@ -1,0 +1,104 @@
+<div class="container py-4">
+    <button id="undo" class="btn btn-primary mb-2">Supprimer le dernier point</button>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+</div>
+
+<style>
+    #map-container {
+        position: relative;
+        height: 30rem;
+    }
+
+    #map {
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    .custom-div-icon {
+        background: none;
+        border: none;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+    const map = L.map('map').setView([48.8566, 2.3522], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let points = [];
+    let markers = [];
+    let currentRoute;
+
+    async function getRoute(points) {
+        if (points.length < 2) return;
+
+        let routePoints = [...points];
+        if (points.length >= 2) {
+            routePoints.push(points[0]);
+        }
+
+        const coordinates = routePoints.map(point => `${point[1]},${point[0]}`).join(';');
+        const url = `https://router.project-osrm.org/route/v1/foot/${coordinates}?overview=full&geometries=geojson`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (currentRoute) {
+                map.removeLayer(currentRoute);
+            }
+
+            currentRoute = L.geoJSON(data.routes[0].geometry, {
+                color: 'blue',
+                weight: 4
+            }).addTo(map);
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+
+    map.on('click', function(e) {
+        const coord = e.latlng;
+        points.push([coord.lat, coord.lng]);
+
+        const markerNumber = points.length;
+        const numberIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `
+               <div style='
+                   background-color: white;
+                   border: 2px solid #3388ff;
+                   border-radius: 50% 50% 0 50%;
+                   transform: rotate(45deg);
+                   width: 25px;
+                   height: 25px;
+                   display: flex;
+                   justify-content: center;
+                   align-items: center;
+               '>
+                   <span style='transform: rotate(-45deg);'>${markerNumber}</span>
+               </div>`,
+            iconSize: [25, 25],
+            iconAnchor: [12, 24]
+        });
+
+        const marker = L.marker([coord.lat, coord.lng], {icon: numberIcon}).addTo(map);
+        markers.push(marker);
+        getRoute(points);
+    });
+
+    document.getElementById('undo').addEventListener('click', function() {
+        if (points.length > 0) {
+            points.pop();
+            const lastMarker = markers.pop();
+            map.removeLayer(lastMarker);
+            getRoute(points);
+        }
+    });
+</script>
