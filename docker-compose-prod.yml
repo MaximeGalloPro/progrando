@@ -12,10 +12,10 @@ services:
       - "3080:3000"
     environment:
       - RAILS_ENV=${RAILS_ENV:-development}
-      - DATABASE_URL=${DATABASE_URL-mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}}
+      - DATABASE_URL=${DATABASE_URL:-mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}}
       - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES:-false}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_key}
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
     volumes:
       - .:/app
       - tmp_data:/app/tmp
@@ -39,8 +39,8 @@ services:
     command: bundle exec sidekiq
     environment:
       - RAILS_ENV=${RAILS_ENV:-development}
-      - DATABASE_URL=${DATABASE_URL-mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}}
-      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=${DATABASE_URL:-mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_key}
     volumes:
       - .:/app
