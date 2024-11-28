@@ -1,22 +1,46 @@
 <div class="container py-4">
-    <div id="route-stats" class="mt-3">
-        <p><strong>Distance :</strong> <span id="distance">0 km</span></p>
-        <p><strong>Dénivelé + :</strong> <span id="elevation-gain">0 m</span></p>
-        <p><strong>Dénivelé - :</strong> <span id="elevation-loss">0 m</span></p>
-        <p><strong>Altitude min :</strong> <span id="min-altitude">0 m</span></p>
-        <p><strong>Altitude max :</strong> <span id="max-altitude">0 m</span></p>
-    </div>
 
-    <div class="mb-2">
-        <button id="undo" class="btn btn-primary">Supprimer le dernier point</button>
-        <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" id="closeLoopCheckbox" />
-            <label class="form-check-label" for="closeLoopCheckbox">Activer la fermeture de la boucle</label>
+    <div class="card rounded mt-3">
+        <div class="card-header">
+            <div class="d-flex justify-content-around text-center">
+                <div>
+                    <p class="mb-1"><strong>Distance :</strong></p>
+                    <p id="distance">0 km</p>
+                </div>
+                <div>
+                    <p class="mb-1"><strong>Dénivelé + :</strong></p>
+                    <p id="elevation-gain">0 m</p>
+                </div>
+                <div>
+                    <p class="mb-1"><strong>Dénivelé - :</strong></p>
+                    <p id="elevation-loss">0 m</p>
+                </div>
+                <div>
+                    <p class="mb-1"><strong>Altitude min :</strong></p>
+                    <p id="min-altitude">0 m</p>
+                </div>
+                <div>
+                    <p class="mb-1"><strong>Altitude max :</strong></p>
+                    <p id="max-altitude">0 m</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <div class="mb-2">
+                <button id="undo" class="btn btn-outline-dark" style="float: right">Supprimer le dernier point</button>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="closeLoopCheckbox"/>
+                    <label class="form-check-label" for="closeLoopCheckbox">Activer la fermeture de la boucle</label>
+                </div>
+            </div>
+            <div id="map-container">
+                <div id="map"></div>
+            </div>
+            <canvas id="elevationChart" width="800" height="200" style="display: none"></canvas>
         </div>
     </div>
-    <div id="map-container">
-        <div id="map"></div>
-    </div>
+
 </div>
 
 <style>
@@ -63,7 +87,7 @@
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     coordinates,
                     elevation: true // Demande des données d'altitude
@@ -83,7 +107,7 @@
             }
 
             currentRoute = L.geoJSON(data, {
-                style: { color: 'blue', weight: 4 }
+                style: {color: 'blue', weight: 4}
             }).addTo(map);
 
             const bounds = currentRoute.getBounds();
@@ -137,18 +161,19 @@
                 document.getElementById('min-altitude').textContent = "Non disponible";
                 document.getElementById('max-altitude').textContent = "Non disponible";
             }
+
+            // Appeler la fonction pour générer le graphique de profil d'altitude
+            generateElevationChart(coordinates);
         } catch (error) {
             console.error("Erreur lors du traitement des statistiques :", error);
         }
     }
 
 
-
-
     function addPoint(lat, lng, label) {
         const point = [lat, lng];
         points.push(point);
-        const marker = L.marker([lat, lng], { title: label }).addTo(map);
+        const marker = L.marker([lat, lng], {title: label}).addTo(map);
         markers.push(marker);
 
         // Vérifie si trois points sont ajoutés pour fermer la boucle (si activée)
@@ -190,11 +215,124 @@
     }
 
     map.on('click', function (e) {
-        const { lat, lng } = e.latlng;
+        const {lat, lng} = e.latlng;
         addPoint(lat, lng, `Point ${points.length + 1}`);
     });
 
     document.getElementById('undo').addEventListener('click', () => {
         removeLastPoint();
     });
+
+    function calculateDistancesAndAltitudes(coordinates) {
+        const distances = [0]; // Distance cumulée
+        const altitudes = coordinates.map(coord => coord[2]); // Altitudes
+
+        for (let i = 1; i < coordinates.length; i++) {
+            const [lon1, lat1] = coordinates[i - 1];
+            const [lon2, lat2] = coordinates[i];
+            const distance = haversineDistance(lat1, lon1, lat2, lon2);
+            distances.push(distances[i - 1] + distance);
+        }
+
+        return {distances, altitudes};
+    }
+
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Rayon de la Terre en km
+        const toRad = x => (x * Math.PI) / 180;
+
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // Distance en km
+    }
+
+    function generateElevationChart(coordinates) {
+        const {distances, altitudes} = calculateDistancesAndAltitudes(coordinates);
+
+        // Crée un canvas pour le graphique
+        let elevationChart = document.getElementById('elevationChart');
+        const ctx = elevationChart.getContext('2d');
+        elevationChart.style.display = "block";
+        // Vérifie si le graphique existe et peut être détruit
+        if (window.elevationChart && typeof window.elevationChart.destroy === 'function') {
+            window.elevationChart.destroy();
+        }
+
+        // Crée un dégradé pour le graphique
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, "rgba(255, 0, 0, 0.7)"); // Rouge (montée forte)
+        gradient.addColorStop(0.5, "rgba(255, 255, 0, 0.7)"); // Jaune (plat)
+        gradient.addColorStop(1, "rgba(0, 255, 0, 0.7)"); // Vert (descente)
+
+        // Créer le graphique avec Chart.js
+        window.elevationChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: distances.map(d => `${d.toFixed(2)} km`), // Distances en abscisses
+                datasets: [
+                    {
+                        label: 'Altitude (m)',
+                        data: altitudes,
+                        borderColor: 'rgb(255,255,255)',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointStyle: false,
+                        fill: true, // Ajoute un remplissage sous la ligne
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        intersect: false, // Permet l'affichage même si la souris n'est pas sur un point précis
+                        mode: 'nearest', // Affiche le point le plus proche
+                        callbacks: {
+                            label: function (context) {
+                                const altitude = context.raw;
+                                const distance = distances[context.dataIndex];
+                                return `Distance: ${distance.toFixed(2)} km, Altitude: ${altitude} m`;
+                            },
+                        },
+                    },
+                    legend: {
+                        display: false, // Supprimer la légende
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Distance (km)',
+                            font: {
+                                size: 14,
+                            },
+                        },
+                        grid: {
+                            display: false, // Supprimer la grille verticale
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Altitude (m)',
+                            font: {
+                                size: 14,
+                            },
+                        },
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.5)', // Grille légère
+                        },
+                    },
+                },
+            },
+        });
+    }
 </script>
