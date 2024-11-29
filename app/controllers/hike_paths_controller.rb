@@ -4,6 +4,14 @@ class HikePathsController < ApplicationController
         session.delete(:last_hike_path)
     end
 
+    def show
+        @hike_path = HikePath.find_by(id: params[:id])
+        if @hike_path.nil?
+            flash[:alert] = "Le tracé demandé n'existe pas."
+            redirect_to hikes_path
+        end
+    end
+
     def create
         points = params[:points]
         @hike_path = HikePath.new
