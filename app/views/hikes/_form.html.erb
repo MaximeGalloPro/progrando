@@ -188,8 +188,8 @@
     <%= render "hike_paths/map", variable: @hike_path %>
 
     <div class="mt-4">
-        <%= f.submit "Enregistrer", class: "btn btn-primary" %>
         <%= link_to "Retour", hikes_path, class: "btn btn-outline-secondary ms-2" %>
+        <%= f.submit "Enregistrer", class: "btn btn-primary", style: "float: right" %>
     </div>
 <% end %>
 

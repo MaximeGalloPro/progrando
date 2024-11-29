@@ -297,6 +297,50 @@ function updateCoordinatesField() {
     }
 }
 
+document.getElementById('locate-user').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+        alert("La géolocalisation n'est pas prise en charge par votre navigateur.");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            const accuracy = position.coords.accuracy;
+
+            // Ajoutez un marqueur pour la position de l'utilisateur
+            const userMarker = L.marker([latitude, longitude], {
+                title: "Votre position",
+                icon: L.icon({
+                    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                }),
+            }).addTo(map);
+
+            // Ajoutez un cercle pour représenter la précision
+            const accuracyCircle = L.circle([latitude, longitude], {
+                radius: accuracy, // Précision en mètres
+                color: 'blue',
+                fillColor: '#3f72af',
+                fillOpacity: 0.2,
+            }).addTo(map);
+
+            // Centrez la carte sur la position de l'utilisateur
+            map.setView([latitude, longitude], 13);
+
+            // Optionnel : afficher une info-bulle avec les détails
+            userMarker.bindPopup(`Vous êtes ici.<br>Précision : ±${Math.round(accuracy)} m`).openPopup();
+        },
+        (error) => {
+            console.error("Erreur de géolocalisation :", error);
+            alert("Impossible de vous localiser. Vérifiez vos permissions ou réessayez.");
+        }
+    );
+});
+
+
 // Event Listeners
 map.on('click', function (e) {
     const {lat, lng} = e.latlng;
