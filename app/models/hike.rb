@@ -5,6 +5,7 @@ class Hike < ApplicationRecord
     has_one :latest_history, -> { order(hiking_date: :desc) },
             class_name: 'HikeHistory',
             foreign_key: :hike_id
+    has_one :hike_path
 
     # Callbacks
     before_validation :convert_distance_separator
@@ -14,10 +15,6 @@ class Hike < ApplicationRecord
               numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
     validates :starting_point, presence: true
     validates :trail_name, presence: true
-    validates :openrunner_ref,
-              presence: true,
-              numericality: { only_integer: true }
-
 
     # Scopes de base
     scope :ordered_by_trail_name, -> { order(:trail_name) }

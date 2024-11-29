@@ -1,0 +1,84 @@
+<div class="container py-4">
+    <% if @hike_path&.errors&.any? %>
+        <div class="alert alert-danger">
+            <h2 class="h6"><%= pluralize(@hike_path&.errors&.count, "erreur") %> :</h2>
+            <ul class="mb-0">
+                <% @hike_path&.errors&.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                <% end %>
+            </ul>
+        </div>
+    <% end %>
+    <div class="card rounded mt-3">
+        <div class="card-header">
+            <div class="d-flex justify-content-around text-center">
+                <div>
+                    <div class="mb-1"><strong>Distance :</strong></div>
+                    <div id="distance">0 km</div>
+                </div>
+                <div>
+                    <div class="mb-1"><strong>Dénivelé + :</strong></div>
+                    <div id="elevation-gain">0 m</div>
+                </div>
+                <div>
+                    <div class="mb-1"><strong>Dénivelé - :</strong></div>
+                    <div id="elevation-loss">0 m</div>
+                </div>
+                <div>
+                    <div class="mb-1"><strong>Altitude min :</strong></div>
+                    <div id="min-altitude">0 m</div>
+                </div>
+                <div>
+                    <div class="mb-1"><strong>Altitude max :</strong></div>
+                    <div id="max-altitude">0 m</div>@hike_path
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-around" style="margin-bottom: 1rem">
+
+                <div class="col-3" style="padding-top: 0.7rem">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="closeLoopCheckbox" checked/>
+                        <label class="form-check-label fw-bold" for="closeLoopCheckbox">Activer la fermeture de la
+                            boucle</label>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <button type="button" id="undo" class="btn btn-outline-dark w-100">Supprimer le dernier point</button>
+                </div>
+                <!--                <div class="col-3">-->
+                <%#= button_to "Sauvegarder le tracé",
+                                  hike_paths_path,
+                                  method: :post,
+                                  params: { points: @points, hike_id: @hike&.id },
+                                  class: "btn btn-outline-success w-100" %>
+                <!--                </div>-->
+            </div>
+            <div id="map-container">
+                <div id="map"></div>
+            </div>
+            <canvas id="elevationChart" width="800" height="200" style="display: none"></canvas>
+        </div>
+    </div>
+</div>
+
+<style>
+    #map-container {
+        position: relative;
+        height: 30rem;
+    }
+
+    #map {
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    .custom-div-icon {
+        background: none;
+        border: none;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>

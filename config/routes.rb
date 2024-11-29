@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
     root to: 'stats#dashboard'
-    resources :hike_paths
+    resources :hike_paths do
+        collection do
+            get :map
+        end
+    end
     resources :guides
     resources :hikes do
         member do

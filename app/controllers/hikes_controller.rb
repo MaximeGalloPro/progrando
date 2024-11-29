@@ -33,15 +33,18 @@ class HikesController < ApplicationController
 
     def new
         @hike = Hike.new
+        @hike_path = HikePath.new
     end
 
     def edit
         @hike = Hike.find(params[:id])
+        @hike_path = @hike.hike_path
     end
 
     def update
         @hike = Hike.find(params[:id])
-        if @hike.update(hike_params)
+        @hike_path = @hike.hike_path
+        if @hike.update(hike_params) and @hike_path.update(coordinates: params[:hike][:coordinates])
             redirect_to hikes_path, notice: 'Parcours mis à jour avec succès.'
         else
             render :edit, status: :unprocessable_entity
@@ -50,10 +53,13 @@ class HikesController < ApplicationController
 
     def create
         @hike = Hike.new(hike_params)
+        @hike_path = HikePath.new(coordinates: params[:hike][:coordinates])
         if @hike.save
+            @hike_path.hike_id = @hike.id
+            @hike_path.save
             redirect_to hikes_path, notice: 'Parcours ajouté avec succès.'
         else
-            render :new, status: :unprocessable_entity
+            render :new, status: :unprocessable_entity, params: { hike: @hike, coordinates: params[:coordinates] }
         end
     end
 
@@ -73,7 +79,6 @@ class HikesController < ApplicationController
         redirect_to hikes_path, notice: 'Parcours supprimé avec succès.'
     end
 
-
     private
 
     def hike_params
@@ -89,7 +94,7 @@ class HikesController < ApplicationController
             :altitude_min,
             :altitude_max,
             :openrunner_ref,
-            )
+        )
 
         if params_with_converted_distance[:distance_km].present?
             params_with_converted_distance[:distance_km].gsub!(',', '.')

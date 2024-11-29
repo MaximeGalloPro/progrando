@@ -1,3 +1,4 @@
+<!--app/views/hikes/_form.html.erb-->
 <%= form_with(model: @hike, local: true) do |f| %>
     <% if @hike.errors.any? %>
         <div class="alert alert-danger">
@@ -14,7 +15,7 @@
     <div class="row g-3 mb-4">
         <div class="col-md-6">
             <div class="input-group">
-                <%= f.label :openrunner_ref, "Référence OpenRunner", class: "form-label required d-block w-100" %>
+                <%= f.label :openrunner_ref, "Référence OpenRunner", class: "form-label d-block w-100" %>
                 <div class="input-group">
                     <%= f.text_field :openrunner_ref,
                                      class: "form-control #{'is-invalid' if @hike.errors[:openrunner_ref].any?}",
@@ -169,29 +170,6 @@
             </div>
         </div>
 
-        <script>
-            const difficultyInput = document.querySelector('input[type="range"]');
-            const difficultyValue = document.getElementById('difficultyValue');
-
-            const updateDifficultyLabel = (value) => {
-                const labels = {
-                    1: 'Très facile',
-                    2: 'Facile',
-                    3: 'Moyen',
-                    4: 'Difficile',
-                    5: 'Très difficile'
-                };
-                difficultyValue.textContent = labels[value];
-            };
-
-            difficultyInput.addEventListener('input', (e) => {
-                updateDifficultyLabel(e.target.value);
-            });
-
-            // Initialiser la valeur au chargement
-            updateDifficultyLabel(difficultyInput.value);
-        </script>
-
         <div class="col-md-6">
             <div class="mb-3">
                 <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label" %>
@@ -206,11 +184,15 @@
         </div>
     </div>
 
+    <%= f.hidden_field :coordinates, :value => "" %>
+    <%= render "hike_paths/map", variable: @hike_path %>
+
     <div class="mt-4">
         <%= f.submit "Enregistrer", class: "btn btn-primary" %>
         <%= link_to "Retour", hikes_path, class: "btn btn-outline-secondary ms-2" %>
     </div>
 <% end %>
+
 
 <style>
     .required:after {
@@ -219,57 +201,16 @@
     }
 </style>
 
-<script>
-    const fetchButton = document.getElementById('fetch_openrunner_data');
-    const spinner = document.getElementById('loading_spinner');
+<script type="module">
+    import "hikes"
+    import "map"
 
-    if (fetchButton) {
-        fetchButton.addEventListener('click', async function () {
-            const openrunnerRef = document.getElementById('openrunner_ref_input').value;
-
-            if (!openrunnerRef) {
-                alert('Veuillez entrer une référence OpenRunner');
-                return;
-            }
-
-            // UI feedback
-            spinner.classList.remove('d-none');
-            fetchButton.disabled = true;
-            console.log("Making request to:", `/hikes/fetch_openrunner_details?openrunner_ref=${openrunnerRef}`);
-
-            try {
-                const response = await fetch(`/hikes/fetch_openrunner_details?openrunner_ref=${openrunnerRef}`);
-                console.log("Response received:", response);
-                const data = await response.json();
-                console.log("Data received:", data);
-
-                if (data.error) {
-                    console.error("Error from server:", data.error);
-                    alert('Erreur lors de la récupération des données: ' + data.error);
-                    return;
-                }
-
-                // Mise à jour des champs du formulaire
-                Object.entries(data).forEach(([key, value]) => {
-                    const input = document.querySelector(`#hike_${key}`);
-                    if (input) {
-                        console.log(`Setting ${key} to ${value}`);
-                        input.value = value;
-                    } else {
-                        console.log(`Input not found for ${key}`);
-                    }
-                });
-
-            } catch (error) {
-                console.error("Fetch error:", error);
-                alert('Erreur lors de la récupération des données');
-            } finally {
-                // Reset UI
-                spinner.classList.add('d-none');
-                fetchButton.disabled = false;
-            }
+    <% unless @hike_path&.coordinates.blank? %>
+    document.addEventListener('DOMContentLoaded', () => {
+        const event = new CustomEvent('coordinatesLoaded', {
+            detail: <%= @hike_path.coordinates.to_json.html_safe %>
         });
-    } else {
-        console.warn("Button not found");
-    }
+        document.dispatchEvent(event);
+    });
+    <% end %>
 </script>
