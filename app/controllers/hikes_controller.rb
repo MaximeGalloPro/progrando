@@ -44,7 +44,6 @@ class HikesController < ApplicationController
     def update
         @hike = Hike.find(params[:id])
         @hike_path = @hike.hike_path || HikePath.new(hike_id: @hike.id)
-        byebug
         if @hike.update(hike_params) and @hike_path&.update(coordinates: params[:hike][:coordinates])
             redirect_to hikes_path, notice: 'Parcours mis à jour avec succès.'
         else
@@ -109,7 +108,7 @@ class HikesController < ApplicationController
             .then { |scope| apply_search(scope) }
             .order_by_latest_date
             .distinct
-            .includes(:hike_histories)
+            .includes(:hike_histories, :hike_path, latest_history: :guide)
     end
 
     def apply_search(scope)
