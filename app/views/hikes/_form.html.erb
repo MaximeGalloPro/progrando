@@ -25,7 +25,7 @@
                         <span class="spinner-border spinner-border-sm d-none" role="status" id="loading_spinner"></span>
                     </button>
                 </div>
-                <i>La récupération des informations prends en moyenne 6 secondes.</i>
+                <i>La récupération des informations prend en moyenne 6 secondes.</i>
                 <% if @hike.errors[:openrunner_ref].any? %>
                     <div class="invalid-feedback">
                         <%= @hike.errors[:openrunner_ref].join(', ') %>
@@ -158,9 +158,22 @@
                     <%= f.range_field :difficulty,
                                       min: 1,
                                       max: 5,
+                                      value: @hike.difficulty,
                                       class: "form-range me-2 #{'is-invalid' if @hike.errors[:difficulty].any?}",
-                                      style: "width: 70%;" %>
-                    <span id="difficultyValue" class="ms-2"></span>
+                                      style: "width: 70%;",
+                                      data: {
+                                          controller: "difficulty",
+                                          difficulties: {
+                                              "1": "Très facile",
+                                              "2": "Facile",
+                                              "3": "Moyen",
+                                              "4": "Difficile",
+                                              "5": "Très difficile"
+                                          }.to_json
+                                      } %>
+                    <span class="badge bg-primary ms-2" data-difficulty-target="display">
+              <%= "#{@hike.difficulty} - #{@hike.difficulty_text}" %>
+            </span>
                 </div>
                 <% if @hike.errors[:difficulty].any? %>
                     <div class="invalid-feedback">
@@ -169,6 +182,24 @@
                 <% end %>
             </div>
         </div>
+
+        <script>
+            document.addEventListener('input', function(e) {
+                if (e.target.matches('input[type="range"]')) {
+                    const difficulties = {
+                        "1": "Très facile",
+                        "2": "Facile",
+                        "3": "Moyen",
+                        "4": "Difficile",
+                        "5": "Très difficile"
+                    };
+                    if (!e.target.dataset.controller) return;
+                    const value = e.target.value;
+                    const display = e.target.closest('.mb-3').querySelector('.badge');
+                    display.textContent = `${value} - ${difficulties[value]}`;
+                }
+            });
+        </script>
 
         <div class="col-md-6">
             <div class="mb-3">
