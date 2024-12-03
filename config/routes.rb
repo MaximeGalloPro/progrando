@@ -6,6 +6,7 @@ Rails.application.routes.draw do
         end
     end
     resources :guides
+    resources :members
     resources :hikes do
         member do
             post :refresh_from_openrunner

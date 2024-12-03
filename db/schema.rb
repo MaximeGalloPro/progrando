@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_03_134846) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_03_222417) do
   create_table "guides", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "phone", null: false
@@ -63,9 +63,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_03_134846) do
     t.string "name"
     t.string "email"
     t.string "phone"
-    t.integer "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "role_id"
   end
 
   create_table "roles", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
