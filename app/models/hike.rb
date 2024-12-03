@@ -1,7 +1,7 @@
 class Hike < ApplicationRecord
     # Associations
     has_many :hike_histories, foreign_key: :hike_id
-    has_many :guides, through: :hike_histories
+    has_many :members, through: :hike_histories
     has_one :latest_history, -> { order(hiking_date: :desc) },
             class_name: 'HikeHistory',
             foreign_key: :hike_id
@@ -80,8 +80,8 @@ class Hike < ApplicationRecord
     # Méthodes de classe
     def self.todays_hike
         today_query = joins(:hike_histories)
-                          .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, guides.name as guide_name')
-                          .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
+                          .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, members.name as member_name')
+                          .joins('LEFT JOIN members ON members.id = hike_histories.member_id')
 
         today_hike = today_query
                          .where('hike_histories.hiking_date = ?', Date.current)
@@ -116,7 +116,7 @@ class Hike < ApplicationRecord
     end
 
     def last_guide_name
-        latest_history&.guide&.name
+        latest_history&.member&.name
     end
 
     private

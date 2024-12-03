@@ -131,10 +131,10 @@ namespace :hike_histories do
                         # Clean numbers
                         carpooling_cost = convert_num(row['* C.V.'])
 
-                        guide = Guide.find_or_initialize_by(phone: row['Tel.']&.strip)
+                        member = Member.find_or_initialize_by(phone: row['Tel.']&.strip)
 
-                        guide.assign_attributes(name: row['Animateur']&.strip)
-                        guide.save(validate: false)
+                        member.assign_attributes(name: row['Animateur']&.strip)
+                        member.save(validate: false)
                         history = HikeHistory.find_or_initialize_by(
                             hiking_date: parse_date(hiking_date),
                             openrunner_ref: convert_num(row['Ref']&.strip))
@@ -144,7 +144,7 @@ namespace :hike_histories do
                             departure_time: row['Depart']&.strip,
                             day_type: row['Journee']&.strip,
                             carpooling_cost: carpooling_cost,
-                            guide_id: guide&.id,
+                            member_id: member&.id,
                             hike_id: hike_id,
                         )
 
