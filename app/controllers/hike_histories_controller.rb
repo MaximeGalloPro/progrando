@@ -4,8 +4,8 @@ class HikeHistoriesController < ApplicationController
     def index
         @hike = Hike.find_by(id: params[:hike_id])
         @results = HikeHistory.where(hike_id: params[:hike_id])
-                              .joins(:guide)
-                              .select('hike_histories.*, guides.name as guide_name')
+                              .joins(:member)
+                              .select('hike_histories.*, members.name as member_name')
                               .order(hiking_date: :desc)
     end
 
@@ -70,7 +70,7 @@ class HikeHistoriesController < ApplicationController
             :carpooling_cost,
             :hike_id,
             :openrunner_ref,
-            :guide_id  # Ajout de guide_id
+            :member_id
         )
     end
 end

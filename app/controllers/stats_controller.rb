@@ -15,8 +15,8 @@ class StatsController < ApplicationController
 
     def fetch_last_hikes
         Hike.joins(:latest_history)
-            .select('hikes.*, hike_histories.hiking_date, guides.name as guide_name')
-            .joins('LEFT JOIN guides ON guides.id = hike_histories.guide_id')
+            .select('hikes.*, hike_histories.hiking_date, members.name as member_name')
+            .joins('LEFT JOIN members ON members.id = hike_histories.member_id')
             .where('hike_histories.hiking_date < ?', Date.current)
             .order('hike_histories.hiking_date DESC')
             .limit(10)
@@ -62,10 +62,10 @@ class StatsController < ApplicationController
     end
 
     def fetch_guide_stats
-        HikeHistory.joins(:guide)
+        HikeHistory.joins(:member)
                    .where('hiking_date >= ?', 1.year.ago)
-                   .where.not(guides: { name: nil })
-                   .group('guides.name')
+                   .where.not(members: { name: nil })
+                   .group('members.name')
                    .order('count_all DESC')
                    .limit(10)
                    .count

@@ -80,7 +80,7 @@
             <% @results.each do |history| %>
                 <tr>
                     <td><%= history.hiking_date&.strftime("%d/%m/%Y") %></td>
-                    <td><%= history['guide_name'] %></td>
+                    <td><%= history['member_name'] %></td>
                     <td><%= history.departure_time %></td>
                     <td><%= history.day_type %></td>
                     <td><%= number_to_currency(history.carpooling_cost, unit: "€", format: "%n %u") %></td>

@@ -1,6 +1,6 @@
 class HikeHistory < ApplicationRecord
     belongs_to :hike
-    belongs_to :guide
+    belongs_to :member
 
     # Validations de présence pour tous les champs requis
     validates :hiking_date, presence: true
