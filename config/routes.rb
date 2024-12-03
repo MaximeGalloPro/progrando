@@ -16,4 +16,6 @@ Rails.application.routes.draw do
     end
     resources :hike_histories
     get 'stats/dashboard', to: 'stats#dashboard'
+
+    get '/health', to: proc { [200, {}, ['OK']] }
 end
