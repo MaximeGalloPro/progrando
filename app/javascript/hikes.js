@@ -52,22 +52,22 @@ if (fetchButton) {
 }
 
 const difficultyInput = document.querySelector('input[type="range"]');
-const difficultyValue = document.getElementById('difficultyValue');
+// const difficultyValue = document.getElementById('difficultyValue');
 
-const updateDifficultyLabel = (value) => {
-    const labels = {
-        1: 'Très facile',
-        2: 'Facile',
-        3: 'Moyen',
-        4: 'Difficile',
-        5: 'Très difficile'
-    };
-    difficultyValue.textContent = labels[value];
-};
+// const updateDifficultyLabel = (value) => {
+//     const labels = {
+//         1: 'Très facile',
+//         2: 'Facile',
+//         3: 'Moyen',
+//         4: 'Difficile',
+//         5: 'Très difficile'
+//     };
+//     difficultyValue.textContent = labels[value];
+// };
 
 difficultyInput.addEventListener('input', (e) => {
     updateDifficultyLabel(e.target.value);
 });
 
 // Initialiser la valeur au chargement
-updateDifficultyLabel(difficultyInput.value);
+// updateDifficultyLabel(difficultyInput.value);

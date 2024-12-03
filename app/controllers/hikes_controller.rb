@@ -44,6 +44,7 @@ class HikesController < ApplicationController
     def update
         @hike = Hike.find(params[:id])
         @hike_path = @hike.hike_path || HikePath.new(hike_id: @hike.id)
+        params[:hike][:coordinates] = "" if params[:hike][:coordinates] == "[]"
         if @hike.update(hike_params) and @hike_path&.update(coordinates: params[:hike][:coordinates])
             redirect_to hikes_path, notice: 'Parcours mis à jour avec succès.'
         else
