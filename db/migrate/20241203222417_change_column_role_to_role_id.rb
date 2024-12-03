@@ -1,6 +1,5 @@
 class ChangeColumnRoleToRoleId < ActiveRecord::Migration[7.0]
   def change
-    remove_column :members, :role if column_exists?(:members, :role)
-    add_column :members, :role_id, :integer unless column_exists?(:members, :role_id)
+    rename_column :members, :role, :role_id if column_exists? :members, :role
   end
 end
