@@ -1,4 +1,5 @@
 class HikeHistoriesController < ApplicationController
+    before_action :get_members
 
     def index
         @hike = Hike.find_by(id: params[:hike_id])
@@ -21,7 +22,6 @@ class HikeHistoriesController < ApplicationController
             redirect_to hikes_path, notice: 'Historique de randonnée mis à jour avec succès.'
         else
             @hikes = Hike.order(:trail_name)
-            @guides = Guide.all.order(:name)
             flash.now[:alert] = 'Veuillez corriger les erreurs ci-dessous.'
             render :edit, status: :unprocessable_entity
         end
@@ -32,13 +32,11 @@ class HikeHistoriesController < ApplicationController
     def new
         @hike_history = HikeHistory.new
         @hikes = Hike.order(:trail_name)
-        @guides = Guide.all.order(:name)
     end
 
     def edit
         @hike_history = HikeHistory.find(params[:id])
         @hikes = Hike.order(:trail_name)
-        @guides = Guide.all.order(:name)
     end
 
     def create
@@ -48,19 +46,21 @@ class HikeHistoriesController < ApplicationController
             redirect_to hikes_path, notice: 'Randonnée ajoutée à l\'historique avec succès.'
         else
             @hikes = Hike.order(:trail_name)
-            @guides = Guide.all.order(:name)  # Ajout de cette ligne
             flash.now[:alert] = 'Veuillez corriger les erreurs ci-dessous.'
             render :new, status: :unprocessable_entity
         end
     rescue ActionController::ParameterMissing
         flash.now[:alert] = 'Données de formulaire invalides.'
         @hikes = Hike.order(:trail_name)
-        @guides = Guide.all.order(:name)  # Ajout de cette ligne aussi
         @hike_history = HikeHistory.new
         render :new, status: :unprocessable_entity
     end
 
     private
+
+    def get_members
+        @members = Member.all.where(role_id: 1).order(:name)
+    end
 
     def hike_history_params
         params.require(:hike_history).permit(
