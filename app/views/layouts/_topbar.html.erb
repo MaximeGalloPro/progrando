@@ -22,6 +22,21 @@
                     <i class="fas fa-hiking"></i> Liste
                 <% end %>
 
+                <% if user_signed_in? %>
+                     <%= current_user.email %>
+                    <%= button_to destroy_user_session_path,
+                                  method: :delete,
+                                  class: "btn btn-outline-dark btn-sm delete-hike",
+                                  title: "Supprimer",
+                                  form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event)" },
+                                  form_class: 'button_to' do %>
+                        Déconnexion
+                    <% end %>
+                <% else %>
+                    <%= link_to 'Sign in', new_user_session_path %>
+                <% end %>
+
+
                 <div class="dropdown">
                     <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="fas fa-plus"></i> Ajouter
