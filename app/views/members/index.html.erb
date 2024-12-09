@@ -2,6 +2,9 @@
     <%= link_to "Ajouter un membre",
                 new_member_path,
                 class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right" %>
+    <%= link_to rights_path, class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right; margin-right: 1rem" do %>
+        Gérer le droits des roles
+    <% end %>
     <div style="clear: both"></div>
     <% if @members.any? %>
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_04_224940) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_09_213039) do
   create_table "guides", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "phone", null: false
@@ -66,6 +66,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_04_224940) do
     t.integer "role_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "rights", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
+    t.integer "role_id"
+    t.string "model"
+    t.boolean "create"
+    t.boolean "read"
+    t.boolean "update"
+    t.boolean "delete"
   end
 
   create_table "roles", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
