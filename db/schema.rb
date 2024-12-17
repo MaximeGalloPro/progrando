@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_04_224940) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_17_204657) do
   create_table "guides", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "phone", null: false
@@ -63,7 +63,25 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_04_224940) do
     t.string "name"
     t.string "email"
     t.string "phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "role_id"
+  end
+
+  create_table "profile_rights", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
+    t.bigint "profile_id", null: false
+    t.string "resource", null: false
+    t.string "action", null: false
+    t.boolean "authorized", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["profile_id"], name: "index_profile_rights_on_profile_id"
+  end
+
+  create_table "profiles", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description"
+    t.boolean "active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -82,8 +100,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_04_224940) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "profile_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["profile_id"], name: "index_users_on_profile_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "profile_rights", "profiles"
+  add_foreign_key "users", "profiles"
 end

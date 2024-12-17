@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+    include AuthorizationConcern
+
     helper_method :browser
 
     private
