@@ -1,5 +1,29 @@
                                   Prefix Verb   URI Pattern                                                                                       Controller#Action
+                        new_user_session GET    /users/sign_in(.:format)                                                                          devise/sessions#new
+                            user_session POST   /users/sign_in(.:format)                                                                          devise/sessions#create
+                    destroy_user_session DELETE /users/sign_out(.:format)                                                                         devise/sessions#destroy
+                       new_user_password GET    /users/password/new(.:format)                                                                     devise/passwords#new
+                      edit_user_password GET    /users/password/edit(.:format)                                                                    devise/passwords#edit
+                           user_password PATCH  /users/password(.:format)                                                                         devise/passwords#update
+                                         PUT    /users/password(.:format)                                                                         devise/passwords#update
+                                         POST   /users/password(.:format)                                                                         devise/passwords#create
+                cancel_user_registration GET    /users/cancel(.:format)                                                                           devise/registrations#cancel
+                   new_user_registration GET    /users/sign_up(.:format)                                                                          devise/registrations#new
+                  edit_user_registration GET    /users/edit(.:format)                                                                             devise/registrations#edit
+                       user_registration PATCH  /users(.:format)                                                                                  devise/registrations#update
+                                         PUT    /users(.:format)                                                                                  devise/registrations#update
+                                         DELETE /users(.:format)                                                                                  devise/registrations#destroy
+                                         POST   /users(.:format)                                                                                  devise/registrations#create
                                     root GET    /                                                                                                 stats#dashboard
+                                  rights GET    /rights(.:format)                                                                                 rights#index
+                                         POST   /rights(.:format)                                                                                 rights#create
+                               new_right GET    /rights/new(.:format)                                                                             rights#new
+                              edit_right GET    /rights/:id/edit(.:format)                                                                        rights#edit
+                                   right GET    /rights/:id(.:format)                                                                             rights#show
+                                         PATCH  /rights/:id(.:format)                                                                             rights#update
+                                         PUT    /rights/:id(.:format)                                                                             rights#update
+                                         DELETE /rights/:id(.:format)                                                                             rights#destroy
+                          map_hike_paths GET    /hike_paths/map(.:format)                                                                         hike_paths#map
                               hike_paths GET    /hike_paths(.:format)                                                                             hike_paths#index
                                          POST   /hike_paths(.:format)                                                                             hike_paths#create
                            new_hike_path GET    /hike_paths/new(.:format)                                                                         hike_paths#new
@@ -16,6 +40,14 @@
                                          PATCH  /guides/:id(.:format)                                                                             guides#update
                                          PUT    /guides/:id(.:format)                                                                             guides#update
                                          DELETE /guides/:id(.:format)                                                                             guides#destroy
+                                 members GET    /members(.:format)                                                                                members#index
+                                         POST   /members(.:format)                                                                                members#create
+                              new_member GET    /members/new(.:format)                                                                            members#new
+                             edit_member GET    /members/:id/edit(.:format)                                                                       members#edit
+                                  member GET    /members/:id(.:format)                                                                            members#show
+                                         PATCH  /members/:id(.:format)                                                                            members#update
+                                         PUT    /members/:id(.:format)                                                                            members#update
+                                         DELETE /members/:id(.:format)                                                                            members#destroy
             refresh_from_openrunner_hike POST   /hikes/:id/refresh_from_openrunner(.:format)                                                      hikes#refresh_from_openrunner
           fetch_openrunner_details_hikes GET    /hikes/fetch_openrunner_details(.:format)                                                         hikes#fetch_openrunner_details
                                    hikes GET    /hikes(.:format)                                                                                  hikes#index
@@ -35,6 +67,7 @@
                                          PUT    /hike_histories/:id(.:format)                                                                     hike_histories#update
                                          DELETE /hike_histories/:id(.:format)                                                                     hike_histories#destroy
                          stats_dashboard GET    /stats/dashboard(.:format)                                                                        stats#dashboard
+                                  health GET    /health(.:format)                                                                                 #<Proc:0x00007f4116b9a290 /app/config/routes.rb:23>
         turbo_recede_historical_location GET    /recede_historical_location(.:format)                                                             turbo/native/navigation#recede
         turbo_resume_historical_location GET    /resume_historical_location(.:format)                                                             turbo/native/navigation#resume
        turbo_refresh_historical_location GET    /refresh_historical_location(.:format)                                                            turbo/native/navigation#refresh

@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
     devise_for :users
     root to: 'stats#dashboard'
+    resources :rights
     resources :hike_paths do
         collection do
             get :map
