@@ -59,7 +59,7 @@ RESOURCES = ['Guide', 'Hike', 'HikeHistory', 'HikePath', 'Member', 'User']
 
 # Droits pour l'administrateur (accès total)
 RESOURCES.each do |resource|
-    %w[index show create update destroy].each do |action|
+    %w[index show create update destroy edit].each do |action|
         ProfileRight.create!(
             profile: admin_profile,
             resource: resource,

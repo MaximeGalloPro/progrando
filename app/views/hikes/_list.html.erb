@@ -33,22 +33,8 @@
                     <td><%= hike.last_guide_name %></td>
                     <td class="text-nowrap">
                         <div class="btn-group">
-                            <% show_if_authorized('Hike', 'show') do %>
-                                <% if hike.hike_path&.coordinates.blank? and (hike.openrunner_ref.blank? or hike.openrunner_ref == 0 or hike.openrunner_ref == "0") %>
-                                    <button class="btn btn-outline-dark btn-sm" disabled title="Pas de référence OpenRunner">
-                                        <i class="fas fa-ban text-danger" title="Pas de référence OpenRunner"></i>
-                                    </button>
-                                <% else %>
-                                    <% url = hike.hike_path&.coordinates.blank? ? "https://www.openrunner.com/route-details/#{hike.openrunner_ref}" : hike_path_path(id: hike.hike_path.id) %>
-                                    <%= link_to url,
-                                                              class: "btn btn-outline-dark btn-sm",
-                                                              target: "_blank",
-                                                              title: "Voir sur OpenRunner" do %>
-                                        <i class="fas fa-mountain"></i>
-                                    <% end %>
-                                <% end %>
-                            <% end %>
 
+                            <%= render partial: "roadmap", locals: { hike: hike } %>
                             <% show_if_authorized('HikeHistory', 'index') do %>
                                 <%= link_to hike_histories_path(hike_id: hike.id),
                                                           class: "btn btn-outline-dark btn-sm",
@@ -57,7 +43,7 @@
                                 <% end %>
                             <% end %>
 
-                            <% show_if_authorized('Hike', 'update') do %>
+                            <% show_if_authorized('Hike', 'edit') do %>
                                 <%= link_to edit_hike_path(hike),
                                                           class: "btn btn-outline-dark btn-sm",
                                                           title: "Editer" do %>

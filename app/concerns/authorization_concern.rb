@@ -10,10 +10,10 @@ module AuthorizationConcern
     private
 
     def check_authorization!
-        Rails.logger.debug "Current user: #{current_user&.email}"
-        Rails.logger.debug "Current user profile: #{current_user&.profile&.name}"
-        Rails.logger.debug "Controller: #{controller_path}"
-        Rails.logger.debug "Action: #{action_name}"
+        Rails.logger.debug "\e[36mCurrent user: \e[1m#{current_user&.email}\e[0m"
+        Rails.logger.debug "\e[35mCurrent user profile: \e[1m#{current_user&.profile&.name}\e[0m"
+        Rails.logger.debug "\e[33mController: \e[1m#{controller_path}\e[0m"
+        Rails.logger.debug "\e[33mAction: \e[1m#{action_name}\e[0m"
 
         return if skip_authorization?
 
@@ -21,7 +21,8 @@ module AuthorizationConcern
         action = extract_action
 
         authorized = can?(action, resource)
-        Rails.logger.debug "Authorization check: #{authorized} for #{resource}##{action}"
+        status_color = authorized ? "\e[32m" : "\e[31m"
+        Rails.logger.debug "#{status_color}Authorization check: \e[1m#{authorized}\e[0m#{status_color} for #{resource}##{action}\e[0m"
 
         unless authorized
             flash[:error] = "Accès non autorisé"

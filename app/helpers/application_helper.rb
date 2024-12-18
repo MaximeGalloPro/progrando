@@ -7,7 +7,6 @@ module ApplicationHelper
     def link_to_if_authorized(name, options = {}, html_options = {}, &block)
         resource = extract_resource_from_path(options)
         action = extract_action_from_path(options)
-        byebug
         if can?(action, resource)
             link_to(name, options, html_options, &block)
         end

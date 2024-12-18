@@ -6,7 +6,7 @@ class ProfileRight < ApplicationRecord
     validates :action, presence: true
     validates :profile_id, uniqueness: { scope: [:resource, :action] }
 
-    VALID_ACTIONS = %w[index show create update destroy].freeze
+    VALID_ACTIONS = %w[index show create update destroy edit].freeze
 
     validates :action, inclusion: { in: VALID_ACTIONS }
 end
