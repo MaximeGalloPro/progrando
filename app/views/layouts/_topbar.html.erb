@@ -12,6 +12,13 @@
 
         <div class="collapse navbar-collapse" id="navbarContent">
             <div class="navbar-nav ms-auto gap-2">
+
+                <div class="form-check form-switch ms-auto">
+                    <input class="form-check-input" type="checkbox" id="themeToggle">
+                    <label class="form-check-label" for="themeToggle">
+                        <i class="bi bi-sun-fill"></i>
+                    </label>
+                </div>
                 <%= link_to stats_dashboard_path,
                             class: "btn #{current_page?(stats_dashboard_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
                     <i class="fas fa-chart-line"></i> Dashboard
@@ -83,3 +90,17 @@
         </div>
     </div>
 </nav>
+
+<script type="module">
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (localStorage.getItem('theme') === 'light') {
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', function() {
+            document.documentElement.classList.toggle('light-theme');
+            localStorage.setItem('theme', this.checked ? 'light' : 'dark');
+        });
+    });
+</script>

@@ -76,6 +76,49 @@
         }
     }
 
+    // Fonction pour obtenir les options de thème pour Chart.js
+    function getChartThemeOptions() {
+        const isDarkTheme = !document.body.classList.contains('light-theme');
+        const textColor = isDarkTheme ? '#ffffff' : '#1e293b';
+        const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+        return {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            }
+        };
+    }
+
     // Fonction pour initialiser les graphiques
     function initializeCharts() {
         log('Initializing charts...');
@@ -90,24 +133,7 @@
         // Nettoyer les graphiques existants
         cleanupCharts();
 
-        // Configuration commune pour les graphiques
-        const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        };
+        const chartOptions = getChartThemeOptions();
 
         // Récupérer et logger l'état des éléments canvas
         const monthlyChartEl = document.getElementById('monthlyChart');
@@ -143,13 +169,14 @@
                             fill: false
                         }]
                     },
-                    options: commonOptions
+                    options: chartOptions
                 });
                 log('Monthly chart created successfully');
             } catch (error) {
                 console.error('Error creating monthly chart:', error);
             }
         }
+
         if (guidesChartEl) {
             try {
                 log('Creating guides chart');
@@ -163,7 +190,7 @@
                             backgroundColor: '#0d6efd'
                         }]
                     },
-                    options: commonOptions
+                    options: chartOptions
                 });
                 log('Guides chart created successfully');
             } catch (error) {
@@ -186,7 +213,7 @@
     }
 
     // Utilisation d'une fonction d'initialisation globale
-    window.initDashboardCharts = function () {
+    window.initDashboardCharts = function() {
         log('Global initialization called');
         setupCharts();
     };
@@ -205,6 +232,17 @@
     document.addEventListener('turbo:before-render', () => {
         log('turbo:before-render event fired');
         cleanupCharts();
+    });
+
+    // Écouteur pour le changement de thème
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('change', function() {
+                // Recréer les graphiques avec les nouvelles options de thème
+                initializeCharts();
+            });
+        }
     });
 
     // S'assurer que l'initialisation se fait même si turbo:load ne se déclenche pas
