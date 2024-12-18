@@ -1,7 +1,12 @@
 module ApplicationHelper
-    def show_if_authorized(resource, action)
-        return unless can?(action, resource)
-        yield if block_given?
+    def show_if_authorized(resource, action, &block)
+        # Retourne true/false au lieu de yield/nil
+        if can?(action, resource)
+            yield if block_given?
+            true
+        else
+            false
+        end
     end
 
     def link_to_if_authorized(name, options = {}, html_options = {}, &block)

@@ -1,0 +1,51 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Inscription</h2>
+
+                    <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+                        <%= render "devise/shared/error_messages", resource: resource %>
+
+                        <div class="form-group mb-3">
+                            <%= f.label :email, class: "form-label" %>
+                            <%= f.email_field :email,
+                                              autofocus: true,
+                                              autocomplete: "email",
+                                              class: "form-control",
+                                              placeholder: "nom@exemple.com" %>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <%= f.label :password, "Mot de passe", class: "form-label" %>
+                            <% if @minimum_password_length %>
+                                <span class="text-muted">(<%= @minimum_password_length %> caractères minimum)</span>
+                            <% end %>
+                            <%= f.password_field :password,
+                                                 autocomplete: "new-password",
+                                                 class: "form-control",
+                                                 placeholder: "Votre mot de passe" %>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <%= f.label :password_confirmation, "Confirmation du mot de passe", class: "form-label" %>
+                            <%= f.password_field :password_confirmation,
+                                                 autocomplete: "new-password",
+                                                 class: "form-control",
+                                                 placeholder: "Confirmez votre mot de passe" %>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <%= f.submit "S'inscrire", class: "btn btn-primary btn-lg" %>
+                        </div>
+                    <% end %>
+
+                    <div class="mt-3 text-center">
+                        <%= render "devise/shared/links" %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

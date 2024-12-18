@@ -107,45 +107,101 @@ MEMBER_RIGHTS.each do |resource, actions|
     end
 end
 
-puts "Creating sample guide..."
-guide = Guide.create!(
-    name: 'Jean Guide',
-    phone: '0687654321',
-    email: 'guide@example.com'
-)
+puts "Creating sample guides..."
+guides = [
+    Guide.create!(
+        name: 'Jean Guide',
+        phone: '0687654321',
+        email: 'guide@example.com'
+    ),
+    Guide.create!(
+        name: 'Marie Rando',
+        phone: '0687654322',
+        email: 'marie@example.com'
+    )
+]
 
-puts "Creating sample hike..."
-hike = Hike.create!(
-    number: 1,
-    day: 1, # 1 = Lundi
-    difficulty: 3,
-    starting_point: "Place du village",
-    trail_name: "Sentier des crêtes",
-    carpooling_cost: 5.50,
-    distance_km: 12.5,
-    elevation_gain: 450,
-    elevation_loss: 450,
-    altitude_min: 800,
-    altitude_max: 1250,
-    openrunner_ref: "12345678"
-)
+puts "Creating sample hikes..."
+hikes = [
+    Hike.create!(
+        number: 1,
+        day: 1,
+        difficulty: 3,
+        starting_point: "Place du village",
+        trail_name: "Sentier des crêtes",
+        carpooling_cost: 5.50,
+        distance_km: 12.5,
+        elevation_gain: 450,
+        elevation_loss: 450,
+        altitude_min: 800,
+        altitude_max: 1250,
+        openrunner_ref: "12345678"
+    ),
+    Hike.create!(
+        number: 2,
+        day: 2,
+        difficulty: 4,
+        starting_point: "Col de la Croix",
+        trail_name: "Circuit des lacs",
+        carpooling_cost: 7.00,
+        distance_km: 15.0,
+        elevation_gain: 600,
+        elevation_loss: 600,
+        altitude_min: 1200,
+        altitude_max: 1800,
+        openrunner_ref: "12345679"
+    ),
+    Hike.create!(
+        number: 3,
+        day: 3,
+        difficulty: 2,
+        starting_point: "Parking des Glaciers",
+        trail_name: "Boucle alpine",
+        carpooling_cost: 6.00,
+        distance_km: 10.0,
+        elevation_gain: 300,
+        elevation_loss: 300,
+        altitude_min: 1000,
+        altitude_max: 1300,
+        openrunner_ref: "12345680"
+    )
+]
 
-puts "Creating sample hike history..."
-HikeHistory.create!(
-    hiking_date: Date.today,
-    departure_time: "09:00",
-    day_type: "morning",
-    carpooling_cost: 5.50,
-    member_id: admin_member.id,
-    hike_id: hike.id,
-    openrunner_ref: hike.openrunner_ref
-)
+puts "Creating hike histories..."
+# Créer 10 randonnées historiques dans le passé
+10.times do |i|
+    date = Date.today - (i + 1).months
+    HikeHistory.create!(
+        hiking_date: date,
+        departure_time: ["08:00", "09:00", "14:00"].sample,
+        day_type: ["morning", "afternoon"].sample,
+        carpooling_cost: rand(4.0..8.0).round(2),
+        member_id: admin_member.id,
+        hike_id: hikes.sample.id,
+        openrunner_ref: "1234#{i+1}"
+    )
+end
 
-puts "Creating sample hike path..."
-HikePath.create!(
-    hike_id: hike.id,
-    coordinates: "[{lat: 45.123, lng: 5.123}, {lat: 45.124, lng: 5.124}]"
-)
+# Ajouter 2 randonnées futures
+2.times do |i|
+    HikeHistory.create!(
+        hiking_date: Date.today + (i + 1).weeks,
+        departure_time: "09:00",
+        day_type: "morning",
+        carpooling_cost: rand(4.0..8.0).round(2),
+        member_id: admin_member.id,
+        hike_id: hikes.sample.id,
+        openrunner_ref: "9876#{i+1}"
+    )
+end
+
+puts "Creating hike paths..."
+hikes.each do |hike|
+    HikePath.create!(
+        hike_id: hike.id,
+        coordinates: "[{lat: #{45.1 + rand/100}, lng: #{5.1 + rand/100}}, {lat: #{45.1 + rand/100}, lng: #{5.1 + rand/100}}]"
+    )
+end
 
 puts "Seed finished!"
 puts "Created:"

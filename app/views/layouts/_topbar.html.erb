@@ -24,8 +24,8 @@
                     <% end %>
                 <% end %>
 
-                <% if show_if_authorized('HikeHistory', 'create') ||
-                    show_if_authorized('Hike', 'create') ||
+                <% if show_if_authorized('HikeHistory', 'create') or
+                    show_if_authorized('Hike', 'create') or
                     show_if_authorized('Member', 'create') %>
                     <div class="dropdown">
                         <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
