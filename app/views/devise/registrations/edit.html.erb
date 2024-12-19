@@ -1,6 +1,41 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
+            <!-- Carte pour le thème -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="card-title h5 mb-3">Personnalisation de l'interface</h3>
+
+                    <%= form_for(current_user, url: update_user_theme_path, method: :patch) do |f| %>
+                        <div class="mb-3">
+                            <%= f.label :theme, "Thème de l'interface", class: "form-label" %>
+                            <%= f.select :theme,
+                                         [
+                                             ['Thème clair (Défaut)', ''],
+                                             ['Océan', 'theme-ocean'],
+                                             ['Forêt', 'theme-forest'],
+                                             ['Coucher de soleil', 'theme-sunset'],
+                                             ['Royal', 'theme-royal'],
+                                             ['Cerise', 'theme-cherry'],
+                                             ['Minuit', 'theme-midnight'],
+                                             ['Nordic', 'theme-nordic'],
+                                             ['Rose', 'theme-rose'],
+                                             ['Café', 'theme-coffee'],
+                                             ['Menthe', 'theme-mint'],
+                                             ['Max', 'max-theme']
+                                         ],
+                                         { include_blank: false },
+                                         { class: "form-select" }
+                            %>
+                            <div class="form-text">Choisissez le thème qui vous convient le mieux</div>
+                        </div>
+
+                        <%= f.submit "Enregistrer le thème", class: "btn btn-primary" %>
+                    <% end %>
+                </div>
+            </div>
+
+            <!-- Carte pour les modifications sensibles -->
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="card-title mb-4">Modifier mon compte</h2>
@@ -9,7 +44,7 @@
                         <%= render "devise/shared/error_messages", resource: resource %>
 
                         <div class="mb-3">
-                            <%= f.label :email, class: "form-label" %>
+                            <%= f.label :email, "Adresse e-mail", class: "form-label" %>
                             <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control" %>
                         </div>
 
@@ -40,7 +75,7 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <%= f.submit "Mettre à jour", class: "btn btn-primary" %>
+                            <%= f.submit "Mettre à jour le compte", class: "btn btn-primary" %>
                         </div>
                     <% end %>
 

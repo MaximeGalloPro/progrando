@@ -79,8 +79,10 @@
     // Fonction pour obtenir les options de thème pour Chart.js
     function getChartThemeOptions() {
         const isDarkTheme = !document.body.classList.contains('light-theme');
-        const textColor = isDarkTheme ? '#ffffff' : '#1e293b';
+        const textColor = isDarkTheme ? 'var(--text-color)' : '#1e293b';
         const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+        const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
 
         return {
             responsive: true,
@@ -92,8 +94,29 @@
                         color: textColor,
                         font: {
                             size: 12
-                        }
+                        },
+                        padding: 20
                     }
+                },
+                tooltip: {
+                    backgroundColor: isDarkTheme ? 'var(--item-hover)' : 'rgba(255, 255, 255, 0.9)',
+                    titleColor: isDarkTheme ? '#FFFFFF' : textColor,
+                    bodyColor: isDarkTheme ? '#FFFFFF' : textColor,
+                    borderColor: isDarkTheme ? 'var(--accent-color)' : borderColor,
+                    borderWidth: 1,
+                    padding: 14,
+                    displayColors: true,
+                    usePointStyle: true,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    boxPadding: 6,
+                    cornerRadius: 6,
+                    opacity: 1
                 }
             },
             scales: {
@@ -101,18 +124,28 @@
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1,
-                        color: textColor
+                        color: textColor,
+                        padding: 8
                     },
                     grid: {
-                        color: gridColor
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    border: {
+                        color: borderColor
                     }
                 },
                 x: {
                     ticks: {
-                        color: textColor
+                        color: textColor,
+                        padding: 8
                     },
                     grid: {
-                        color: gridColor
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    border: {
+                        color: borderColor
                     }
                 }
             }
@@ -134,6 +167,7 @@
         cleanupCharts();
 
         const chartOptions = getChartThemeOptions();
+        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
 
         // Récupérer et logger l'état des éléments canvas
         const monthlyChartEl = document.getElementById('monthlyChart');
@@ -164,9 +198,13 @@
                         datasets: [{
                             label: 'Nombre de randonnées',
                             data: <%= raw @stats[:monthly_stats].values %>,
-                            borderColor: '#0d6efd',
-                            tension: 0.1,
-                            fill: false
+                            borderColor: accentColor,
+                            backgroundColor: accentColor + '20', // Version transparente
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         }]
                     },
                     options: chartOptions
@@ -187,7 +225,11 @@
                         datasets: [{
                             label: 'Randonnées guidées',
                             data: <%= raw @stats[:guide_stats].values %>,
-                            backgroundColor: '#0d6efd'
+                            backgroundColor: accentColor + '80', // Version semi-transparente
+                            borderColor: accentColor,
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            hoverBackgroundColor: accentColor
                         }]
                     },
                     options: chartOptions

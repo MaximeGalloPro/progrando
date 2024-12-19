@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
     devise_for :users
+
+    patch 'users/theme', to: 'users#update_theme', as: :update_user_theme
+
     root to: 'stats#dashboard'
     resources :rights
     resources :hike_paths do
