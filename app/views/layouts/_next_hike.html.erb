@@ -26,42 +26,42 @@
                     <div class="d-flex flex-wrap gap-3 align-items-center flex-grow-1">
                         <% if todays_hike.starting_point.present? %>
                             <div class="d-flex align-items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-muted"></i>
+                                <i class="fas fa-map-marker-alt "></i>
                                 <span><%= todays_hike.starting_point %></span>
                             </div>
                         <% end %>
 
                         <% if todays_hike.departure_time.present? %>
                             <div class="d-flex align-items-center gap-1">
-                                <i class="fas fa-clock text-muted"></i>
+                                <i class="fas fa-clock "></i>
                                 <span><%= todays_hike.departure_time %></span>
                             </div>
                         <% end %>
 
                         <% if todays_hike.member_name.present? %>
                             <div class="d-flex align-items-center gap-1">
-                                <i class="fas fa-user text-muted"></i>
+                                <i class="fas fa-user "></i>
                                 <span><%= todays_hike.member_name %></span>
                             </div>
                         <% end %>
 
                         <% if todays_hike.distance_km.present? %>
                             <div class="d-flex align-items-center gap-1">
-                                <i class="fas fa-route text-muted"></i>
+                                <i class="fas fa-route "></i>
                                 <span><%= todays_hike.distance_km %> km</span>
                             </div>
                         <% end %>
 
                         <% if todays_hike.elevation_gain.present? %>
                             <div class="d-flex align-items-center gap-1">
-                                <i class="fas fa-mountain text-muted"></i>
+                                <i class="fas fa-mountain "></i>
                                 <span><%= todays_hike.elevation_gain %>m D+</span>
                             </div>
                         <% end %>
 
                         <% if todays_hike.carpooling_cost.present? %>
                             <div class="d-flex align-items-center gap-1">
-                                <i class="fas fa-car text-muted"></i>
+                                <i class="fas fa-car "></i>
                                 <span><%= todays_hike.carpooling_cost %> €</span>
                             </div>
                         <% end %>
@@ -77,7 +77,7 @@
                         <% end %>
                     </div>
                 <% else %>
-                    <span class="text-muted">
+                    <span class="">
                         <i class="fas fa-info-circle"></i> Aucune randonnée programmée
                     </span>
                 <% end %>

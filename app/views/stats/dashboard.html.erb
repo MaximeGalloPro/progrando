@@ -14,9 +14,9 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h6 class="card-title text-muted">Total Randonnées</h6>
+                    <h6 class="card-title ">Total Randonnées</h6>
                     <h2 class="card-text"><%= @stats[:total_hikes] %></h2>
-                    <small class="text-muted">Sur l'année en cours</small>
+                    <small class="">Sur l'année en cours</small>
                 </div>
             </div>
         </div>
@@ -24,9 +24,9 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h6 class="card-title text-muted">Distance Totale</h6>
+                    <h6 class="card-title ">Distance Totale</h6>
                     <h2 class="card-text"><%= number_with_precision(@stats[:total_distance], precision: 1, separator: '.', delimiter: '') %> km</h2>
-                    <small class="text-muted">Distance cumulée</small>
+                    <small class="">Distance cumulée</small>
                 </div>
             </div>
         </div>
@@ -34,9 +34,9 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h6 class="card-title text-muted">Dénivelé Total</h6>
+                    <h6 class="card-title ">Dénivelé Total</h6>
                     <h2 class="card-text"><%= number_with_precision(@stats[:total_elevation], precision: 1, separator: '.', delimiter: '') %> m</h2>
-                    <small class="text-muted">Dénivelé cumulé</small>
+                    <small class="">Dénivelé cumulé</small>
                 </div>
             </div>
         </div>
@@ -44,9 +44,9 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
-                    <h6 class="card-title text-muted">Guides Actifs</h6>
+                    <h6 class="card-title ">Guides Actifs</h6>
                     <h2 class="card-text"><%= @stats[:active_guides] %></h2>
-                    <small class="text-muted">Ce mois-ci</small>
+                    <small class="">Ce mois-ci</small>
                 </div>
             </div>
         </div>
