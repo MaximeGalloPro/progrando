@@ -1,4 +1,6 @@
 class HikeHistory < ApplicationRecord
+    acts_as_tenant(:organization)
+
     belongs_to :hike
     belongs_to :member
 

@@ -10,15 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
-  create_table "guides", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "phone", null: false
-    t.string "email"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
+ActiveRecord::Schema[7.0].define(version: 2024_12_23_103150) do
   create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
@@ -29,8 +21,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.string "openrunner_ref"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "organization_id", null: false
     t.index ["hike_id"], name: "index_hike_histories_on_hike_id"
     t.index ["hiking_date", "hike_id"], name: "index_hike_histories_on_hiking_date_and_hike_id", unique: true
+    t.index ["organization_id"], name: "index_hike_histories_on_organization_id"
   end
 
   create_table "hike_paths", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -38,6 +32,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.text "coordinates"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "organization_id", null: false
+    t.index ["organization_id"], name: "index_hike_paths_on_organization_id"
   end
 
   create_table "hikes", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -57,6 +53,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.integer "altitude_max"
     t.boolean "updating", default: false
     t.datetime "last_update_attempt"
+    t.bigint "organization_id", null: false
+    t.index ["organization_id"], name: "index_hikes_on_organization_id"
   end
 
   create_table "members", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -64,6 +62,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.string "email"
     t.string "phone"
     t.integer "role_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "organization_id", null: false
+    t.index ["organization_id"], name: "index_members_on_organization_id"
+  end
+
+  create_table "organizations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.string "subdomain", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -75,6 +82,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.boolean "authorized", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "organization_id", null: false
+    t.index ["organization_id"], name: "index_profile_rights_on_organization_id"
     t.index ["profile_id"], name: "index_profile_rights_on_profile_id"
   end
 
@@ -84,6 +93,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.boolean "active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "organization_id", null: false
+    t.index ["organization_id"], name: "index_profiles_on_organization_id"
   end
 
   create_table "rights", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -99,6 +110,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "organization_id", null: false
+    t.index ["organization_id"], name: "index_roles_on_organization_id"
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -111,11 +124,21 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_19_191910) do
     t.datetime "updated_at", null: false
     t.bigint "profile_id"
     t.string "theme"
+    t.bigint "organization_id", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["organization_id"], name: "index_users_on_organization_id"
     t.index ["profile_id"], name: "index_users_on_profile_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "hike_histories", "organizations"
+  add_foreign_key "hike_paths", "organizations"
+  add_foreign_key "hikes", "organizations"
+  add_foreign_key "members", "organizations"
+  add_foreign_key "profile_rights", "organizations"
   add_foreign_key "profile_rights", "profiles"
+  add_foreign_key "profiles", "organizations"
+  add_foreign_key "roles", "organizations"
+  add_foreign_key "users", "organizations"
   add_foreign_key "users", "profiles"
 end

@@ -10,7 +10,6 @@ Rails.application.routes.draw do
             get :map
         end
     end
-    resources :guides
     resources :members
     resources :hikes do
         member do

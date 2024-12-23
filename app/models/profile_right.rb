@@ -1,5 +1,7 @@
 # app/models/profile_right.rb
 class ProfileRight < ApplicationRecord
+    acts_as_tenant(:organization)
+
     belongs_to :profile
 
     validates :resource, presence: true
