@@ -1,6 +1,6 @@
 # app/models/user.rb
 class User < ApplicationRecord
-  acts_as_tenant(:organization)
+  include OrganizationScoped
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

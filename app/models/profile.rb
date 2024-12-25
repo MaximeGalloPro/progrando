@@ -1,6 +1,6 @@
 # app/models/profile.rb
 class Profile < ApplicationRecord
-    acts_as_tenant(:organization)
+    include OrganizationScoped
 
     has_many :profile_rights, dependent: :destroy
 

@@ -1,35 +1,29 @@
 class ApplicationController < ActionController::Base
     include AuthorizationConcern
-    set_current_tenant_through_filter
-    before_action :set_current_tenant
 
-    helper_method :browser
+    helper_method :current_organization
+    before_action :ensure_organization
 
     private
 
-    def browser
-        @browser ||= Browser.new(request.user_agent)
+    def current_organization
+        Rails.logger.info "=== URL Debug Information ==="
+        Rails.logger.info "Full URL: #{request.url}"
+        Rails.logger.info "Host with Port: #{request.host_with_port}"
+        Rails.logger.info "Host: #{request.host}"
+        Rails.logger.info "Subdomain: #{request.subdomain}"
+        Rails.logger.info "Domain: #{request.domain}"
+        Rails.logger.info "Protocol: #{request.protocol}"
+        Rails.logger.info "=========================="
+        @current_organization ||= Organization.find_by(subdomain: request.subdomain)
     end
 
-    def set_current_tenant
-        # Si on est sur localhost sans sous-domaine
-        if request.subdomain.blank? || request.subdomain == 'www'
-            default_org = Organization.first
-            if default_org
-                # Rediriger vers le sous-domaine du premier tenant
-                redirect_to(
-                    "#{request.protocol}#{default_org.subdomain}.#{request.domain}#{":#{request.port}" if request.port}#{request.path}",
-                    allow_other_host: true
-                )
-                return
-            end
-        end
+    def ensure_organization
+        return if request.subdomain.blank?
 
-        begin
-            current_organization = Organization.find_by!(subdomain: request.subdomain)
-            set_current_tenant(current_organization)
-        rescue ActiveRecord::RecordNotFound
-            redirect_to root_path, alert: "Organisation non trouvée"
+        unless current_organization
+            redirect_to root_url(subdomain: nil),
+                        alert: "Organisation non trouvée"
         end
     end
 end

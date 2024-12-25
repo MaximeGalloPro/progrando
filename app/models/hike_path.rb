@@ -1,5 +1,5 @@
 class HikePath < ApplicationRecord
-    acts_as_tenant(:organization)
+    include OrganizationScoped
 
     belongs_to :hike
 end

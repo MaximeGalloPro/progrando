@@ -1,4 +1,4 @@
 class Role < ApplicationRecord
-    acts_as_tenant(:organization)
+    include OrganizationScoped
 
 end

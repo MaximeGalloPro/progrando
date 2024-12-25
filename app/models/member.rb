@@ -1,5 +1,5 @@
 class Member < ApplicationRecord
-    acts_as_tenant(:organization)
+    include OrganizationScoped
 
     has_many :hike_histories
     has_many :hikes, through: :hike_histories

@@ -1,6 +1,6 @@
 # app/models/profile_right.rb
 class ProfileRight < ApplicationRecord
-    acts_as_tenant(:organization)
+    include OrganizationScoped
 
     belongs_to :profile
 

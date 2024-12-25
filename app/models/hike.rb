@@ -1,5 +1,5 @@
 class Hike < ApplicationRecord
-    acts_as_tenant(:organization)
+    include OrganizationScoped
 
     # Associations
     has_many :hike_histories, foreign_key: :hike_id
