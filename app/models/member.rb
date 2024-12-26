@@ -1,4 +1,5 @@
 class Member < ApplicationRecord
+    belongs_to :organisation
     has_many :hike_histories
     has_many :hikes, through: :hike_histories
     validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true

@@ -1,5 +1,6 @@
 # app/models/profile.rb
 class Profile < ApplicationRecord
+    belongs_to :organisation
     has_many :profile_rights, dependent: :destroy
 
     validates :name, presence: true, uniqueness: true

@@ -13,7 +13,7 @@
                                               autocomplete: "email",
                                               class: "form-control",
                                               placeholder: "nom@exemple.com",
-                                              value: Rails.env.development? ? 'admin@example.com' : nil %>
+                                              value: Rails.env.development? ? 'admin@caf.com' : nil %>
                         </div>
 
                         <div class="form-group mb-3">
@@ -46,7 +46,12 @@
                     <% if Rails.env.development? %>
                         <div class="alert alert-info mt-3 text-center">
                             <small>Environnement de développement<br>
-                                Email: admin@example.com<br>
+                                <strong>Club Alpin Français</strong><br>
+                                Admin: admin@caf.com<br>
+                                Guide: guide@caf.com<br>
+                                <strong>Randonneurs des Alpes</strong><br>
+                                Admin: admin@rda.com<br>
+                                Guide: guide@rda.com<br>
                                 Mot de passe: password123</small>
                         </div>
                     <% end %>

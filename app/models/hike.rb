@@ -1,4 +1,6 @@
 class Hike < ApplicationRecord
+    belongs_to :organisation
+
     # Associations
     has_many :hike_histories, foreign_key: :hike_id
     has_many :members, through: :hike_histories
