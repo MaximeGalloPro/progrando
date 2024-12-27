@@ -2,8 +2,6 @@
 // import "@hotwired/turbo-rails"
 import "controllers"
 import "bootstrap"
-// import "map"
-// import "chart"
 
 $(document).ready(function () {
     console.log('Select2 is ready!');

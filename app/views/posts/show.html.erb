@@ -1,0 +1,36 @@
+<div class="container py-4">
+    <article class="blog-post">
+
+        <% if notice.present? %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= notice %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% end %>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <%= render @post %>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <%= link_to edit_post_path(@post), class: "btn btn-outline-primary" do %>
+                            <i class="bi bi-pencil-square"></i> Edit
+                        <% end %>
+                        <%= link_to posts_path, class: "btn btn-outline-secondary" do %>
+                            <i class="bi bi-arrow-left"></i> Back
+                        <% end %>
+                    </div>
+
+                    <%= button_to @post,
+                                  method: :delete,
+                                  class: "btn btn-danger",
+                                  form: { data: { turbo_confirm: "Are you sure you want to delete this post?" } } do %>
+                        <i class="bi bi-trash"></i> Delete
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>

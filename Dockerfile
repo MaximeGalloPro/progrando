@@ -7,7 +7,10 @@ RUN apt-get update -qq && \
                        nodejs \
                        default-libmysqlclient-dev \
                        git \
-                       curl && \
+                       curl \
+                       imagemagick \
+                       libvips \
+                       libmagickwand-dev && \
     apt-get update && apt-get install -y chromium chromium-driver
 
 
@@ -18,6 +21,14 @@ WORKDIR /app
 RUN mkdir -p /usr/local/bundle && \
     chmod -R 777 /usr/local/bundle
 
+# Configuration d'ImageMagick
+RUN mkdir -p /etc/ImageMagick-6 && \
+    echo '<policymap>\
+    <policy domain="resource" name="memory" value="256MiB"/>\
+    <policy domain="resource" name="map" value="512MiB"/>\
+    <policy domain="resource" name="width" value="16KP"/>\
+    <policy domain="resource" name="height" value="16KP"/>\
+    </policymap>' > /etc/ImageMagick-6/policy.xml
 
 # Copie et installation des gems
 COPY Gemfile Gemfile.lock ./

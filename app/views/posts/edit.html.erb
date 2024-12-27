@@ -1,0 +1,17 @@
+<div class="container py-4">
+    <h1>Editing post</h1>
+
+    <%= render "form", post: @post %>
+    <div class="d-flex gap-3 mt-4">
+        <%= link_to post_path(@post), class: "btn btn-primary" do %>
+            <i class="bi bi-eye"></i> Voir le post
+        <% end %>
+
+        <%= link_to posts_path, class: "btn btn-outline-secondary" do %>
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        <% end %>
+    </div>
+</div>
+<br>
+
+

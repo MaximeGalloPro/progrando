@@ -1,0 +1,30 @@
+<%# app/views/posts/_post.html.erb %>
+<article class="blog-post">
+    <div class="mb-4">
+        <div class="d-flex align-items-center">
+            <h2 class="display-5 link-body-emphasis mb-1"><%= @post.title %></h2>
+        </div>
+        <div class="text-muted mb-2">
+            <small>
+                <i class="bi bi-person"></i> <%= @post.author %> |
+                <i class="bi bi-calendar3"></i> <%= @post.published_at&.strftime("%B %d, %Y") %>
+            </small>
+        </div>
+    </div>
+
+    <% if @post.thumbnail.attached? %>
+        <div class="mb-4">
+            <%= image_tag @post.thumbnail, class: "img-fluid rounded" %>
+        </div>
+    <% end %>
+
+    <div class="post-content mb-4">
+        <%= @post.content.html_safe %>
+    </div>
+
+    <% if @post.created_at != @post.updated_at %>
+        <div class="text-muted mt-3">
+            <small><em>Last updated: <%= time_ago_in_words(@post.updated_at) %> ago</em></small>
+        </div>
+    <% end %>
+</article>

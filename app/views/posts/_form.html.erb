@@ -1,0 +1,80 @@
+<%= form_with(model: post, class: "mb-4") do |form| %>
+    <% if post.errors.any? %>
+        <div class="alert alert-danger">
+            <h2><%= pluralize(post.errors.count, "error") %> prohibited this post from being saved:</h2>
+            <ul class="list-unstyled mb-0">
+                <% post.errors.each do |error| %>
+                    <li><%= error.full_message %></li>
+                <% end %>
+            </ul>
+        </div>
+    <% end %>
+
+    <div class="mb-3">
+        <%= form.label :title, class: "form-label" %>
+        <%= form.text_field :title, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+        <%= form.label :content, class: "form-label" %>
+        <%= form.text_area :content, class: "form-control", id: "editor" %>
+    </div>
+
+    <div class="mb-3">
+        <%= form.label :author, class: "form-label" %>
+        <%= form.text_field :author, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+        <%= form.label :published_at, class: "form-label" %>
+        <%= form.datetime_field :published_at, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+        <%= form.label :thumbnail, class: "form-label" %>
+        <%= form.file_field :thumbnail, class: "form-control", accept: 'image/png,image/jpeg,image/jpg' %>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <%= link_to "Cancel", posts_path, class: "btn btn-secondary me-md-2" %>
+        <%= form.submit class: "btn btn-primary" %>
+    </div>
+<% end %>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                removePlugins: [
+                    'ImageUpload',
+                    'ImageToolbar',
+                    'Image',
+                    'EasyImage',
+                    'ImageCaption',
+                    'ImageStyle',
+                    'ImageResize',
+                    'CKFinder',
+                    'CKFinderUploadAdapter'
+                ],
+                toolbar: [
+                    'heading',
+                    '|',
+                    'bold',
+                    'italic',
+                    'link',
+                    'bulletedList',
+                    'numberedList',
+                    '|',
+                    'undo',
+                    'redo'
+                ]
+            })
+            .then(editor => {
+                console.log('Editor initialized');
+            })
+            .catch(error => {
+                console.error('Editor failed to initialize:', error);
+            });
+    });
+</script>

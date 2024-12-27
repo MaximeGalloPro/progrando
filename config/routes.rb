@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+    resources :posts
     root to: 'stats#dashboard'
     resources :hike_paths do
         collection do
