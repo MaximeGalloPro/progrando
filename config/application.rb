@@ -1,6 +1,6 @@
 require_relative "boot"
-
 require "rails/all"
+require_relative "../app/middleware/subdomain_middleware"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -11,6 +11,7 @@ module Rails7WithDocker
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
     config.active_job.queue_adapter = :sidekiq
+    config.middleware.use SubdomainMiddleware
 
     # Configuration for the application, engines, and railties goes here.
     #

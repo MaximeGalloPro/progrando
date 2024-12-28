@@ -6,7 +6,6 @@ import "bootstrap"
 // import "chart"
 
 $(document).ready(function () {
-    console.log('Select2 is ready!');
     $('.select2').select2({
         language: 'fr',
         width: '100%',

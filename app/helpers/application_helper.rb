@@ -33,4 +33,10 @@ module ApplicationHelper
         return 'update' if options.to_s.include?('/edit')
         'show'
     end
+
+    def with_subdomain(organisation, options = {})
+        subdomain = organisation.try(:slug)
+        options.merge!(subdomain: subdomain) if subdomain.present?
+        options
+    end
 end
