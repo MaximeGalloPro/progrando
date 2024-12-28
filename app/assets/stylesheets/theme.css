@@ -10,7 +10,7 @@
     --input-bg: #FFFFFF;
 }
 
-.theme-ocean {
+.ocean-theme {
     --bg-color: #1A365D;
     --container-bg: #2C5282;
     --item-bg: #2B6CB0;
@@ -21,7 +21,7 @@
     --input-bg: #2C5282;
 }
 
-.theme-forest {
+.forest-theme {
     --bg-color: #1C4532;
     --container-bg: #276749;
     --item-bg: #2F855A;
@@ -32,40 +32,8 @@
     --input-bg: #276749;
 }
 
-.theme-sunset {
-    --bg-color: #744210;
-    --container-bg: #975A16;
-    --item-bg: #B7791F;
-    --item-hover: #D69E2E;
-    --border-color: #ECC94B;
-    --text-color: #FFFFF0;
-    --accent-color: #F6E05E;
-    --input-bg: #975A16;
-}
 
-.theme-royal {
-    --bg-color: #322659;
-    --container-bg: #44337A;
-    --item-bg: #553C9A;
-    --item-hover: #6B46C1;
-    --border-color: #805AD5;
-    --text-color: #FAF5FF;
-    --accent-color: #9F7AEA;
-    --input-bg: #44337A;
-}
-
-.theme-cherry {
-    --bg-color: #63171B;
-    --container-bg: #822727;
-    --item-bg: #9B2C2C;
-    --item-hover: #C53030;
-    --border-color: #E53E3E;
-    --text-color: #FFF5F5;
-    --accent-color: #FC8181;
-    --input-bg: #822727;
-}
-
-.theme-midnight {
+.midnight-theme {
     --bg-color: #1A202C;
     --container-bg: #2D3748;
     --item-bg: #4A5568;
@@ -74,61 +42,6 @@
     --text-color: #F7FAFC;
     --accent-color: #CBD5E1;
     --input-bg: #2D3748;
-}
-
-.theme-nordic {
-    --bg-color: #234E52;
-    --container-bg: #285E61;
-    --item-bg: #2C7A7B;
-    --item-hover: #319795;
-    --border-color: #38B2AC;
-    --text-color: #E6FFFA;
-    --accent-color: #4FD1C5;
-    --input-bg: #285E61;
-}
-
-.theme-rose {
-    --bg-color: #702459;
-    --container-bg: #97266D;
-    --item-bg: #B83280;
-    --item-hover: #D53F8C;
-    --border-color: #ED64A6;
-    --text-color: #FFF5F7;
-    --accent-color: #F687B3;
-    --input-bg: #97266D;
-}
-
-.theme-coffee {
-    --bg-color: #2D3748;
-    --container-bg: #4A5568;
-    --item-bg: #718096;
-    --item-hover: #805AD5;
-    --border-color: #B794F4;
-    --text-color: #FAF5FF;
-    --accent-color: #D6BCFA;
-    --input-bg: #4A5568;
-}
-
-.theme-mint {
-    --bg-color: #234E52;
-    --container-bg: #285E61;
-    --item-bg: #319795;
-    --item-hover: #38B2AC;
-    --border-color: #4FD1C5;
-    --text-color: #E6FFFA;
-    --accent-color: #81E6D9;
-    --input-bg: #285E61;
-}
-
-.ocean-theme {
-    --bg-color: #0C1E35;
-    --container-bg: #112846;
-    --item-bg: #1a3a6e;
-    --item-hover: #254b8f;
-    --border-color: #2a5298;
-    --text-color: #ffffff;
-    --accent-color: #0d6efd;
-    --input-bg: #2f405e;
 }
 
 .max-theme {
@@ -309,26 +222,49 @@
     border-bottom-color: var(--border-color);
 }
 
-/* Table styles */
-[class*="theme-"] .table,
-.ocean-theme .table,
-.max-theme .table {
+/* Table styles avec spécificité augmentée */
+body[class*="theme-"] .table,
+body.ocean-theme .table,
+body.max-theme .table {
+    color: var(--text-color);
+    background-color: var(--container-bg);
+}
+
+body[class*="theme-"] .table > thead,
+body.ocean-theme .table > thead,
+body.max-theme .table > thead {
+    background-color: var(--item-bg);
+}
+
+body[class*="theme-"] .table td,
+body[class*="theme-"] .table th,
+body.ocean-theme .table td,
+body.ocean-theme .table th,
+body.max-theme .table td,
+body.max-theme .table th {
+    border-color: var(--border-color);
+    background-color: var(--container-bg);
+}
+
+body[class*="theme-"] .table-hover tbody tr:hover,
+body.ocean-theme .table-hover tbody tr:hover,
+body.max-theme .table-hover tbody tr:hover {
+    background-color: var(--item-hover) !important;
     color: var(--text-color);
 }
 
-[class*="theme-"] .table td,
-[class*="theme-"] .table th,
-.ocean-theme .table td,
-.ocean-theme .table th,
-.max-theme .table td,
-.max-theme .table th {
+/* Pour les boutons d'action */
+body[class*="theme-"] .table .btn-outline-dark,
+body.ocean-theme .table .btn-outline-dark,
+body.max-theme .table .btn-outline-dark {
+    background-color: transparent;
     border-color: var(--border-color);
+    color: var(--text-color);
 }
 
-[class*="theme-"] .table-hover tbody tr:hover,
-.ocean-theme .table-hover tbody tr:hover,
-.max-theme .table-hover tbody tr:hover {
-    background-color: var(--item-hover);
+html body.max-theme table.table,
+html body.max-theme table.table td,
+html body.max-theme table.table th {
     color: var(--text-color);
 }
 

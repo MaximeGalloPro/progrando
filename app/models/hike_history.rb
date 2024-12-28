@@ -1,4 +1,5 @@
 class HikeHistory < ApplicationRecord
+    belongs_to :organisation
     belongs_to :hike
     belongs_to :member
 

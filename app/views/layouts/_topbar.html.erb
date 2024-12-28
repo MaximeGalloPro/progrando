@@ -2,10 +2,9 @@
     <div class="container">
         <%= link_to stats_dashboard_path, class: "text-decoration-none" do %>
             <span class="navbar-brand fw-bold text-primary">
-                <i class="fas fa-mountain"></i> ProgRando
+                <i class="fas fa-mountain"></i> ProgIt
             </span>
         <% end %>
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -83,18 +82,3 @@
         </div>
     </div>
 </nav>
-
-<script type="module">
-    document.addEventListener('DOMContentLoaded', function() {
-        const themeToggle = document.getElementById('themeToggle');
-        if (localStorage.getItem('theme') === 'light') {
-            themeToggle.checked = true;
-            document.documentElement.classList.add('light-theme');
-        }
-
-        themeToggle.addEventListener('change', function() {
-            document.documentElement.classList.toggle('light-theme');
-            localStorage.setItem('theme', this.checked ? 'light' : 'dark');
-        });
-    });
-</script>

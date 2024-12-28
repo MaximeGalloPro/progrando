@@ -16,15 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fr.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"/>
-
-    <script>
-        const themeSelect = document.querySelector('select[name*="[theme]"]');
-        if (themeSelect) {
-            themeSelect.addEventListener('change', function(e) {
-                document.body.className = e.target.value;
-            });
-        }
-    </script>
 </head>
 
 <body class="<%= current_user&.theme %>">
@@ -36,9 +27,6 @@
 <% end %>
 <%= render partial: 'layouts/topbar' %>
 <%= render partial: 'layouts/next_hike' %>
-<% unless alert.blank? %>
-<p class="alert"><%= alert %></p>
-<% end %>
 <%= yield %>
 </body>
 </html>

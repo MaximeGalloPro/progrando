@@ -54,6 +54,7 @@ class HikesController < ApplicationController
 
     def create
         @hike = Hike.new(hike_params)
+        @hike.organisation_id = Current.organisation.id
         @hike_path = HikePath.new(coordinates: params[:hike][:coordinates])
         if @hike.save
             @hike_path.hike_id = @hike.id
