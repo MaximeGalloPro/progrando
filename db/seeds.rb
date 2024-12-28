@@ -113,13 +113,14 @@ organisations.each do |organisation|
             organisation_id: organisation.id
         )
 
-        Member.create!(
+        member = Member.create!(
             name: "Membre #{i+1} #{organisation.slug.upcase}",
             email: member_user.email,
             phone: "012345678#{i+1}",
             role: roles[:member],
             organisation_id: organisation.id
         )
+        puts "Member #{member.name} created in organisation #{organisation.slug.upcase} with id: #{organisation.id}!"
     end
 
     puts "Creating profile rights..."

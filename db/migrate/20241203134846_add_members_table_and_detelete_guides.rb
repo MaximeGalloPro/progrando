@@ -18,18 +18,5 @@ class AddMembersTableAndDeteleteGuides < ActiveRecord::Migration[7.0]
         end
         role = Role.find_by(name: 'guide')
         role = Role.create(name: 'guide') unless role.present?
-
-        # transféré les datas de guides vers members
-        Guide.all.each do |guide|
-            member = Member.new(
-                name: guide.name,
-                email: guide.email,
-                phone: guide.phone,
-                role: role.id
-            ).save(validate: false)
-            unless member
-                puts member.errors.full_messages
-            end
-        end
     end
 end

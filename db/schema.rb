@@ -11,22 +11,14 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
-  create_table "guides", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "phone", null: false
-    t.string "email"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
     t.string "day_type"
     t.decimal "carpooling_cost", precision: 5, scale: 2
-    t.integer "member_id"
     t.integer "hike_id"
     t.string "openrunner_ref"
+    t.integer "member_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "organisation_id"
@@ -34,7 +26,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.index ["hiking_date", "hike_id"], name: "index_hike_histories_on_hiking_date_and_hike_id", unique: true
   end
 
-  create_table "hike_paths", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "hike_paths", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.integer "hike_id"
     t.text "coordinates"
     t.datetime "created_at", null: false
@@ -42,7 +34,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.integer "organisation_id"
   end
 
-  create_table "hikes", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "hikes", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.integer "number"
     t.integer "day"
     t.integer "difficulty"
@@ -62,7 +54,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.integer "organisation_id"
   end
 
-  create_table "members", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "members", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "email"
     t.string "phone"
@@ -72,7 +64,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.integer "organisation_id"
   end
 
-  create_table "organisations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "organisations", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "slug"
     t.string "url"
@@ -88,7 +80,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.string "contact_language"
   end
 
-  create_table "profile_rights", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "profile_rights", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.bigint "profile_id", null: false
     t.string "resource", null: false
     t.string "action", null: false
@@ -99,7 +91,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.index ["profile_id"], name: "index_profile_rights_on_profile_id"
   end
 
-  create_table "profiles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "profiles", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
     t.boolean "active", default: true
@@ -108,7 +100,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.integer "organisation_id"
   end
 
-  create_table "rights", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "rights", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.integer "role_id"
     t.string "model"
     t.boolean "create"
@@ -118,14 +110,14 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_25_141758) do
     t.integer "organisation_id"
   end
 
-  create_table "roles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "roles", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "organisation_id"
   end
 
-  create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_uca1400_ai_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"

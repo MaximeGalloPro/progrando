@@ -12,17 +12,10 @@
                             <%= f.select :theme,
                                          [
                                              ['Thème clair (Défaut)', ''],
-                                             ['Océan', 'theme-ocean'],
-                                             ['Forêt', 'theme-forest'],
-                                             ['Coucher de soleil', 'theme-sunset'],
-                                             ['Royal', 'theme-royal'],
-                                             ['Cerise', 'theme-cherry'],
-                                             ['Minuit', 'theme-midnight'],
-                                             ['Nordic', 'theme-nordic'],
-                                             ['Rose', 'theme-rose'],
-                                             ['Café', 'theme-coffee'],
-                                             ['Menthe', 'theme-mint'],
-                                             ['Max', 'max-theme']
+                                             ['Max', 'max-theme'],
+                                             ['Océan', 'ocean-theme'],
+                                             ['Forêt', 'forest-theme'],
+                                             ['Minuit', 'midnight-theme'],
                                          ],
                                          { include_blank: false },
                                          { class: "form-select" }
@@ -83,16 +76,15 @@
 
                     <h3 class="h5 mb-3">Supprimer mon compte</h3>
 
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex justify-content-between">
+                        <%= link_to :back, class: "btn btn-outline-secondary" do %>
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        <% end %>
                         <%= button_to registration_path(resource_name),
                                       data: { confirm: "Êtes-vous sûr ?", turbo_confirm: "Êtes-vous sûr ?" },
                                       method: :delete,
                                       class: "btn btn-outline-danger" do %>
                             <i class="fas fa-trash-alt me-2"></i>Supprimer mon compte
-                        <% end %>
-
-                        <%= link_to :back, class: "btn btn-outline-secondary" do %>
-                            <i class="fas fa-arrow-left me-2"></i>Retour
                         <% end %>
                     </div>
                 </div>
