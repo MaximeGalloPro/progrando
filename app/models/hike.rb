@@ -104,11 +104,11 @@ class Hike < ApplicationRecord
     # Méthodes d'instance
     def difficulty_text
         case difficulty
-        when 1 then "Facile"
-        when 2 then "Moyen"
-        when 3 then "Difficile"
-        when 4 then "Très difficile"
-        when 5 then "Extrême"
+        when 1 then "Très facile"
+        when 2 then "Facile"
+        when 3 then "Moyen"
+        when 4 then "Difficile"
+        when 5 then "Très difficile"
         else "Non défini"
         end
     end

@@ -204,7 +204,7 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label" %>
-                <%= f.number_field :carpooling_cost,
+                <%= f.number_field :carpooling_cost, step: 0.1,
                                    class: "form-control #{'is-invalid' if @hike.errors[:carpooling_cost].any?}" %>
                 <% if @hike.errors[:carpooling_cost].any? %>
                     <div class="invalid-feedback">
