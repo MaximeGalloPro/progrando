@@ -8,7 +8,7 @@ class MembersController < ApplicationController
     end
 
     def index
-        @members = Member.all.includes(:role)
+        @members = Member.all.includes(:role, :profile)
     end
 
     def new
@@ -41,6 +41,7 @@ class MembersController < ApplicationController
 
     def get_roles
         @roles = Role.all
+        @profiles = Profile.all
     end
 
     def member_params
@@ -48,7 +49,8 @@ class MembersController < ApplicationController
             :name,
             :phone,
             :email,
-            :role_id
+            :role_id,
+            :profile_id
         )
     end
 end

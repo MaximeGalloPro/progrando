@@ -1,0 +1,72 @@
+<% content_for :title, "#{@profile.name} - #{@organisation.name}" %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><%= @profile.name %></h1>
+        <div>
+            <%= link_to "Modifier", edit_organisation_profile_path(@organisation, @profile), class: "btn btn-primary" %>
+            <%= link_to "Retour aux profils", organisation_profiles_path(@organisation), class: "btn btn-outline-secondary ms-2" %>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informations générales</h5>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div>
+                                <strong>Description :</strong><br>
+                                <%= @profile.description %>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Statut :</strong>
+                            <span class="badge <%= @profile.active? ? 'bg-success' : 'bg-danger' %>">
+                                    <%= @profile.active? ? 'Actif' : 'Inactif' %>
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <%= render partial: "profile_rights" %>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations système</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <strong>Identifiant :</strong>
+                        <%= @profile.id %>
+                    </p>
+                    <p>
+                        <strong>Organisation :</strong>
+                        <%= @organisation.name %>
+                    </p>
+                    <p>
+                        <strong>Créé le :</strong>
+                        <%= l(@profile.created_at, format: :long) %>
+                    </p>
+                    <p>
+                        <strong>Dernière modification :</strong>
+                        <%= l(@profile.updated_at, format: :long) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    })
+</script>

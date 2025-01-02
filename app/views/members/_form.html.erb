@@ -26,6 +26,25 @@
 
         <div class="col-md-6">
             <div class="mb-3">
+                <%= f.label :profile_id, "Profil", class: "form-label required" %>
+                <div class="d-flex gap-2">
+                    <%= f.collection_select :profile_id,
+                                            @profiles,
+                                            :id,
+                                            ->(profile) { "#{profile.name}" },
+                                            { prompt: "Sélectionner un profil..." },
+                                            { class: "select2 #{'is-invalid' if @member.errors[:profile_id].any?}" } %>
+                </div>
+                <% if @member.errors[:profile_id].any? %>
+                    <div class="invalid-feedback">
+                        <%= @member.errors[:profile_id].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
                 <%= f.label :role_id, "Rôle", class: "form-label required" %>
                 <div class="d-flex gap-2">
                     <%= f.collection_select :role_id,
