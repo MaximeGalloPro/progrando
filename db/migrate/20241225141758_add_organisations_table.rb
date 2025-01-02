@@ -15,6 +15,7 @@ class AddOrganisationsTable < ActiveRecord::Migration[7.0]
                 t.string :contact_phone
                 t.string :contact_position
                 t.string :contact_language
+                t.timestamps
             end
         end
 

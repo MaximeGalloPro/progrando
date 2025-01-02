@@ -1,0 +1,118 @@
+<% content_for :title, @organisation.name %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><%= @organisation.name %></h1>
+        <div>
+            <% show_if_authorized('organisation', 'update') do %>
+                <%= link_to "Modifier", edit_organisation_path(@organisation), class: "btn btn-primary" %>
+            <% end %>
+            <%= link_to "Retour", organisations_path, class: "btn btn-outline-secondary ms-2" %>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <% if @organisation.logo_url.present? %>
+                            <div class="col-md-3">
+                                <%= image_tag @organisation.logo_url, class: "img-fluid" %>
+                            </div>
+                        <% end %>
+                        <div class="col">
+                            <h5 class="card-title">Informations générales</h5>
+                            <p class="card-text"><%= @organisation.description %></p>
+
+                            <div class="mt-3">
+                                <% if @organisation.url.present? %>
+                                    <p>
+                                        <strong>Site web :</strong>
+                                        <%= link_to @organisation.url, @organisation.url, target: "_blank" %>
+                                    </p>
+                                <% end %>
+                                <p>
+                                    <strong>Localisation :</strong>
+                                    <%= @organisation.location %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Coordonnées principales</h5>
+                            <div class="mt-3">
+                                <p>
+                                    <strong>Email :</strong>
+                                    <%= mail_to @organisation.email %>
+                                </p>
+                                <p>
+                                    <strong>Téléphone :</strong>
+                                    <%= @organisation.phone %>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5>Contact principal</h5>
+                            <div class="mt-3">
+                                <p>
+                                    <strong>Nom :</strong>
+                                    <%= @organisation.contact_name %>
+                                </p>
+                                <p>
+                                    <strong>Poste :</strong>
+                                    <%= @organisation.contact_position %>
+                                </p>
+                                <p>
+                                    <strong>Email :</strong>
+                                    <%= mail_to @organisation.contact_email %>
+                                </p>
+                                <p>
+                                    <strong>Téléphone :</strong>
+                                    <%= @organisation.contact_phone %>
+                                </p>
+                                <% if @organisation.contact_language.present? %>
+                                    <p>
+                                        <strong>Langue :</strong>
+                                        <%= @organisation.contact_language %>
+                                    </p>
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations système</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <strong>Identifiant :</strong>
+                        <%= @organisation.id %>
+                    </p>
+                    <p>
+                        <strong>Slug :</strong>
+                        <%= @organisation.slug %>
+                    </p>
+                    <p>
+                        <strong>Créé le :</strong>
+                        <%= l(@organisation.created_at, format: :long) %>
+                    </p>
+                    <p>
+                        <strong>Dernière modification :</strong>
+                        <%= l(@organisation.updated_at, format: :long) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,5 @@
-module ModelForRightsModule
+module ModelsForRightsModule
     def model_list
-        [Hike, HikeHistory]
+        [Hike, HikeHistory, Organisation]
     end
 end
