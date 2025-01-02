@@ -16,6 +16,12 @@
                     <i class="fas fa-chart-line"></i> Dashboard
                 <% end %>
 
+                <% show_if_authorized('Organisation', 'index') do %>
+                    <%= link_to organisations_path,
+                                class: "btn #{current_page?(organisations_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
+                        <i class="fas fa-sitemap"></i> Organisation
+                    <% end %>
+                <% end %>
                 <% show_if_authorized('Hike', 'index') do %>
                     <%= link_to hikes_path,
                                 class: "btn #{current_page?(hikes_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>

@@ -1,7 +1,7 @@
 module ApplicationHelper
     def show_if_authorized(resource, action, &block)
         # Retourne true/false au lieu de yield/nil
-        if can?(action, resource)
+        if current_user&.super_admin or can?(action, resource)
             yield if block_given?
             true
         else
