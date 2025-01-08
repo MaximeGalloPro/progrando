@@ -11,7 +11,7 @@ module Rails7WithDocker
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
     config.active_job.queue_adapter = :sidekiq
-    config.middleware.use SubdomainMiddleware
+    # config.middleware.use SubdomainMiddleware
 
     # Configuration for the application, engines, and railties goes here.
     #

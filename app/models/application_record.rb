@@ -13,6 +13,7 @@ class ApplicationRecord < ActiveRecord::Base
 
     def set_organisation_id
         return if self.is_a?(Organisation)
+        return if self.is_a?(User)
         return if self.organisation_id.present?
         self.organisation_id = Current.organisation&.id
     end

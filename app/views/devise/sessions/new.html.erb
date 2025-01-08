@@ -22,7 +22,9 @@
                                                  autocomplete: "current-password",
                                                  class: "form-control",
                                                  placeholder: "Votre mot de passe",
-                                                 value: Rails.env.development? ? 'password123' : nil %>
+                                                 value: Rails.env.development? ? 'password123' : nil,
+                                                 id: "password-field" %>
+                            <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
                         </div>
 
                         <% if devise_mapping.rememberable? %>
@@ -45,13 +47,16 @@
 
                     <% if Rails.env.development? %>
                         <div class="alert alert-info mt-3 text-center">
-                            <small>Environnement de développement<br>
+                            Environnement de développement<br>
                                 <strong>Club Alpin Français</strong><br>
                                 Admin: admin@caf.com<br>
                                 Guide: guide@caf.com<br>
+                                Membre: member1@caf.com, member2@caf.com, member3@caf.com<br>
+                                Mot de passe: password123<br>
                                 <strong>Randonneurs des Alpes</strong><br>
                                 Admin: admin@rda.com<br>
                                 Guide: guide@rda.com<br>
+                                Membre: member1@rda.com, member2@rda.com, member3@rda.com<br>
                                 Mot de passe: password123</small>
                         </div>
                     <% end %>
@@ -60,3 +65,36 @@
         </div>
     </div>
 </div>
+
+<script>
+// Toggle password visibility
+$(".toggle-password").click(function() {
+    $(this).toggleClass("fa-eye fa-eye-slash");
+    var input = $($(this).attr("toggle"));
+    if (input.attr("type") == "password") {
+        input.attr("type", "text");
+    } else {
+        input.attr("type", "password");
+    }
+});
+</script>
+
+<style>
+.form-group {
+  position: relative;
+}
+
+.field-icon {
+  position: absolute;
+  right: 10px;
+  top: 72%;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+  color: #495057;
+}
+
+#password-field {
+  padding-right: 35px;
+}
+</style>

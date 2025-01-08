@@ -25,8 +25,14 @@ class AddOrganisationsTable < ActiveRecord::Migration[7.0]
         add_column :members, :organisation_id, :integer unless column_exists?(:members, :organisation_id)
         add_column :profile_rights, :organisation_id, :integer unless column_exists?(:profile_rights, :organisation_id)
         add_column :profiles, :organisation_id, :integer unless column_exists?(:profiles, :organisation_id)
-        add_column :rights, :organisation_id, :integer unless column_exists?(:rights, :organisation_id)
         add_column :roles, :organisation_id, :integer unless column_exists?(:roles, :organisation_id)
-        add_column :users, :organisation_id, :integer unless column_exists?(:users, :organisation_id)
+
+        unless table_exists? :user_organisations
+            create_table :user_organisations do |t|
+                t.integer :user_id
+                t.integer :organisation_id
+                t.timestamps
+            end
+        end
     end
 end

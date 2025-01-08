@@ -38,6 +38,19 @@ class OrganisationsController < ApplicationController
         redirect_to organisations_url, notice: 'Organisation supprimée avec succès.'
     end
 
+    def switch
+        org = current_user.organisations.find_by(id: params[:id])
+
+        if org
+            session[:current_organisation_id] = org.id
+            redirect_to organisation_root_url(subdomain: org.slug),
+                        notice: "Organisation changée"
+        else
+            redirect_back fallback_location: root_path,
+                          alert: "Organisation non trouvée"
+        end
+    end
+
     private
 
     def set_organisation

@@ -1,6 +1,7 @@
 # app/models/user.rb
 class User < ApplicationRecord
-  belongs_to :organisation, optional: true
+  has_many :user_organisations
+  has_many :organisations, through: :user_organisations
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,

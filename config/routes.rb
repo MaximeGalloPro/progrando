@@ -2,6 +2,7 @@ Rails.application.routes.draw do
     # Routes en dehors des contraintes
     devise_for :users
     resources :organisations do
+        post :switch, on: :member
         resources :profiles do
             resources :profile_rights do
                 member do
@@ -37,7 +38,13 @@ Rails.application.routes.draw do
         get '/health', to: proc { [200, {}, ['OK']] }
     end
 
-    # Route par défaut (sans organisation) vers sign_in
-    root to: redirect('/users/sign_in'), as: :unauthenticated_root
+    root to: lambda { |_|
+        if Current.organisation.present?
+            '/stats/dashboard'
+        else
+            '/users/sign_in'
+        end
+    }
+
     get '/404', to: 'errors#not_found'
 end

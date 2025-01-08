@@ -21,8 +21,5 @@ class CreateProfileRights < ActiveRecord::Migration[7.0]
                 t.timestamps
             end
         end
-
-
-        add_reference :users, :profile, foreign_key: true unless column_exists?(:users, :profile_id)
     end
 end

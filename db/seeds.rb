@@ -67,40 +67,41 @@ organisations.each do |organisation|
         guide: Role.create!(name: 'guide', organisation_id: organisation.id),
         member: Role.create!(name: 'member', organisation_id: organisation.id)
     }
-
     puts "Creating users and members..."
     # Admin
     admin_user = User.create!(
         email: "admin@#{organisation.slug}.com",
         password: 'password123',
-        password_confirmation: 'password123',
-        profile: profiles[:admin],
-        organisation_id: organisation.id
+        password_confirmation: 'password123'
     )
+
+    UserOrganisation.create!(user: admin_user, organisation: organisation)
 
     admin_member = Member.create!(
         name: "Admin #{organisation.slug.upcase}",
         email: admin_user.email,
         phone: '0123456789',
         role: roles[:admin],
-        organisation_id: organisation.id
+        organisation_id: organisation.id,
+        profile: profiles[:admin]
     )
 
     # Guide
     guide_user = User.create!(
         email: "guide@#{organisation.slug}.com",
         password: 'password123',
-        password_confirmation: 'password123',
-        profile: profiles[:guide],
-        organisation_id: organisation.id
+        password_confirmation: 'password123'
     )
+
+    UserOrganisation.create!(user: guide_user, organisation: organisation)
 
     guide_member = Member.create!(
         name: "Guide #{organisation.slug.upcase}",
         email: guide_user.email,
         phone: '0123456780',
         role: roles[:guide],
-        organisation_id: organisation.id
+        organisation_id: organisation.id,
+        profile: profiles[:guide]
     )
 
     # Regular members
@@ -108,17 +109,18 @@ organisations.each do |organisation|
         member_user = User.create!(
             email: "member#{i+1}@#{organisation.slug}.com",
             password: 'password123',
-            password_confirmation: 'password123',
-            profile: profiles[:member],
-            organisation_id: organisation.id
+            password_confirmation: 'password123'
         )
+
+        UserOrganisation.create!(user: member_user, organisation: organisation)
 
         member = Member.create!(
             name: "Membre #{i+1} #{organisation.slug.upcase}",
             email: member_user.email,
             phone: "012345678#{i+1}",
             role: roles[:member],
-            organisation_id: organisation.id
+            organisation_id: organisation.id,
+            profile: profiles[:member]
         )
         puts "Member #{member.name} created in organisation #{organisation.slug.upcase} with id: #{organisation.id}!"
     end
