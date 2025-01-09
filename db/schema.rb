@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_01_02_135005) do
+ActiveRecord::Schema[7.0].define(version: 2025_01_02_154858) do
   create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
@@ -62,6 +62,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_02_135005) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "organisation_id"
+    t.integer "profile_id"
   end
 
   create_table "organisations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -109,7 +110,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_02_135005) do
     t.boolean "read"
     t.boolean "update"
     t.boolean "delete"
-    t.integer "organisation_id"
   end
 
   create_table "roles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -117,6 +117,13 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_02_135005) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "organisation_id"
+  end
+
+  create_table "user_organisations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "organisation_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -129,7 +136,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_02_135005) do
     t.datetime "updated_at", null: false
     t.bigint "profile_id"
     t.string "theme"
-    t.integer "organisation_id"
     t.boolean "super_admin", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["profile_id"], name: "index_users_on_profile_id"
