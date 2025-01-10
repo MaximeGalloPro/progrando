@@ -14,9 +14,9 @@ Rails.application.routes.draw do
     end
 
     # Routes avec contraintes d'organisation
-    constraints lambda { |req| Current.organisation.present? } do
+    # TODO manage subdomain
+    # constraints lambda { |req| Current.organisation.present? } do
         root to: 'stats#dashboard', as: :authenticated_root
-
         patch 'users/theme', to: 'users#update_theme', as: :update_user_theme
         resources :rights
         resources :hike_paths do
@@ -37,7 +37,7 @@ Rails.application.routes.draw do
         resources :hike_histories
         get 'stats/dashboard', to: 'stats#dashboard'
         get '/health', to: proc { [200, {}, ['OK']] }
-    end
+    # end
 
     # Route par défaut (sans organisation) vers sign_in
     root to: redirect('/users/sign_in'), as: :unauthenticated_root

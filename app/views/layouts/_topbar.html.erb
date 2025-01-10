@@ -2,7 +2,7 @@
     <div class="container">
         <%= link_to stats_dashboard_path, class: "text-decoration-none" do %>
     <span class="navbar-brand fw-bold text-primary">
-        <i class="fas fa-mountain"></i> Prog<span style="font-family: 'Georgia', serif;font-size: larger">i</span>t - <%= Current.organisation.name %>
+        <i class="fas fa-mountain"></i> Prog<span style="font-family: 'Georgia', serif;font-size: larger">i</span>t <%= Current.organisation.present? ? "- #{Current.organisation.name}" : nil %>
     </span>
         <% end %>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">

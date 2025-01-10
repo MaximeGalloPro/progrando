@@ -10,12 +10,12 @@ class ApplicationRecord < ActiveRecord::Base
     private
 
     def exclude_model
-        %w[User Organisation]
+        ['User', 'Organisation']
     end
 
     def set_organisation_id
-        return if self.organisation_id.present?
         return if exclude_model.include?(self.class.name)
+        return if self&.organisation_id&.present?
         self.organisation_id = Current.organisation&.id
     end
 end

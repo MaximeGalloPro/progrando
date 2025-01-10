@@ -31,6 +31,7 @@ class AddOrganisationsTable < ActiveRecord::Migration[7.0]
             create_table :user_organisations do |t|
                 t.integer :user_id
                 t.integer :organisation_id
+                t.integer :profile_id
                 t.timestamps
             end
         end

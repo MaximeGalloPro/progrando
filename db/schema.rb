@@ -121,6 +121,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_09_215037) do
   create_table "user_organisations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
     t.integer "organisation_id"
+    t.integer "profile_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -133,15 +134,12 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_09_215037) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "profile_id"
     t.string "theme"
     t.boolean "super_admin", default: false
     t.integer "current_organisation_id"
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["profile_id"], name: "index_users_on_profile_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "profile_rights", "profiles"
-  add_foreign_key "users", "profiles"
 end

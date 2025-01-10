@@ -46,6 +46,13 @@ organisations = [
     )
 ]
 
+puts "Creating multi-org admin user..."
+multi_org_admin = User.create!(
+    email: 'multi_org_admin@exemple.com',
+    password: 'password123',
+    password_confirmation: 'password123'
+)
+
 organisations.each do |organisation|
     puts "Creating profiles for #{organisation.name}..."
     profiles = {
@@ -75,6 +82,17 @@ organisations.each do |organisation|
         guide: Role.create!(name: 'guide', organisation_id: organisation.id),
         member: Role.create!(name: 'member', organisation_id: organisation.id)
     }
+
+
+    Member.create!(
+        name: "Multi-Org Admin",
+        email: multi_org_admin.email,
+        phone: '0123456789',
+        role: Role.find_by(name: 'admin', organisation_id: organisation.id),
+        organisation_id: organisation.id)
+
+    UserOrganisation.create!(user: multi_org_admin, organisation: organisation, profile: profiles[:admin])
+
     puts "Creating users and members..."
     # Admin
     admin_user = User.create!(
@@ -83,7 +101,7 @@ organisations.each do |organisation|
         password_confirmation: 'password123'
     )
 
-    UserOrganisation.create!(user: admin_user, organisation: organisation)
+    UserOrganisation.create!(user: admin_user, organisation: organisation, profile: profiles[:admin])
 
     admin_member = Member.create!(
         name: "Admin #{organisation.slug.upcase}",
@@ -100,7 +118,7 @@ organisations.each do |organisation|
         password_confirmation: 'password123'
     )
 
-    UserOrganisation.create!(user: guide_user, organisation: organisation)
+    UserOrganisation.create!(user: guide_user, organisation: organisation, profile: profiles[:guide])
 
     guide_member = Member.create!(
         name: "Guide #{organisation.slug.upcase}",
@@ -118,7 +136,7 @@ organisations.each do |organisation|
             password_confirmation: 'password123'
         )
 
-        UserOrganisation.create!(user: member_user, organisation: organisation)
+        UserOrganisation.create!(user: member_user, organisation: organisation, profile: profiles[:member])
 
         member = Member.create!(
             name: "Membre #{i+1} #{organisation.slug.upcase}",
@@ -234,24 +252,6 @@ organisations.each do |organisation|
             organisation_id: organisation.id
         )
     end
-end
-
-puts "Creating multi-org admin user..."
-multi_org_admin = User.create!(
-    email: 'multi_org_admin@hiking.com',
-    password: 'password123',
-    password_confirmation: 'password123'
-)
-
-organisations.each do |organisation|
-    UserOrganisation.create!(user: multi_org_admin, organisation: organisation)
-    Member.create!(
-        name: "Multi-Org Admin",
-        email: multi_org_admin.email,
-        phone: '0123456789',
-        role: Role.find_by(name: 'admin', organisation_id: organisation.id),
-        organisation_id: organisation.id,
-        )
 end
 
 puts "Seed finished!"

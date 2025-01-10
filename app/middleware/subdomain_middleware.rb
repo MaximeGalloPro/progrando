@@ -16,7 +16,7 @@ class SubdomainMiddleware
         #     redirect_url = "http://#{current_organisation.slug}.localhost:3000#{request.path}"
         #     return [302, { 'Location' => redirect_url }, []]
         # end
-        set_current_organisation(current_user, request)
+        set_current_organisation(current_user, request) if current_user
         @app.call(env)
     end
 
@@ -29,8 +29,7 @@ class SubdomainMiddleware
     def find_current_organisation(user)
         if user.current_organisation_id.present?
             Organisation.find_by(id: user.current_organisation_id)
-        else
-            user.organisations.first
+        elsif user.organisations.present?
             user.update_column(:current_organisation_id, user.organisations.first.id)
         end
         Organisation.find_by(id: user.current_organisation_id)
