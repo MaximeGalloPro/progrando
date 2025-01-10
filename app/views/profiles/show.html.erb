@@ -4,8 +4,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><%= @profile.name %></h1>
         <div>
-            <%= link_to "Modifier", edit_organisation_profile_path(@organisation, @profile), class: "btn btn-primary" %>
-            <%= link_to "Retour aux profils", organisation_profiles_path(@organisation), class: "btn btn-outline-secondary ms-2" %>
+            <%= link_to "Modifier", edit_profile_path(@organisation, @profile), class: "btn btn-primary" %>
+            <%= link_to "Retour aux profils", profiles_path(@organisation), class: "btn btn-outline-secondary ms-2" %>
         </div>
     </div>
 

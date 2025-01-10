@@ -7,6 +7,11 @@ Rails.application.routes.draw do
             patch :switch
         end
     end
+    resources :profiles do
+        member do
+            patch :toggle_authorization
+        end
+    end
 
     # Routes avec contraintes d'organisation
     constraints lambda { |req| Current.organisation.present? } do

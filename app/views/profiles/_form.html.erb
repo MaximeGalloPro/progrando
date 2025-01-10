@@ -1,4 +1,4 @@
-<%= form_with(model: [@organisation, @profile], local: true) do |form| %>
+<%= form_with(model: @profile, local: true) do |form| %>
     <% if @profile.errors.any? %>
         <div class="alert alert-danger">
             <h2 class="h6"><%= pluralize(@profile.errors.count, "erreur") %> :</h2>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="mt-4">
-        <%= link_to "Retour", organisation_profiles_path(@organisation), class: "btn btn-outline-secondary ms-2" %>
+        <%= link_to "Retour", profiles_path, class: "btn btn-outline-secondary ms-2" %>
         <%= form.submit "Enregistrer", class: "btn btn-primary", style: "float: right" %>
     </div>
 <% end %>

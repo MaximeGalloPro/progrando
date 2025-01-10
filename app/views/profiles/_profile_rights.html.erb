@@ -46,7 +46,7 @@
                                                   <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>"
                                                         role="button"
                                                         data-controller="permission"
-                                                        data-permission-url="<%= toggle_authorization_organisation_profile_profile_right_path(@organisation, @profile, right) %>"
+                                                        data-permission-url="<%= toggle_authorization_profile_path(right) %>"
                                                         data-action="click->permission#toggle"><%= right.authorized ? 'Autorisé' : 'Non autorisé' %></span>
                             </td>
                             <td><%= l(right.updated_at, format: :short) %></td>
