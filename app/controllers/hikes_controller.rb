@@ -6,7 +6,7 @@ class HikesController < ApplicationController
     end
 
     def refresh_from_openrunner
-        @hike = Hike.find(params[:id])
+        @hike = Hike.for_organisation.find_by(id: params[:id])
         @hike.update(updating: true)
         UpdateHikeFromOpenrunnerJob.perform_later(@hike)
 
@@ -37,12 +37,12 @@ class HikesController < ApplicationController
     end
 
     def edit
-        @hike = Hike.find(params[:id])
+        @hike = Hike.for_organisation.find_by(id: params[:id])
         @hike_path = @hike.hike_path
     end
 
     def update
-        @hike = Hike.find(params[:id])
+        @hike = Hike.for_organisation.find_by(id: params[:id])
         @hike_path = @hike.hike_path || HikePath.new(hike_id: @hike.id)
         params[:hike][:coordinates] = "" if params[:hike][:coordinates] == "[]"
         if @hike.update(hike_params) and @hike_path&.update(coordinates: params[:hike][:coordinates])
@@ -54,7 +54,6 @@ class HikesController < ApplicationController
 
     def create
         @hike = Hike.new(hike_params)
-        @hike.organisation_id = Current.organisation.id
         @hike_path = HikePath.new(coordinates: params[:hike][:coordinates])
         if @hike.save
             @hike_path.hike_id = @hike.id
@@ -76,7 +75,7 @@ class HikesController < ApplicationController
     end
 
     def destroy
-        @hike = Hike.find_by(id: params[:id])
+        @hike = Hike.for_organisation.find_by(id: params[:id])
         @hike.destroy
         redirect_to hikes_path, notice: 'Parcours supprimé avec succès.'
     end
@@ -106,7 +105,8 @@ class HikesController < ApplicationController
     end
 
     def fetch_hikes
-        Hike.with_latest_history
+        Hike.for_organisation
+            .with_latest_history
             .then { |scope| apply_search(scope) }
             .order_by_latest_date
             .distinct

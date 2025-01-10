@@ -5,7 +5,7 @@ class HikePathsController < ApplicationController
     end
 
     def show
-        @hike_path = HikePath.find_by(id: params[:id])
+        @hike_path = HikePath.for_organisation.find_by(id: params[:id])
         if @hike_path.nil?
             flash[:alert] = "Le tracé demandé n'existe pas."
             redirect_to hikes_path
@@ -20,7 +20,7 @@ class HikePathsController < ApplicationController
             return render :new, status: :unprocessable_entity
         end
 
-        hike = Hike.find_by(id: params[:hike_id])
+        hike = Hike.for_organisation.find_by(id: params[:hike_id])
         @hike_path.assign_attributes(coordinates: points, hike_id: hike&.id)
 
         if @hike_path.save

@@ -1,7 +1,7 @@
 class RolesController < ApplicationController
 
     def index
-        @roles = Role.all
+        @roles = Role.for_organisation.all
     end
 
     def create
@@ -18,11 +18,11 @@ class RolesController < ApplicationController
     end
 
     def edit
-        @role = Role.find(params[:id])
+        @role = Role.for_organisation.find_by(id: params[:id])
     end
 
     def update
-        @role = Role.find(params[:id])
+        @role = Role.for_organisation.find_by(id: params[:id])
         if @role.update(role_params)
             redirect_to roles_path, notice: 'Role modifié avec succès.'
         else
@@ -31,7 +31,7 @@ class RolesController < ApplicationController
     end
 
     def destroy
-        @role = Role.find(params[:id])
+        @role = Role.for_organisation.find_by(id: params[:id])
         @role.destroy
         redirect_to roles_path, notice: 'Role supprimé avec succès.'
     end

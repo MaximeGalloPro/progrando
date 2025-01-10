@@ -7,52 +7,34 @@ class SubdomainMiddleware
         request = Rack::Request.new(env)
         current_user = env['warden']&.user
 
-        # Si c'est une route Devise, on laisse passer
-        if devise_route?(request.path)
-            return @app.call(env)
-        end
-
-        subdomain = extract_subdomain(request.host)
-
-        # Si l'utilisateur est connecté et qu'il y a un sous-domaine qui ne correspond pas
-        if current_user && subdomain.present?
-            organisation = Organisation.find_by(slug: subdomain)
-            if organisation && current_user.organisation_id != organisation.id
-                # Déconnecter l'utilisateur
-                env['warden'].logout
-                # Créer un cookie de flash message
-                flash_cookie = "flash=%7B%22alert%22%3A%22Vous+n%27avez+pas+acc%C3%A8s+%C3%A0+cette+organisation%22%7D"
-                begin
-                    url = "http://#{current_user.organisation.slug}.localhost:3000#{request.path}"
-                rescue
-                    url = "http://localhost:3000/users/sign_in"
-                end
-                return [302, {
-                    'Location' => url,
-                    'Set-Cookie' => flash_cookie
-                }, []]
-            elsif organisation && current_user.organisation_id == organisation.id
-                Current.organisation = organisation
-                return @app.call(env)
-            end
-        end
-
-        # Si l'utilisateur est connecté mais n'a pas de sous-domaine, rediriger vers son organisation
-        if current_user && !subdomain && current_user.organisation
-            redirect_url = "http://#{current_user.organisation.slug}.localhost:3000#{request.path}"
-            return [302, { 'Location' => redirect_url }, []]
-        end
-
-        # Si pas d'utilisateur connecté
-        if !current_user
-            Current.organisation = nil
-            return @app.call(env)
-        end
-
+        # TODO manage subdomain
+        # if devise_route?(request.path) or !current_user
+        #             return @app.call(env)
+        #         end
+        # current_organisation = set_current_organisation(current_user, request)
+        # if current_user and current_organisation
+        #     redirect_url = "http://#{current_organisation.slug}.localhost:3000#{request.path}"
+        #     return [302, { 'Location' => redirect_url }, []]
+        # end
+        set_current_organisation(current_user, request)
         @app.call(env)
     end
 
     private
+
+    def set_current_organisation(current_user, _request)
+        Current.organisation = find_current_organisation(current_user)
+    end
+
+    def find_current_organisation(user)
+        if user.current_organisation_id.present?
+            Organisation.find_by(id: user.current_organisation_id)
+        else
+            user.organisations.first
+            user.update_column(:current_organisation_id, user.organisations.first.id)
+        end
+        Organisation.find_by(id: user.current_organisation_id)
+    end
 
     def devise_route?(path)
         path.start_with?('/users/sign_in',

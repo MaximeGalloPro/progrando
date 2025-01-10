@@ -396,3 +396,63 @@ body.max-theme .table .btn-outline-dark {
 .form-switch:hover {
     background-color: var(--item-hover);
 }
+
+/* List group styles */
+[class*="theme-"] .list-group-item,
+.ocean-theme .list-group-item,
+.midnight-theme .list-group-item,
+.max-theme .list-group-item {
+    background-color: var(--container-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[class*="theme-"] .list-group-item-action:hover,
+.ocean-theme .list-group-item-action:hover,
+.midnight-theme .list-group-item-action:hover,
+.max-theme .list-group-item-action:hover {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+}
+
+/* Button reset styles for list items */
+[class*="theme-"] button.p-0.border-0,
+.ocean-theme button.p-0.border-0,
+.midnight-theme button.p-0.border-0,
+.max-theme button.p-0.border-0 {
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+/* Badge styles */
+[class*="theme-"] .badge.bg-success,
+.ocean-theme .badge.bg-success,
+.midnight-theme .badge.bg-success,
+.max-theme .badge.bg-success {
+    background-color: var(--accent-color) !important;
+    color: var(--text-color);
+}
+
+/* Icon colors */
+[class*="theme-"] .text-secondary,
+.ocean-theme .text-secondary,
+.midnight-theme .text-secondary,
+.max-theme .text-secondary {
+    color: var(--border-color) !important;
+}
+
+/* Focus styles for buttons */
+[class*="theme-"] button.p-0.border-0:focus,
+.ocean-theme button.p-0.border-0:focus,
+.midnight-theme button.p-0.border-0:focus,
+.max-theme button.p-0.border-0:focus {
+    outline: none;
+}
+
+[class*="theme-"] button.p-0.border-0:focus .list-group-item,
+.ocean-theme button.p-0.border-0:focus .list-group-item,
+.midnight-theme button.p-0.border-0:focus .list-group-item,
+.max-theme button.p-0.border-0:focus .list-group-item {
+    background-color: var(--item-hover);
+}

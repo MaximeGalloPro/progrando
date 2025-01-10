@@ -3,7 +3,21 @@ class OrganisationsController < ApplicationController
     before_action :check_organisation_access, only: [:show, :edit, :update, :destroy]
 
     def index
-        @organisations = current_user.super_admin ? Organisation.all : Organisation.where(id: current_user.organisation_id)
+        @organisations = current_user.super_admin ? Organisation.all : Organisation.where(id: current_user.organisations.pluck(:id))
+    end
+
+    def switch
+        @organisations = current_user.super_admin ? Organisation.all : Organisation.where(id: current_user.organisations.pluck(:id))
+
+        if params[:id]
+            @organisation = Organisation.find(params[:id])
+            if current_user.super_admin || current_user.organisations.include?(@organisation)
+                current_user.update(current_organisation_id: @organisation.id)
+                redirect_to authenticated_root_path, notice: "Vous utilisez maintenant l'organisation #{@organisation.name}"
+            else
+                redirect_to organisations_path, alert: "Vous n'avez pas accès à cette organisation"
+            end
+        end
     end
 
     def show

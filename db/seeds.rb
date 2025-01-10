@@ -24,6 +24,14 @@ MEMBER_RIGHTS = {
     'Member' => %w[show update]
 }
 
+puts "Creating super admin user..."
+super_admin = User.create!(
+    email: 'super_admin@exemple.com',
+    password: 'password123',
+    password_confirmation: 'password123',
+    super_admin: true
+)
+
 puts "Creating organisations..."
 organisations = [
     Organisation.create!(
@@ -83,7 +91,6 @@ organisations.each do |organisation|
         phone: '0123456789',
         role: roles[:admin],
         organisation_id: organisation.id,
-        profile: profiles[:admin]
     )
 
     # Guide
@@ -101,7 +108,6 @@ organisations.each do |organisation|
         phone: '0123456780',
         role: roles[:guide],
         organisation_id: organisation.id,
-        profile: profiles[:guide]
     )
 
     # Regular members
@@ -120,7 +126,6 @@ organisations.each do |organisation|
             phone: "012345678#{i+1}",
             role: roles[:member],
             organisation_id: organisation.id,
-            profile: profiles[:member]
         )
         puts "Member #{member.name} created in organisation #{organisation.slug.upcase} with id: #{organisation.id}!"
     end
@@ -229,6 +234,24 @@ organisations.each do |organisation|
             organisation_id: organisation.id
         )
     end
+end
+
+puts "Creating multi-org admin user..."
+multi_org_admin = User.create!(
+    email: 'multi_org_admin@hiking.com',
+    password: 'password123',
+    password_confirmation: 'password123'
+)
+
+organisations.each do |organisation|
+    UserOrganisation.create!(user: multi_org_admin, organisation: organisation)
+    Member.create!(
+        name: "Multi-Org Admin",
+        email: multi_org_admin.email,
+        phone: '0123456789',
+        role: Role.find_by(name: 'admin', organisation_id: organisation.id),
+        organisation_id: organisation.id,
+        )
 end
 
 puts "Seed finished!"

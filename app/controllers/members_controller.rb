@@ -2,13 +2,13 @@ class MembersController < ApplicationController
     before_action :get_roles
 
     def destroy
-        @member = Member.find(params[:id])
+        @member = Member.for_organisation.find_by(id: params[:id])
         @member.destroy
         redirect_to members_path, notice: 'Membre supprimé avec succès.'
     end
 
     def index
-        @members = Member.all.includes(:role)
+        @members = Member.for_organisation.all.includes(:role)
     end
 
     def new
@@ -16,11 +16,11 @@ class MembersController < ApplicationController
     end
 
     def edit
-        @member = Member.find(params[:id])
+        @member = Member.for_organisation.find_by(id: params[:id])
     end
 
     def update
-        @member = Member.find(params[:id])
+        @member = Member.for_organisation.find_by(id: params[:id])
         if @member.update(member_params)
             redirect_to members_path, notice: 'Membre modifié avec succès.'
         else
@@ -40,7 +40,7 @@ class MembersController < ApplicationController
     private
 
     def get_roles
-        @roles = Role.all
+        @roles = Role.for_organisation.all
     end
 
     def member_params

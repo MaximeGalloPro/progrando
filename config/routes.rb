@@ -1,7 +1,12 @@
 Rails.application.routes.draw do
     # Routes d'authentification en dehors des contraintes
     devise_for :users
-    resources :organisations
+    resources :organisations do
+        collection do
+            get :switch
+            patch :switch
+        end
+    end
 
     # Routes avec contraintes d'organisation
     constraints lambda { |req| Current.organisation.present? } do

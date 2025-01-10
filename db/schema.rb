@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_01_02_154858) do
+ActiveRecord::Schema[7.0].define(version: 2025_01_09_215037) do
   create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
@@ -62,7 +62,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_02_154858) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "organisation_id"
-    t.integer "profile_id"
   end
 
   create_table "organisations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -137,6 +136,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_02_154858) do
     t.bigint "profile_id"
     t.string "theme"
     t.boolean "super_admin", default: false
+    t.integer "current_organisation_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["profile_id"], name: "index_users_on_profile_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

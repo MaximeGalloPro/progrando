@@ -2,26 +2,27 @@ class HikeHistoriesController < ApplicationController
     before_action :get_members
 
     def index
-        @hike = Hike.find_by(id: params[:hike_id])
-        @results = HikeHistory.where(hike_id: params[:hike_id])
+        @hike = Hike.for_organisation.find_by(id: params[:hike_id])
+        @results = HikeHistory.for_organisation
+                              .where(hike_id: params[:hike_id])
                               .joins(:member)
                               .select('hike_histories.*, members.name as member_name')
                               .order(hiking_date: :desc)
     end
 
     def destroy
-        @hike_history = HikeHistory.find(params[:id])
+        @hike_history = HikeHistory.for_organisation.find_by(id: params[:id])
         @hike_history.destroy
         redirect_to hikes_path, notice: 'Historique de randonnée supprimé avec succès.'
     end
 
     def update
-        @hike_history = HikeHistory.find(params[:id])
+        @hike_history = HikeHistory.for_organisation.find_by(id: params[:id])
 
         if @hike_history.update(hike_history_params)
             redirect_to hikes_path, notice: 'Historique de randonnée mis à jour avec succès.'
         else
-            @hikes = Hike.order(:trail_name)
+            @hikes = Hike.for_organisation.order(:trail_name)
             flash.now[:alert] = 'Veuillez corriger les erreurs ci-dessous.'
             render :edit, status: :unprocessable_entity
         end
@@ -35,7 +36,7 @@ class HikeHistoriesController < ApplicationController
     end
 
     def edit
-        @hike_history = HikeHistory.find(params[:id])
+        @hike_history = HikeHistory.for_organisation.find_by(id: params[:id])
         @hikes = Hike.order(:trail_name)
     end
 
@@ -59,7 +60,7 @@ class HikeHistoriesController < ApplicationController
     private
 
     def get_members
-        @members = Member.all.where(role_id: 1).order(:name)
+        @members = Member.for_organisation.all.where(role_id: 1).order(:name)
     end
 
     def hike_history_params
