@@ -2,8 +2,10 @@
     <%= link_to "Ajouter un membre",
                 new_member_path,
                 class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right" %>
-    <%= link_to profiles_path, class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right; margin-right: 1rem" do %>
-        Gérer les profils
+    <% show_if_authorized('Profile', 'show') do %>
+        <%= link_to profiles_path, class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right; margin-right: 1rem" do %>
+            Gérer les profils
+        <% end %>
     <% end %>
     <div style="clear: both"></div>
     <% if @members.any? %>

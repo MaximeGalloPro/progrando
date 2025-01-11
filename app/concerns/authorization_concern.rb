@@ -1,7 +1,6 @@
 # app/controllers/concerns/authorization_concern.rb
 module AuthorizationConcern
     extend ActiveSupport::Concern
-    include ModelsForRightsModule
 
     included do
         helper_method :can?
@@ -9,6 +8,10 @@ module AuthorizationConcern
     end
 
     private
+
+    def exclude_models
+        []
+    end
 
     def check_authorization!
         Rails.logger.debug "\n --- \e[36mCurrent user: \e[1m#{current_user&.email}\e[0m --- \n"
@@ -23,8 +26,8 @@ module AuthorizationConcern
 
         authorized = can?(action, resource)
         status_color = authorized ? "\e[32m" : "\e[31m"
-        model_has_to_be_checked =  model_list.map(&:name).include?(resource)
-        if !model_has_to_be_checked
+        model_dont_have_to_be_checked =  exclude_models.include?(resource)
+        if model_dont_have_to_be_checked
             Rails.logger.debug "\n --- \e[33mNo need to check authorization for #{resource}##{action}\e[0m --- \n"
             return
         else
