@@ -49,8 +49,11 @@ module AuthorizationConcern
 
     def can?(action, resource)
         return true if current_user&.super_admin
-        return false unless current_user&.profile
-        current_user.profile.authorized_for?(resource, action)
+        return false unless current_user.user_organisations.any?(&:profile)
+        return true if current_user.user_organisations.for_organisation&.first&.creator
+        current_user.user_organisations.find_by(organisation_id: current_user.current_organisation_id).profile.authorized_for?(resource, action)
+    rescue
+        false
     end
 
     def extract_action

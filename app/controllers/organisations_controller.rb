@@ -60,7 +60,7 @@ class OrganisationsController < ApplicationController
 
     def check_organisation_access
         return if current_user.super_admin
-        return if @organisation.id == current_user.organisation_id
+        return if @organisation.id == current_user.user_organisations.for_organisation&.first&.organisation_id
 
         flash[:error] = "Vous n'avez pas accès à cette organisation"
         redirect_to organisations_path
