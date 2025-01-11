@@ -30,9 +30,9 @@
                   </span>
                             </td>
                             <td>
-                                <%= link_to "Voir", profile_path(@organisation, profile), class: "btn btn-sm btn-outline-primary" %>
-                                <%= link_to "Modifier", edit_profile_path(@organisation, profile), class: "btn btn-sm btn-outline-secondary" %>
-                                <%= link_to "Supprimer", profile_path(@organisation, profile),
+                                <%= link_to "Voir", profile_path(profile), class: "btn btn-sm btn-outline-primary" %>
+                                <%= link_to "Modifier", edit_profile_path(profile), class: "btn btn-sm btn-outline-secondary" %>
+                                <%= link_to "Supprimer", profile_path(profile),
                                             class: "btn btn-sm btn-outline-danger",
                                             data: { turbo_method: :delete, turbo_confirm: "Êtes-vous sûr ?" } %>
                             </td>

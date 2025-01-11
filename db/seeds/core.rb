@@ -5,12 +5,16 @@ ProfileRight.destroy_all
 Member.destroy_all
 Role.destroy_all
 
-RESOURCES = ['User',
-             'Organisation',
-             'Profile',
-             'Member']
+MODELS = ['User',
+          'Organisation',
+          'Profile',
+          'Member']
 
 ACTION = %w[index show create update destroy edit new]
+
+SPECIAL_ACTIONS = {
+    'ProfileRight' => %w[toggle_authorization]
+}
 
 MEMBER_RIGHTS = {
     'Member' => %w[show update],
@@ -53,6 +57,13 @@ creator_user = User.create!(
     password_confirmation: 'password123'
 )
 
+puts "No organisation user..."
+User.create!(
+    email: 'no_orga@exemple.com',
+    password: 'password123',
+    password_confirmation: 'password123'
+)
+
 organisations.each do |organisation|
     puts "Creating profiles for #{organisation.name}..."
     profiles = {
@@ -83,10 +94,9 @@ organisations.each do |organisation|
 
     puts "Linking creator to organisations..."
     UserOrganisation.create!(user: creator_user,
-                                organisation: organisation,
-                                profile: profiles[:creator],
-                                creator: true)
-
+                             organisation: organisation,
+                             profile: profiles[:creator],
+                             creator: true)
 
     puts "Creating roles..."
     roles = {
@@ -136,14 +146,26 @@ organisations.each do |organisation|
             phone: "012345678#{i + 1}",
             role: roles[:member],
             organisation_id: organisation.id,
-            )
+        )
         puts "Member #{member.name} created in organisation #{organisation.slug.upcase} with id: #{organisation.id}!"
     end
 
     puts "Creating 'Admin' profile rights for #{organisation.name}..."
-    RESOURCES.each do |resource|
+    MODELS.each do |resource|
         ACTION.each do |action|
             ProfileRight.create!(
+                profile: profiles[:admin],
+                resource: resource,
+                action: action,
+                authorized: true,
+                organisation_id: organisation.id
+            )
+        end
+    end
+
+    SPECIAL_ACTIONS.each do |resource, actions|
+        actions.each do |action|
+            ProfileRight.find_or_create_by(
                 profile: profiles[:admin],
                 resource: resource,
                 action: action,
@@ -157,6 +179,18 @@ organisations.each do |organisation|
     MEMBER_RIGHTS.each do |resource, actions|
         actions.each do |action|
             ProfileRight.create!(
+                profile: profiles[:member],
+                resource: resource,
+                action: action,
+                authorized: true,
+                organisation_id: organisation.id
+            )
+        end
+    end
+
+    SPECIAL_ACTIONS.each do |resource, actions|
+        actions.each do |action|
+            ProfileRight.find_or_create_by(
                 profile: profiles[:member],
                 resource: resource,
                 action: action,

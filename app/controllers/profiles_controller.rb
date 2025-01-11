@@ -2,6 +2,45 @@ class ProfilesController < ApplicationController
     before_action :set_profile, only: [:show, :edit, :update, :destroy]
     before_action :set_organisation
 
+    MODELS = ['User',
+              'Organisation',
+              'Profile',
+              'Member',
+              'Hike',
+              'HikeHistory',
+              'HikePath']
+
+    ACTION = %w[index show create update destroy edit new]
+
+    SPECIAL_ACTIONS = {
+        'ProfileRight' => %w[toggle_authorization]
+    }
+
+    def show
+        MODELS.each do |resource|
+            ACTION.each do |action|
+                ProfileRight.find_or_create_by(
+                    profile: @profile,
+                    resource: resource,
+                    action: action,
+                    authorized: false,
+                    organisation_id: Current.organisation.id
+                )
+            end
+        end
+        SPECIAL_ACTIONS.each do |resource, actions|
+            actions.each do |action|
+                ProfileRight.find_or_create_by(
+                    profile: @profile,
+                    resource: resource,
+                    action: action,
+                    authorized: false,
+                    organisation_id: Current.organisation.id
+                )
+            end
+        end
+    end
+
     def index
         @profiles = @organisation.profiles
     end
@@ -13,9 +52,6 @@ class ProfilesController < ApplicationController
         respond_to do |format|
             format.json { render json: { authorized: @profile_right.authorized } }
         end
-    end
-
-    def show
     end
 
     def new

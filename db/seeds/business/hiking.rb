@@ -2,9 +2,9 @@ HikeHistory.destroy_all
 HikePath.destroy_all
 Hike.destroy_all
 
-RESOURCES = ['Hike',
-             'HikeHistory',
-             'HikePath']
+MODELS = ['Hike',
+          'HikeHistory',
+          'HikePath']
 
 GUIDE_RIGHTS = {
     'Hike' => %w[index show create update new],
@@ -65,7 +65,7 @@ organisations.each do |organisation|
         phone: '0123456780',
         role: roles[:guide],
         organisation_id: organisation.id,
-        )
+    )
 
     puts "Creating hikes for #{organisation.name}..."
     hike_data = [

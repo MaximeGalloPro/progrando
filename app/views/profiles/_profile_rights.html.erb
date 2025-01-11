@@ -43,11 +43,15 @@
                                                 </span>
                             </td>
                             <td>
+                                <% if show_if_authorized('ProfileRight', 'toggle_authorization') %>
                                                   <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>"
                                                         role="button"
                                                         data-controller="permission"
                                                         data-permission-url="<%= toggle_authorization_profile_path(right) %>"
                                                         data-action="click->permission#toggle"><%= right.authorized ? 'Autorisé' : 'Non autorisé' %></span>
+                                <% else %>
+                                    <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>"><%= right.authorized ? 'Autorisé' : 'Non autorisé' %></span>
+                                <% end %>
                             </td>
                             <td><%= l(right.updated_at, format: :short) %></td>
                         </tr>
