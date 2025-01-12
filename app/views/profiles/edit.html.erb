@@ -1,5 +1,15 @@
 <div class="container py-4">
     <h1 class="h2 mb-4">Editer un profil</h1>
     <%= render partial: "form" %>
+    <hr>
     <%= render partial: "profile_rights" %>
 </div>
+
+<script type="module">
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    })
+</script>

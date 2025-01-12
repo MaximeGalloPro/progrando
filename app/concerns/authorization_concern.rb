@@ -15,7 +15,7 @@ module AuthorizationConcern
 
     def exclude_actions
         {
-            'Organisation' => ['index', 'show'],
+            'Organisation' => ['index', 'show', 'new', 'create'],
             'OrganisationAccessRequest' => ['edit', 'destroy'],
             'User' => ['index', 'show', 'edit', 'update'],
         }

@@ -55,13 +55,13 @@ organisations.each do |organisation|
     puts "Creating profiles for #{organisation.name}..."
     profiles = {
         creator: Profile.create!(
-            name: "Creator - #{organisation.name}",
+            name: "Createur",
             description: 'Créateur et a donc accès complet à toutes les fonctionnalités',
             active: true,
             organisation_id: organisation.id
         ),
         admin: Profile.create!(
-            name: "Administrateur - #{organisation.name}",
+            name: "Admin",
             description: 'Accès complet à toutes les fonctionnalités',
             active: true,
             organisation_id: organisation.id

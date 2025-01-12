@@ -65,7 +65,7 @@ class ProfilesController < ApplicationController
         @profile = @organisation.profiles.build(profile_params)
 
         if @profile.save
-            redirect_to organisation_profile_path(@organisation, @profile), notice: 'Profil créé avec succès.'
+            redirect_to profile_path(@organisation, @profile), notice: 'Profil créé avec succès.'
         else
             render :new, status: :unprocessable_entity
         end
@@ -73,7 +73,7 @@ class ProfilesController < ApplicationController
 
     def update
         if @profile.update(profile_params)
-            redirect_to organisation_profile_path(@organisation, @profile), notice: 'Profil mis à jour avec succès.'
+            redirect_to profile_path(@organisation, @profile), notice: 'Profil mis à jour avec succès.'
         else
             render :edit, status: :unprocessable_entity
         end
@@ -81,7 +81,7 @@ class ProfilesController < ApplicationController
 
     def destroy
         @profile.destroy
-        redirect_to organisation_profiles_path(@organisation), notice: 'Profil supprimé avec succès.'
+        redirect_to profiles_path(@organisation), notice: 'Profil supprimé avec succès.'
     end
 
     private

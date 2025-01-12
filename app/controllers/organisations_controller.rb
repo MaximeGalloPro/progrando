@@ -58,6 +58,11 @@ class OrganisationsController < ApplicationController
     def create
         @organisation = Organisation.new(organisation_params)
         if @organisation.save
+            profile = Profile.find_or_create_by(name: 'Createur', organisation_id: @organisation.id)
+            UserOrganisation.create(user: current_user,
+                                    organisation: @organisation,
+                                    profile: profile,
+                                    creator: true)
             redirect_to @organisation, notice: 'Organisation créée avec succès.'
         else
             render :new, status: :unprocessable_entity
