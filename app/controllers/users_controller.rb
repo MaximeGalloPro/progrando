@@ -7,13 +7,13 @@ class UsersController < ApplicationController
         member = current_user.members&.for_organisation&.first
         if !member.blank?
             member.update(name: params[:user][:name], email: params[:user][:email],
-                           phone: params[:user][:phone], organisation: Current.organisation.id)
+                           phone: params[:user][:phone], organisation: Current.organisation)
         else
-            byebug
             @member = Member.create(name: params[:user][:name], email: params[:user][:email],
                                     phone: params[:user][:phone], organisation: Current.organisation)
             UserMember.create(user: current_user, member: @member)
         end
+        redirect_back(fallback_location: edit_user_registration_path, notice: 'Informations mise à jour avec succès')
     end
 
     def update_theme

@@ -1,70 +1,8 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <!-- Carte pour le thème -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h3 class="card-title h5 mb-3">Personnalisation de l'interface</h3>
-
-                    <%= form_for(current_user, url: update_user_theme_path, method: :patch) do |f| %>
-                        <div class="mb-3">
-                            <%= f.label :theme, "Thème de l'interface", class: "form-label" %>
-                            <%= f.select :theme,
-                                         [
-                                             ['Thème clair (Défaut)', ''],
-                                             ['Max', 'max-theme'],
-                                             ['Océan', 'ocean-theme'],
-                                             ['Minuit', 'midnight-theme'],
-                                         ],
-                                         { include_blank: false },
-                                         { class: "form-select" }
-                            %>
-                            <div class="form-text">Choisissez le thème qui vous convient le mieux</div>
-                        </div>
-
-                        <%= f.submit "Enregistrer le thème", class: "btn btn-primary" %>
-                    <% end %>
-                </div>
-            </div>
 
             <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h3 class="card-title h5 mb-3">Mettre à jour mes informations personnelles</h3>
-                    <% member = current_user&.user_members&.for_organisation&.first&.member %>
-                    <% member = (member.blank? ? current_user&.user_members&.first&.member : member) %>
-
-                    <%= form_for(current_user, url: update_user_member_path, method: :patch) do |f| %>
-                        <div class="mb-4">
-                            <%= f.label :name, "Nom", class: "form-label required" %>
-                            <%= f.text_field :name,
-                                             value: member&.name,
-                                             class: "form-control",
-                                             placeholder: "Votre nom complet" %>
-                        </div>
-
-                        <div class="mb-4">
-                            <%= f.label :email, "Email", class: "form-label required" %>
-                            <%= f.email_field :email,
-                                              value: current_user&.user_members&.for_organisation&.first&.member&.email,
-                                              class: "form-control",
-                                              placeholder: "votre@email.com" %>
-                        </div>
-
-                        <div class="mb-4">
-                            <%= f.label :phone, "Téléphone", class: "form-label" %>
-                            <%= f.telephone_field :phone,
-                                                  value: current_user&.user_members&.for_organisation&.first&.member&.phone,
-                                                  class: "form-control",
-                                                  placeholder: "Votre numéro de téléphone" %>
-                        </div>
-
-                        <%= f.submit "Enregistrer mes informations", class: "btn btn-primary" %>
-                    <% end %>
-                </div>
-            </div>
-
-            <!-- Carte pour les modifications sensibles -->
-            <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="card-title mb-4">Modifier mon compte</h2>
 
@@ -125,6 +63,64 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Carte pour le thème -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="card-title h5 mb-3">Personnalisation de l'interface</h3>
+
+                    <%= form_for(current_user, url: update_user_theme_path, method: :patch) do |f| %>
+                        <div class="mb-3">
+                            <%= f.label :theme, "Thème de l'interface", class: "form-label" %>
+                            <%= f.select :theme,
+                                         [
+                                             ['Thème clair (Défaut)', ''],
+                                             ['Max', 'max-theme'],
+                                             ['Océan', 'ocean-theme'],
+                                             ['Minuit', 'midnight-theme'],
+                                         ],
+                                         { include_blank: false },
+                                         { class: "form-select" }
+                            %>
+                            <div class="form-text">Choisissez le thème qui vous convient le mieux</div>
+                        </div>
+
+                        <%= f.submit "Enregistrer le thème", class: "btn btn-primary" %>
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="card-title h5 mb-3">Mettre à jour mes informations personnelles</h3>
+                    <% member = current_user&.user_members&.for_organisation&.first&.member %>
+                    <% member = (member.blank? ? current_user&.user_members&.first&.member : member) %>
+
+                    <%= form_for(current_user, url: update_user_member_path, method: :patch) do |f| %>
+                        <div class="mb-4">
+                            <%= f.label :name, "Nom", class: "form-label required" %>
+                            <%= f.text_field :name,
+                                             value: member&.name,
+                                             class: "form-control",
+                                             placeholder: "Votre nom complet" %>
+                        </div>
+
+                        <% f.hidden_field :email, value: current_user.email %>
+
+                        <div class="mb-4">
+                            <%= f.label :phone, "Téléphone", class: "form-label" %>
+                            <%= f.telephone_field :phone,
+                                                  value: current_user&.user_members&.for_organisation&.first&.member&.phone,
+                                                  class: "form-control",
+                                                  placeholder: "Votre numéro de téléphone" %>
+                        </div>
+
+                        <%= f.submit "Enregistrer mes informations", class: "btn btn-primary" %>
+                    <% end %>
+                </div>
+            </div>
+
+            <!-- Carte pour les modifications sensibles -->
         </div>
     </div>
 </div>
