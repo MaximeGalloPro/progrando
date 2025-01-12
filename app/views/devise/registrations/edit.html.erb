@@ -27,6 +27,42 @@
                 </div>
             </div>
 
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="card-title h5 mb-3">Mettre à jour mes informations personnelles</h3>
+                    <% member = current_user&.user_members&.for_organisation&.first&.member %>
+                    <% member = (member.blank? ? current_user&.user_members&.first&.member : member) %>
+
+                    <%= form_for(current_user, url: update_user_member_path, method: :patch) do |f| %>
+                        <div class="mb-4">
+                            <%= f.label :name, "Nom", class: "form-label required" %>
+                            <%= f.text_field :name,
+                                             value: member&.name,
+                                             class: "form-control",
+                                             placeholder: "Votre nom complet" %>
+                        </div>
+
+                        <div class="mb-4">
+                            <%= f.label :email, "Email", class: "form-label required" %>
+                            <%= f.email_field :email,
+                                              value: current_user&.user_members&.for_organisation&.first&.member&.email,
+                                              class: "form-control",
+                                              placeholder: "votre@email.com" %>
+                        </div>
+
+                        <div class="mb-4">
+                            <%= f.label :phone, "Téléphone", class: "form-label" %>
+                            <%= f.telephone_field :phone,
+                                                  value: current_user&.user_members&.for_organisation&.first&.member&.phone,
+                                                  class: "form-control",
+                                                  placeholder: "Votre numéro de téléphone" %>
+                        </div>
+
+                        <%= f.submit "Enregistrer mes informations", class: "btn btn-primary" %>
+                    <% end %>
+                </div>
+            </div>
+
             <!-- Carte pour les modifications sensibles -->
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -66,29 +102,6 @@
                             <%= f.password_field :current_password, autocomplete: "current-password", class: "form-control" %>
                         </div>
 
-                        <div class="mb-4">
-                            <%= f.label :name, "Nom", class: "form-label required" %>
-                            <%= f.text_field :name,
-                                             value: @member&.name,
-                                             class: "form-control",
-                                             placeholder: "Votre nom complet" %>
-                        </div>
-
-                        <div class="mb-4">
-                            <%= f.label :email, "Email", class: "form-label required" %>
-                            <%= f.email_field :email,
-                                              value: @member&.email,
-                                              class: "form-control",
-                                              placeholder: "votre@email.com" %>
-                        </div>
-
-                        <div class="mb-4">
-                            <%= f.label :phone, "Téléphone", class: "form-label" %>
-                            <%= f.telephone_field :phone,
-                                                  value: @member&.phone,
-                                                  class: "form-control",
-                                                  placeholder: "Votre numéro de téléphone" %>
-                        </div>
 
                         <div class="d-grid gap-2">
                             <%= f.submit "Mettre à jour le compte", class: "btn btn-primary" %>

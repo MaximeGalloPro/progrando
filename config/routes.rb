@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     # constraints lambda { |req| Current.organisation.present? } do
         root to: 'stats#dashboard', as: :authenticated_root
         patch 'users/theme', to: 'users#update_theme', as: :update_user_theme
+        patch 'users/member', to: 'users#update_member', as: :update_user_member
         resources :rights
         resources :hike_paths do
             collection do

@@ -1,9 +1,19 @@
 # app/controllers/users_controller.rb
-class UsersController::RegistrationsController < Devise::RegistrationsController
+class UsersController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_member, only: [:edit, :update]
+    before_action :get_member, only: [:edit, :update]
 
-    def edit
+    def update_member
+        member = current_user.members&.for_organisation&.first
+        if !member.blank?
+            member.update(name: params[:user][:name], email: params[:user][:email],
+                           phone: params[:user][:phone], organisation: Current.organisation.id)
+        else
+            byebug
+            @member = Member.create(name: params[:user][:name], email: params[:user][:email],
+                                    phone: params[:user][:phone], organisation: Current.organisation)
+            UserMember.create(user: current_user, member: @member)
+        end
     end
 
     def update_theme
@@ -16,18 +26,7 @@ class UsersController::RegistrationsController < Devise::RegistrationsController
 
     private
 
-    def set_member
+    def get_member
         @member = current_user&.members&.for_organisation&.first || Member.new
-    end
-
-    def update_member
-        if !@member.persisted?
-            @member.update(name: params[:name], email: params[:email],
-                           phone: params[:phone], organisation: @organisation)
-        else
-            @member = Member.create(name: params[:name], email: params[:email],
-                                    phone: params[:phone], organisation: @organisation)
-            UserMember.create(user: current_user, member: @member)
-        end
     end
 end
