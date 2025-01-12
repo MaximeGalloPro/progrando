@@ -39,4 +39,12 @@ module ApplicationHelper
         options.merge!(subdomain: subdomain) if subdomain.present?
         options
     end
+
+    def translate_status(status)
+        {
+            'pending' => 'En attente',
+            'approved' => 'Approuvé',
+            'rejected' => 'Rejeté'
+        }[status]
+    end
 end

@@ -27,12 +27,15 @@
                             <td><%= request.message %></td>
                             <td><%= l request.created_at, format: :short %></td>
                             <td>
-                                <%= button_to "Accepter", approve_organisation_access_request_path(request),
-                                              method: :patch,
-                                              class: "btn btn-sm btn-success" %>
-                                <%= button_to "Refuser", reject_organisation_access_request_path(request),
-                                              method: :patch,
-                                              class: "btn btn-sm btn-danger" %>
+                                <div class="d-flex justify-content-between">
+                                    <%= open_modal(edit_organisation_access_request_path(request), "Accepter", class_names = 'btn-sm btn-success') %>
+                                    <%#= button_to "Accepter", approve_organisation_access_request_path(request),
+                                                  method: :patch,
+                                                  class: "btn btn-sm btn-success" %>
+                                    <%= button_to "Refuser", reject_organisation_access_request_path(request),
+                                                  method: :patch,
+                                                  class: "btn btn-sm btn-danger" %>
+                                </div>
                             </td>
                         </tr>
                     <% end %>

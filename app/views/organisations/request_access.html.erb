@@ -26,7 +26,7 @@
                         <div class="mb-4">
                             <%= f.label :email, "Email", class: "form-label required" %>
                             <%= f.email_field :email,
-                                              value: @member&.email,
+                                              value: current_user&.email,
                                               class: "form-control",
                                               placeholder: "votre@email.com" %>
                         </div>

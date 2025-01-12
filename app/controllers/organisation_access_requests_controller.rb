@@ -1,22 +1,25 @@
 # app/controllers/organisation_access_requests_controller.rb
 class OrganisationAccessRequestsController < ApplicationController
-    before_action :set_request, only: [:approve, :reject]
+    before_action :set_request, only: [:edit, :update, :reject, :destroy]
 
     def index
         @access_requests = OrganisationAccessRequest.where(status: 'pending')
     end
 
-    def approve
+    def edit
+        @profiles = Profile.for_organisation.all
+        render layout: false
+    end
+
+    def update
         @request.update(
             status: 'approved',
             processed_by_id: current_user.id,
             processed_at: Time.current
         )
-        byebug
         UserOrganisation.create!(user: @request.user,
                                  organisation: @request.organisation,
-                                 profile: @request.role)
-        # Ici, vous pourriez ajouter la logique pour créer l'adhésion à l'organisation
+                                 profile_id: params[:organisation_access_request][:profile_id])
         redirect_to organisation_access_requests_path, notice: 'Demande approuvée'
     end
 
@@ -29,9 +32,17 @@ class OrganisationAccessRequestsController < ApplicationController
         redirect_to organisation_access_requests_path, notice: 'Demande rejetée'
     end
 
+    def destroy
+        if @request&.destroy
+         redirect_to organisations_path, notice: 'Demande annulée'
+        else
+            redirect_to organisations_path, alert: 'Erreur lors du rejet de la demande'
+            end
+    end
+
     private
 
     def set_request
-        @request = OrganisationAccessRequest.find(params[:id])
+        @request = OrganisationAccessRequest.find_by(id: params[:id])
     end
 end

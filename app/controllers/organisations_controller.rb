@@ -3,7 +3,7 @@ class OrganisationsController < ApplicationController
     before_action :check_organisation_access, only: [:edit, :update, :destroy]
 
     def request_access
-        @organisation = Organisation.find(params[:id])
+        @organisation = Organisation.find_by(id: params[:id])
         @member = current_user&.members&.for_organisation&.first || Member.new
         if request.post?
             check_already_requested = OrganisationAccessRequest.where(user: current_user, organisation: @organisation).exists?
@@ -28,6 +28,7 @@ class OrganisationsController < ApplicationController
 
     def index
         @organisations = Organisation.all
+        @access_requests = OrganisationAccessRequest.where(user_id: current_user.id)
     end
 
     def switch

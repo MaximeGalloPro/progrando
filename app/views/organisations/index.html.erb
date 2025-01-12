@@ -3,7 +3,10 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Organisations</h1>
-        <%= link_to "Nouvelle organisation", new_organisation_path, class: "btn btn-primary" if current_user.super_admin %>
+        <div>
+            <%= link_to "Nouvelle organisation", new_organisation_path, class: "btn btn-primary" %>
+            <%= link_to "Demande en attentes", organisation_access_requests_path, class: "btn btn-primary" %>
+        </div>
     </div>
 
     <div class="card">
@@ -52,3 +55,42 @@
         </div>
     <% end %>
 </div>
+
+<% unless @access_requests.blank? %>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Demandes en cours</h1>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Organisation</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% @access_requests.each do |request| %>
+                            <tr>
+                                <td><%= request.organisation.name %></td>
+                                <td><%= translate_status(request.status) %></td>
+                                <td>
+                                    <%= button_to organisation_access_request_path(request),
+                                                  data: { confirm: "Êtes-vous sûr ?", turbo_confirm: "Êtes-vous sûr ?" },
+                                                  method: :delete,
+                                                  class: "btn btn-outline-danger" do %>
+                                        <i class="fas fa-trash-alt me-2"></i>Annuler
+                                    <% end %>
+                                </td>
+                            </tr>
+                        <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+<% end %>

@@ -6,10 +6,34 @@ import "bootstrap"
 // import "chart"
 
 $(document).ready(function () {
-    $('.select2').select2({
+    initSelect2();
+
+    $('#myModal').on('shown.bs.modal', function () {
+        initSelect2InModal();
+    });
+
+    document.addEventListener('modalContentLoaded', function() {
+        setTimeout(() => {
+            initSelect2InModal();
+        }, 100);
+    });
+});
+
+function initSelect2() {
+    $('.select2').not('.modal .select2').select2({
         language: 'fr',
         width: '100%',
         placeholder: 'Rechercher...',
         allowClear: true
     });
-});
+}
+
+function initSelect2InModal() {
+    $('.modal .select2').select2({
+        language: 'fr',
+        width: '100%',
+        placeholder: 'Rechercher...',
+        allowClear: true,
+        dropdownParent: $('#myModal')
+    });
+}

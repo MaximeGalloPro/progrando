@@ -93,8 +93,7 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h3 class="card-title h5 mb-3">Mettre à jour mes informations personnelles</h3>
-                    <% member = current_user&.user_members&.for_organisation&.first&.member %>
-                    <% member = (member.blank? ? current_user&.user_members&.first&.member : member) %>
+                    <% member = Member.for_organisation.where(id: current_user&.user_members&.pluck(:member_id))&.first %>
 
                     <%= form_for(current_user, url: update_user_member_path, method: :patch) do |f| %>
                         <div class="mb-4">
@@ -110,7 +109,7 @@
                         <div class="mb-4">
                             <%= f.label :phone, "Téléphone", class: "form-label" %>
                             <%= f.telephone_field :phone,
-                                                  value: current_user&.user_members&.for_organisation&.first&.member&.phone,
+                                                  value: member&.phone,
                                                   class: "form-control",
                                                   placeholder: "Votre numéro de téléphone" %>
                         </div>
