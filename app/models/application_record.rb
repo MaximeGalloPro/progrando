@@ -10,7 +10,7 @@ class ApplicationRecord < ActiveRecord::Base
     private
 
     def exclude_model
-        ['User', 'Organisation']
+        ['User', 'Organisation', 'UserMember']
     end
 
     def set_organisation_id

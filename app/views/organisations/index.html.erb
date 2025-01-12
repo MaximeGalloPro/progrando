@@ -31,6 +31,7 @@
                             <td><%= organisation.phone %></td>
                             <td>
                                 <%= link_to "Voir", organisation_path(organisation), class: "btn btn-sm btn-outline-primary" %>
+                                <%= link_to "Demander à rejoindre", request_access_organisation_path(organisation), class: "btn btn-sm btn-outline-primary" %>
                                 <%= link_to "Modifier", edit_organisation_path(organisation), class: "btn btn-sm btn-outline-secondary" if can? :update, organisation %>
                                 <%= link_to "Supprimer",
                                             organisation_path(organisation),

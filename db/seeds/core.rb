@@ -7,6 +7,7 @@ Role.destroy_all
 
 MODELS = ['User',
           'Organisation',
+          'OrganisationAccessRequest',
           'Profile',
           'Member']
 

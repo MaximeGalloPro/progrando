@@ -1,9 +1,33 @@
 class OrganisationsController < ApplicationController
     before_action :set_organisation, only: [:show, :edit, :update, :destroy]
-    before_action :check_organisation_access, only: [:show, :edit, :update, :destroy]
+    before_action :check_organisation_access, only: [:edit, :update, :destroy]
+
+    def request_access
+        @organisation = Organisation.find(params[:id])
+        @member = current_user&.members&.for_organisation&.first || Member.new
+        if request.post?
+            check_already_requested = OrganisationAccessRequest.where(user: current_user, organisation: @organisation).exists?
+            return redirect_to organisations_path, alert: 'Vous avez déjà envoyé une demande pour cette organisation' if check_already_requested
+            handle_member
+            access_request = OrganisationAccessRequest.new(
+                user: current_user,
+                organisation: @organisation,
+                message: params[:message],
+                role: params[:role],
+            )
+
+            if access_request.save
+                OrganisationMailer.access_request_notification(access_request).deliver_later
+                redirect_to organisations_path, notice: 'Votre demande a été envoyée avec succès'
+            else
+                flash.now[:error] = 'Erreur lors de l\'envoi de la demande'
+                render :request_access
+            end
+        end
+    end
 
     def index
-        @organisations = current_user.super_admin ? Organisation.all : Organisation.where(id: current_user.organisations.pluck(:id))
+        @organisations = Organisation.all
     end
 
     def switch
@@ -53,6 +77,17 @@ class OrganisationsController < ApplicationController
     end
 
     private
+
+    def handle_member
+        if !@member.persisted?
+            @member.update(name: params[:name], email: params[:email],
+                           phone: params[:phone], organisation: @organisation)
+        else
+            @member = Member.create(name: params[:name], email: params[:email],
+                                    phone: params[:phone], organisation: @organisation)
+            UserMember.create(user: current_user, member: @member)
+        end
+    end
 
     def set_organisation
         @organisation = Organisation.find(params[:id])

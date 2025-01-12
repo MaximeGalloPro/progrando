@@ -1,0 +1,24 @@
+<% if current_user and current_user.organisations.size == 0 %>
+    <div class="container py-2">
+        <div class="card">
+            <div class="card-body p-2">
+                <div class="d-flex flex-column flex-lg-row gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-primary"></i>
+                        <strong>
+                            Vous n'avez pas encore rejoint une organisation
+                        </strong>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3 align-items-center flex-grow-1">
+                        <div class="ms-auto">
+                            <%= link_to organisations_path,
+                                        class: "btn btn-sm btn-outline-primary" do %>
+                                <i class="fas fa-sitemap"></i> Rejoindre une organisation
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<% end %>

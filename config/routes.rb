@@ -6,6 +6,16 @@ Rails.application.routes.draw do
             get :switch
             patch :switch
         end
+        member do
+            get :request_access
+            post :request_access
+        end
+    end
+    resources :organisation_access_requests do
+        member do
+            patch :approve
+            patch :reject
+        end
     end
     resources :profiles do
         member do

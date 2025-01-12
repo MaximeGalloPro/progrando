@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_01_09_215037) do
+ActiveRecord::Schema[7.0].define(version: 2025_01_12_001042) do
   create_table "hike_histories", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.date "hiking_date"
     t.string "departure_time"
@@ -62,6 +62,19 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_09_215037) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "organisation_id"
+  end
+
+  create_table "organisation_access_requests", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "organisation_id"
+    t.text "message"
+    t.string "role"
+    t.string "status"
+    t.text "admin_response"
+    t.integer "processed_by_id"
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "organisations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -116,6 +129,13 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_09_215037) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "organisation_id"
+  end
+
+  create_table "user_members", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "member_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_organisations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|

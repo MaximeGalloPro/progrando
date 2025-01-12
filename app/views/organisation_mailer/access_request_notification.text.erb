@@ -1,0 +1,9 @@
+<%# app/views/organisation_mailer/access_request_notification.text.erb %>
+Nouvelle demande d'accès
+
+<%= @user.email %> souhaite rejoindre l'organisation <%= @organisation.name %> en tant que <%= @access_request.role %>.
+
+Message de l'utilisateur :
+<%= @access_request.message %>
+
+Vous pouvez gérer cette demande en vous connectant à l'application.
