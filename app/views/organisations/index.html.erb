@@ -78,11 +78,13 @@
                                 <td><%= request.organisation.name %></td>
                                 <td><%= translate_status(request.status) %></td>
                                 <td>
-                                    <%= button_to organisation_access_request_path(request),
-                                                  data: { confirm: "Êtes-vous sûr ?", turbo_confirm: "Êtes-vous sûr ?" },
-                                                  method: :delete,
-                                                  class: "btn btn-outline-danger" do %>
-                                        <i class="fas fa-trash-alt me-2"></i>Annuler
+                                    <% if request.status == 'pending' %>
+                                        <%= button_to organisation_access_request_path(request),
+                                                      data: { confirm: "Êtes-vous sûr ?", turbo_confirm: "Êtes-vous sûr ?" },
+                                                      method: :delete,
+                                                      class: "btn btn-outline-danger" do %>
+                                            <i class="fas fa-trash-alt me-2"></i>Annuler
+                                        <% end %>
                                     <% end %>
                                 </td>
                             </tr>

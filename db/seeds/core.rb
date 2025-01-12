@@ -1,26 +1,12 @@
+# db/seeds/core.rb
+include GlobalConfig
+
 User.destroy_all
 Organisation.destroy_all
 Profile.destroy_all
 ProfileRight.destroy_all
 Member.destroy_all
 Role.destroy_all
-
-MODELS = ['User',
-          'Organisation',
-          'OrganisationAccessRequest',
-          'Profile',
-          'Member']
-
-ACTION = %w[index show create update destroy edit new]
-
-SPECIAL_ACTIONS = {
-    'ProfileRight' => %w[toggle_authorization]
-}
-
-MEMBER_RIGHTS = {
-    'Member' => %w[show update],
-    'Organisation' => %w[index show]
-}
 
 puts "Creating super admin user..."
 super_admin = User.create!(
@@ -152,8 +138,8 @@ organisations.each do |organisation|
     end
 
     puts "Creating 'Admin' profile rights for #{organisation.name}..."
-    MODELS.each do |resource|
-        ACTION.each do |action|
+    GlobalConfig::MODELS.each do |resource|
+        GlobalConfig::ACTION.each do |action|
             ProfileRight.create!(
                 profile: profiles[:admin],
                 resource: resource,
@@ -164,7 +150,7 @@ organisations.each do |organisation|
         end
     end
 
-    SPECIAL_ACTIONS.each do |resource, actions|
+    GlobalConfig::SPECIAL_ACTIONS.each do |resource, actions|
         actions.each do |action|
             ProfileRight.find_or_create_by(
                 profile: profiles[:admin],
@@ -177,7 +163,7 @@ organisations.each do |organisation|
     end
 
     puts "Creating 'Member' profile rights for #{organisation.name}..."
-    MEMBER_RIGHTS.each do |resource, actions|
+    GlobalConfig::MEMBER_RIGHTS.each do |resource, actions|
         actions.each do |action|
             ProfileRight.create!(
                 profile: profiles[:member],
@@ -189,7 +175,7 @@ organisations.each do |organisation|
         end
     end
 
-    SPECIAL_ACTIONS.each do |resource, actions|
+    GlobalConfig::SPECIAL_ACTIONS.each do |resource, actions|
         actions.each do |action|
             ProfileRight.find_or_create_by(
                 profile: profiles[:member],

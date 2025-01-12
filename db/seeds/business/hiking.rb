@@ -1,23 +1,9 @@
+# db/seeds/business/hiking.rb
+include GlobalConfig
+
 HikeHistory.destroy_all
 HikePath.destroy_all
 Hike.destroy_all
-
-MODELS = ['Hike',
-          'HikeHistory',
-          'HikePath']
-
-GUIDE_RIGHTS = {
-    'Hike' => %w[index show create update new],
-    'HikeHistory' => %w[index show create update],
-    'HikePath' => %w[index show create update],
-    'Member' => %w[index show],
-    'Organisation' => %w[index show]
-}
-
-MEMBER_RIGHTS = {
-    'Hike' => %w[index show],
-    'HikeHistory' => %w[index show create]
-}
 
 organisations = Organisation.all
 
@@ -38,7 +24,7 @@ organisations.each do |organisation|
     }
 
     puts "Creating 'Guide' profiles rights for #{organisation.name}..."
-    GUIDE_RIGHTS.each do |resource, actions|
+    GlobalConfig::GUIDE_RIGHTS.each do |resource, actions|
         actions.each do |action|
             ProfileRight.create!(
                 profile: profiles[:guide],
