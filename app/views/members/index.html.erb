@@ -7,6 +7,11 @@
             Gérer les profils
         <% end %>
     <% end %>
+    <% show_if_authorized('Role', 'show') do %>
+        <%= link_to roles_path, class: "btn btn-outline-primary mb-4 d-inline-block", style: "float: right; margin-right: 1rem" do %>
+            Gérer les rôles
+        <% end %>
+    <% end %>
     <div style="clear: both"></div>
     <% if @members.any? %>
 

@@ -16,12 +16,6 @@
                     <i class="fas fa-chart-line"></i> Dashboard
                 <% end %>
 
-                <% show_if_authorized('Organisation', 'index') do %>
-                    <%= link_to organisations_path,
-                                class: "btn #{current_page?(organisations_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
-                        <i class="fas fa-sitemap"></i> Organisation
-                    <% end %>
-                <% end %>
                 <% show_if_authorized('Hike', 'index') do %>
                     <%= link_to hikes_path,
                                 class: "btn #{current_page?(hikes_path) ? 'btn-primary' : 'btn-outline-primary'}" do %>
@@ -51,16 +45,38 @@
                                     <i class="fas fa-map-marked-alt me-2"></i>Nouveau parcours
                                 <% end %>
                             <% end %>
-
-                            <% show_if_authorized('Member', 'create') do %>
-                                <div class="dropdown-divider"></div>
-                                <%= link_to members_path, class: "dropdown-item" do %>
-                                    <i class="fas fa-users me-2"></i>Gérer les membres
-                                <% end %>
-                            <% end %>
                         </ul>
                     </div>
                 <% end %>
+
+
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-building"></i> Organisation
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <%= link_to organisations_path, class: "dropdown-item" do %>
+                            <i class="fas fa-building me-2"></i>Gérer l'organisation
+                        <% end %>
+                        <% show_if_authorized('Member', 'create') do %>
+                            <%= link_to members_path, class: "dropdown-item" do %>
+                                <i class="fas fa-user-friends me-2"></i>Membres
+                            <% end %>
+                        <% end %>
+                        <% show_if_authorized('Profile', 'index') do %>
+                            <%= link_to profiles_path, class: "dropdown-item" do %>
+                                <i class="fas fa-id-card me-2"></i>Profils
+                            <% end %>
+                        <% end %>
+                        <% show_if_authorized('OrganisationAccessRequest', 'index') do %>
+                            <%= link_to organisation_access_requests_path, class: "dropdown-item" do %>
+                                <i class="fas fa-user-clock me-2"></i>Demande en attentes
+                            <% end %>
+                        <% end %>
+                    </ul>
+                </div>
+
+
                 <% if user_signed_in? %>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">

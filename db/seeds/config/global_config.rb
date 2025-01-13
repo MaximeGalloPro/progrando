@@ -5,6 +5,7 @@ module GlobalConfig
               'Organisation',
               'OrganisationAccessRequest',
               'Profile',
+              'Role',
               'Member',
               'Hike',
               'HikeHistory',

@@ -1,0 +1,46 @@
+<% content_for :title, "Rôles" %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Rôles</h1>
+        <div>
+            <%= link_to "Nouveau rôle", new_role_path, class: "btn btn-primary" %>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <% @roles.each do |role| %>
+                        <tr>
+                            <td><%= role.name %></td>
+                            <td>
+                                <%= link_to "Modifier", edit_role_path(role), class: "btn btn-sm btn-outline-secondary" %>
+                                <%= link_to "Supprimer",
+                                            role_path(role),
+                                            class: "btn btn-sm btn-outline-danger",
+                                            data: { turbo_method: :delete, turbo_confirm: "Êtes-vous sûr ?" } %>
+                            </td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <% unless @roles.any? %>
+        <div class="alert alert-info mt-4">
+            Aucun rôle n'a été créé pour le moment.
+        </div>
+    <% end %>
+</div>

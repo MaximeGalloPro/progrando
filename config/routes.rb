@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :roles
     # Routes d'authentification en dehors des contraintes
     devise_for :users
     resources :organisations do

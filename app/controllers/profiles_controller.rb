@@ -5,6 +5,7 @@ class ProfilesController < ApplicationController
     MODELS = ['User',
               'Organisation',
               'Profile',
+              'Role',
               'Member',
               'Hike',
               'HikeHistory',
