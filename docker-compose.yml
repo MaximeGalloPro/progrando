@@ -9,7 +9,8 @@ services:
       rm -f /app/tmp/pids/server.pid &&
       bundle exec rails s -p 3000 -b "0.0.0.0"'
     ports:
-      - "127.0.0.1:3000:3000"
+#      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     environment:
       - RAILS_ENV=${RAILS_ENV:-development}
       - DATABASE_URL=mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}
@@ -97,6 +98,14 @@ services:
     ports:
       - "1025:1025" # Port SMTP
       - "8025:8025" # Port interface web
+
+  ngrok:
+    image: ngrok/ngrok
+    command: http web:3000 --log=stdout
+    depends_on:
+      - web
+    environment:
+      - NGROK_AUTHTOKEN=1Re4c1fq2Mp1klHeiJi63hnZlJq_TUFo4MvJQa98GjPzLKyn
 
 volumes:
   mariadb_data:

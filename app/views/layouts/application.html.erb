@@ -3,8 +3,23 @@
 <head>
     <title>ProgIt</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <!-- Définir l'icône de l'application -->
+    <link rel="apple-touch-icon" href="/icons/icon_192.png">
+
+    <!-- Définir la couleur de la barre de statut -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <!-- Activer le mode plein écran -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- Définir le nom affiché sous l'icône de l'application -->
+    <meta name="apple-mobile-web-app-title" content="Nom de votre App">
+
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -25,9 +40,67 @@
     </div>
 <% end %>
 <%= render partial: 'layouts/topbar' %>
+
+
 <%= render partial: 'layouts/no_organisation' %>
 <%= render partial: 'layouts/next_hike' %>
+<div id="feedback-message" style="display: none; margin-top: 10px; color: green;"></div>
+<button id="install-pwa" style="display: none;">Installer l'App</button>
+
+<script type="text/javascript" charset="utf-8">
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        const installButton = document.getElementById('install-pwa');
+        const feedbackMessage = document.getElementById('feedback-message');
+        installButton.style.display = 'block';
+
+        installButton.addEventListener('click', () => {
+            deferredPrompt.prompt();
+
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    feedbackMessage.style.color = 'green';
+                    feedbackMessage.innerText = 'Merci ! L’application est en cours d’installation.';
+                } else {
+                    feedbackMessage.style.color = 'red';
+                    feedbackMessage.innerText = 'Installation annulée. Vous pouvez réessayer plus tard.';
+                }
+                feedbackMessage.style.display = 'block';
+                deferredPrompt = null;
+            });
+        });
+    });
+</script>
 <%= yield %>
 <%= render partial: 'layouts/modal' %>
+
+
+
+<script>
+    // Détection d'iOS
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    // Détection de Safari (évite les autres navigateurs comme Chrome sur iOS)
+    const isSafari = !!navigator.userAgent.match(/Safari/) && !navigator.userAgent.match(/Chrome/);
+
+    if (isIos && isSafari) {
+        // Afficher une bannière personnalisée avec les instructions
+        document.getElementById('ios-install-banner').style.display = 'block';
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(function(registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(function(error) {
+            console.log('Service Worker registration failed:', error);
+        });
+    }
+</script>
+
 </body>
 </html>
