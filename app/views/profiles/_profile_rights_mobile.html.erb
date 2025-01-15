@@ -1,0 +1,151 @@
+<% action_explanations = {
+    'index' => "Permet d'afficher la liste complète des éléments disponibles",
+    'show' => "Permet de consulter le détail d'un élément spécifique",
+    'create' => "Permet de créer un nouvel élément dans le système",
+    'update' => "Permet de modifier les informations d'un élément existant",
+    'destroy' => "Permet de supprimer définitivement un élément",
+    'edit' => "Permet d'accéder au formulaire de modification d'un élément",
+    'new' => "Permet d'accéder au formulaire de création d'un nouvel élément"
+} %>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-2">Permissions du profil</h5>
+        <div class="d-flex flex-column gap-1">
+            <small class="text-muted">
+                <i class="fas fa-hand-pointer me-1"></i> Touchez le statut pour changer l'autorisation
+            </small>
+            <small class="text-muted">
+                <i class="fas fa-circle-info me-1"></i> Touchez <i class="fas fa-info-circle text-primary"></i> pour plus de détails
+            </small>
+        </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="d-block d-md-none">
+        <% @profile.profile_rights.order(:resource, :action).group_by(&:resource).each do |resource, rights| %>
+            <div class="resource-section border-bottom">
+                <div class="resource-header bg-light p-2">
+                    <strong><%= resource %></strong>
+                </div>
+
+                <% rights.each do |right| %>
+                    <div class="permission-item p-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="action-name d-flex align-items-center">
+                                <span class="me-2"><%= right.action %></span>
+                                <i class="fas fa-info-circle text-primary"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="top"
+                                   title="<%= action_explanations[right.action] %>">
+                                </i>
+                            </div>
+
+                            <% if show_if_authorized('ProfileRight', 'toggle_authorization') %>
+                                <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>"
+                                      role="button"
+                                      data-controller="permission"
+                                      data-permission-url="<%= toggle_authorization_profile_path(right) %>"
+                                      data-action="click->permission#toggle">
+                                    <%= right.authorized ? 'Autorisé' : 'Non autorisé' %>
+                                </span>
+                            <% else %>
+                                <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>">
+                                    <%= right.authorized ? 'Autorisé' : 'Non autorisé' %>
+                                </span>
+                            <% end %>
+                        </div>
+                        <small class="text-muted">
+                            Modifié le <%= l(right.updated_at, format: :short) %>
+                        </small>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+    </div>
+
+    <!-- Desktop View -->
+    <div class="d-none d-md-block card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">Ressource</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Dernière modification</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% @profile.profile_rights.order(:resource, :action).group_by(&:resource).each do |resource, rights| %>
+                    <tr class="table-secondary">
+                        <td colspan="4" class="fw-bold"><%= resource %></td>
+                    </tr>
+                    <% rights.each do |right| %>
+                        <tr>
+                            <td class="ps-4"></td>
+                            <td>
+                                    <span data-bs-toggle="tooltip"
+                                          data-bs-placement="top"
+                                          title="<%= action_explanations[right.action] %>">
+                                        <%= right.action %>
+                                        <i class="fas fa-info-circle ms-1 text-muted small"></i>
+                                    </span>
+                            </td>
+                            <td>
+                                <% if show_if_authorized('ProfileRight', 'toggle_authorization') %>
+                                        <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>"
+                                              role="button"
+                                              data-controller="permission"
+                                              data-permission-url="<%= toggle_authorization_profile_path(right) %>"
+                                              data-action="click->permission#toggle">
+                                            <%= right.authorized ? 'Autorisé' : 'Non autorisé' %>
+                                        </span>
+                                <% else %>
+                                        <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>">
+                                            <%= right.authorized ? 'Autorisé' : 'Non autorisé' %>
+                                        </span>
+                                <% end %>
+                            </td>
+                            <td><%= l(right.updated_at, format: :short) %></td>
+                        </tr>
+                    <% end %>
+                <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 767.98px) {
+        .permission-item {
+            background-color: white;
+        }
+
+        .permission-item:active {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.5em 0.8em;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .resource-header {
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .action-name {
+            font-size: 0.95rem;
+        }
+
+        /* Improve touch target size for badges */
+        [data-controller="permission"] {
+            min-width: 100px;
+            text-align: center;
+        }
+    }
+</style>

@@ -1,0 +1,166 @@
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+        <h1 class="h3 mb-0">Profils</h1>
+        <%= link_to new_profile_path(@organisation), class: "btn btn-primary w-100 w-md-auto" do %>
+            <i class="fas fa-plus me-2"></i>Nouveau profil
+        <% end %>
+    </div>
+
+    <!-- Mobile view (cards) -->
+    <div class="d-block d-md-none">
+        <% if @profiles.any? %>
+            <div class="profiles-grid">
+                <% @profiles.each do |profile| %>
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body">
+                            <!-- Profile Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0 me-2"><%= profile.name %></h5>
+                                <span class="badge <%= profile.active? ? 'bg-success' : 'bg-danger' %> rounded-pill">
+                                    <%= profile.active? ? 'Actif' : 'Inactif' %>
+                                </span>
+                            </div>
+
+                            <!-- Description -->
+                            <p class="card-text text-muted mb-3">
+                                <%= profile.description.presence || "<em class='text-muted'>Aucune description</em>".html_safe %>
+                            </p>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2 mt-2">
+                                <% show_if_authorized('Profile', 'show') do %>
+                                    <%= link_to profile_path(profile),
+                                                class: "btn btn-outline-dark btn-sm flex-grow-1",
+                                                title: "Voir" do %>
+                                        <i class="fas fa-eye"></i>
+                                    <% end %>
+                                <% end %>
+                                <% show_if_authorized('Profile', 'edit') do %>
+                                    <%= link_to edit_profile_path(profile),
+                                                class: "btn btn-outline-dark btn-sm flex-grow-1",
+                                                title: "Modifier" do %>
+                                        <i class="fas fa-pen"></i>
+                                    <% end %>
+                                <% end %>
+
+                                <% show_if_authorized('Profile', 'destroy') do %>
+                                    <%= link_to profile_path(profile),
+                                                class: "btn btn-outline-dark btn-sm flex-grow-1",
+                                                title: "Supprimer",
+                                                data: {
+                                                    turbo_method: :delete,
+                                                    turbo_confirm: "Êtes-vous sûr de vouloir supprimer ce profil ?"
+                                                } do %>
+                                        <i class="fas fa-trash"></i>
+                                    <% end %>
+
+                                    <script>
+                                        function confirmDelete(event) {
+                                            event.preventDefault();
+                                            if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
+                                                event.target.submit();
+                                            }
+                                            return false;
+                                        }
+                                    </script>
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        <% else %>
+            <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                Aucun profil n'a été créé pour le moment.
+            </div>
+        <% end %>
+    </div>
+
+    <!-- Desktop view (table) - hidden on mobile -->
+    <div class="d-none d-md-block">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <% @profiles.each do |profile| %>
+                            <tr>
+                                <td><%= profile.name %></td>
+                                <td><%= profile.description %></td>
+                                <td>
+                                        <span class="badge <%= profile.active? ? 'bg-success' : 'bg-danger' %>">
+                                            <%= profile.active? ? 'Actif' : 'Inactif' %>
+                                        </span>
+                                </td>
+                                <td>
+                                    <%= link_to "Voir", profile_path(profile), class: "btn btn-sm btn-outline-primary" %>
+                                    <%= link_to "Modifier", edit_profile_path(profile), class: "btn btn-sm btn-outline-secondary" %>
+                                    <%= link_to "Supprimer", profile_path(profile),
+                                                class: "btn btn-sm btn-outline-danger",
+                                                data: { turbo_method: :delete, turbo_confirm: "Êtes-vous sûr ?" } %>
+                                </td>
+                            </tr>
+                        <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Mobile optimizations */
+    @media (max-width: 767.98px) {
+        .container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .card {
+            border-radius: 12px;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        /* Compact button styling */
+        .btn-sm {
+            padding: 0.4rem;
+            font-size: 0.875rem;
+            min-width: 2.5rem;
+        }
+
+        /* Clean button borders */
+        .btn-outline-dark {
+            border-width: 1px;
+            background-color: white;
+        }
+
+        .btn-outline-dark:active {
+            background-color: #f8f9fa;
+        }
+
+        /* Add touch-friendly spacing */
+        .profiles-grid .card:not(:last-child) {
+            margin-bottom: 16px;
+        }
+
+        /* Improve badge visibility */
+        .badge {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+    }
+</style>

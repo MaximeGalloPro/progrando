@@ -37,16 +37,16 @@
                             <%= render partial: "roadmap", locals: { hike: hike } %>
                             <% show_if_authorized('HikeHistory', 'index') do %>
                                 <%= link_to hike_histories_path(hike_id: hike.id),
-                                                          class: "btn btn-outline-dark btn-sm",
-                                                          title: "Voir l'historique" do %>
+                                            class: "btn btn-outline-dark btn-sm",
+                                            title: "Voir l'historique" do %>
                                     <i class="fas fa-history"></i>
                                 <% end %>
                             <% end %>
 
                             <% show_if_authorized('Hike', 'edit') do %>
                                 <%= link_to edit_hike_path(hike),
-                                                          class: "btn btn-outline-dark btn-sm",
-                                                          title: "Editer" do %>
+                                            class: "btn btn-outline-dark btn-sm",
+                                            title: "Editer" do %>
                                     <i class="fas fa-pen"></i>
                                 <% end %>
                             <% end %>
@@ -60,17 +60,18 @@
                                               form_class: 'button_to' do %>
                                     <i class="fas fa-trash"></i>
                                 <% end %>
+
+                                <script>
+                                    function confirmDelete(event) {
+                                        event.preventDefault();
+                                        if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
+                                            event.target.submit();
+                                        }
+                                        return false;
+                                    }
+                                </script>
                             <% end %>
 
-                            <script>
-                                function confirmDelete(event) {
-                                    event.preventDefault();
-                                    if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
-                                        event.target.submit();
-                                    }
-                                    return false;
-                                }
-                            </script>
 
                             <% show_if_authorized('Hike', 'update') do %>
                                 <% if hike.updating? %>

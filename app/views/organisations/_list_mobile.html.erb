@@ -1,0 +1,138 @@
+<div class="container mt-4">
+    <div class="d-flex flex-column mb-4">
+        <h1 class="mb-3">Organisations</h1>
+        <div class="d-flex w-100">
+            <%= link_to new_organisation_path, class: "btn btn-outline-primary flex-grow-1 me-2" do %>
+                <i class="fas fa-plus me-2"></i>Nouvelle organisation
+            <% end %>
+            <%= link_to organisation_access_requests_path, class: "btn btn-outline-primary flex-grow-1" do %>
+                <i class="fas fa-clock me-2"></i>Demandes en attentes
+            <% end %>
+        </div>
+    </div>
+
+
+    <div class="row g-4">
+        <% @organisations.each do |organisation| %>
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body p-3">
+                        <h5 class="fw-bold mb-3"><%= organisation.name %></h5>
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                <%= organisation.location || "<i class='fas fa-ban text-danger small'></i>".html_safe %>
+                            </div>
+
+                            <div class="d-flex align-items-center text-muted mb-2">
+                                <i class="fas fa-user me-2"></i>
+                                <%= organisation.contact_name || "<i class='fas fa-ban text-danger small'></i>".html_safe %>
+                            </div>
+
+                            <div class="d-flex align-items-center text-muted mb-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                <%= organisation.email || "<i class='fas fa-ban text-danger small'></i>".html_safe %>
+                            </div>
+
+                            <div class="d-flex align-items-center text-muted">
+                                <i class="fas fa-phone me-2"></i>
+                                <%= organisation.phone || "<i class='fas fa-ban text-danger small'></i>".html_safe %>
+                            </div>
+                        </div>
+
+                        <div class="d-flex w-100">
+                            <% button_classes = "btn btn-outline-dark w-100" %>
+
+                            <div class="flex-grow-1">
+                                <%= link_to organisation_path(organisation),
+                                            title: "Voir",
+                                            class: button_classes do %>
+                                    <i class="fas fa-eye"></i>
+                                <% end %>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <%= link_to request_access_organisation_path(organisation),
+                                            title: "Demander à rejoindre",
+                                            class: button_classes do %>
+                                    <i class="fas fa-user-plus"></i>
+                                <% end %>
+                            </div>
+
+                            <% if can? :update, organisation %>
+                                <div class="flex-grow-1">
+                                    <%= link_to edit_organisation_path(organisation),
+                                                title: "Modifier",
+                                                class: button_classes do %>
+                                        <i class="fas fa-pen"></i>
+                                    <% end %>
+                                </div>
+                            <% end %>
+
+                            <% if can? :destroy, organisation %>
+                                <div class="flex-grow-1">
+                                    <%= link_to organisation_path(organisation),
+                                                title: "Supprimer",
+                                                class: button_classes,
+                                                data: {
+                                                    turbo_method: :delete,
+                                                    turbo_confirm: "Êtes-vous sûr ?"
+                                                } do %>
+                                        <i class="fas fa-trash"></i>
+                                    <% end %>
+                                </div>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    </div>
+
+    <% unless @organisations.any? %>
+        <div class="alert alert-info mt-4">
+            Aucune organisation n'a été créée pour le moment.
+        </div>
+    <% end %>
+</div>
+
+<% unless @access_requests.blank? %>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Demandes en cours</h1>
+        </div>
+
+        <div class="row g-4">
+            <% @access_requests.each do |request| %>
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-3">
+                            <h5 class="fw-bold mb-3"><%= request.organisation.name %></h5>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-info p-2">
+                                    <%= translate_status(request.status) %>
+                                </span>
+                            </div>
+
+                            <% if request.status == 'pending' %>
+                                <div class="d-flex w-100">
+                                    <%= button_to organisation_access_request_path(request),
+                                                  method: :delete,
+                                                  class: "btn btn-outline-danger w-100",
+                                                  data: {
+                                                      confirm: "Êtes-vous sûr ?",
+                                                      turbo_confirm: "Êtes-vous sûr ?"
+                                                  } do %>
+                                        <i class="fas fa-trash-alt me-2"></i>Annuler
+                                    <% end %>
+                                </div>
+                            <% end %>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+    </div>
+<% end %>

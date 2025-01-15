@@ -2,7 +2,11 @@
     <h1 class="h2 mb-4">Editer un profil</h1>
     <%= render partial: "form" %>
     <hr>
-    <%= render partial: "profile_rights" %>
+    <% if browser.device.mobile? %>
+        <%= render partial: "profile_rights_mobile" %>
+    <% else %>
+        <%= render partial: "profile_rights" %>
+    <% end %>
 </div>
 
 <script type="module">

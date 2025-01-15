@@ -1,0 +1,96 @@
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Organisations</h1>
+        <div>
+            <%= link_to "Nouvelle organisation", new_organisation_path, class: "btn btn-outline-primary" %>
+            <%= link_to "Demande en attentes", organisation_access_requests_path, class: "btn btn-outline-primary" %>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Localisation</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <% @organisations.each do |organisation| %>
+                        <tr>
+                            <td><%= organisation.name %></td>
+                            <td><%= organisation.location %></td>
+                            <td><%= organisation.contact_name %></td>
+                            <td><%= organisation.email %></td>
+                            <td><%= organisation.phone %></td>
+                            <td>
+                                <%= link_to "Voir", organisation_path(organisation), class: "btn btn-sm btn-outline-primary" %>
+                                <%= link_to "Demander à rejoindre", request_access_organisation_path(organisation), class: "btn btn-sm btn-outline-primary" %>
+                                <%= link_to "Modifier", edit_organisation_path(organisation), class: "btn btn-sm btn-outline-secondary" if can? :update, organisation %>
+                                <%= link_to "Supprimer",
+                                            organisation_path(organisation),
+                                            class: "btn btn-sm btn-outline-danger",
+                                            data: { turbo_method: :delete, turbo_confirm: "Êtes-vous sûr ?" } if can? :destroy, organisation %>
+                            </td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <% unless @organisations.any? %>
+        <div class="alert alert-info mt-4">
+            Aucune organisation n'a été créée pour le moment.
+        </div>
+    <% end %>
+</div>
+
+<% unless @access_requests.blank? %>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Demandes en cours</h1>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Organisation</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% @access_requests.each do |request| %>
+                            <tr>
+                                <td><%= request.organisation.name %></td>
+                                <td><%= translate_status(request.status) %></td>
+                                <td>
+                                    <% if request.status == 'pending' %>
+                                        <%= button_to organisation_access_request_path(request),
+                                                      data: { confirm: "Êtes-vous sûr ?", turbo_confirm: "Êtes-vous sûr ?" },
+                                                      method: :delete,
+                                                      class: "btn btn-outline-danger" do %>
+                                            <i class="fas fa-trash-alt me-2"></i>Annuler
+                                        <% end %>
+                                    <% end %>
+                                </td>
+                            </tr>
+                        <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+<% end %>

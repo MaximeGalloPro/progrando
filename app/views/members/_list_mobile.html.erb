@@ -1,0 +1,172 @@
+<div class="container py-4">
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column flex-sm-row gap-2 mb-4">
+        <%= link_to "Ajouter un membre",
+                    new_member_path,
+                    class: "btn btn-outline-dark order-1 order-sm-3" %>
+
+        <% show_if_authorized('Profile', 'show') do %>
+            <%= link_to profiles_path, class: "btn btn-outline-dark order-2 order-sm-2" do %>
+                Gérer les profils
+            <% end %>
+        <% end %>
+
+        <% show_if_authorized('Role', 'show') do %>
+            <%= link_to roles_path, class: "btn btn-outline-dark order-3 order-sm-1" do %>
+                Gérer les rôles
+            <% end %>
+        <% end %>
+    </div>
+
+    <% if @members.any? %>
+        <!-- Mobile View (Cards) -->
+        <div class="d-block d-md-none">
+            <div class="members-grid">
+                <% @members.each do |member| %>
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body">
+                            <!-- Member Name and Role -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0"><%= member.name %></h5>
+                                <% if member.role&.name.present? %>
+                                    <span class="badge bg-secondary"><%= member.role.name %></span>
+                                <% end %>
+                            </div>
+
+                            <!-- Contact Info -->
+                            <div class="mb-3">
+                                <% if member.phone.present? %>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="fas fa-phone text-muted me-2"></i>
+                                        <%= member.phone %>
+                                    </div>
+                                <% end %>
+                                <% if member.email.present? %>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-envelope text-muted me-2"></i>
+                                        <%= member.email %>
+                                    </div>
+                                <% end %>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-flex gap-2">
+                                <%= link_to edit_member_path(member),
+                                            class: "btn btn-outline-dark btn-sm",
+                                            style: "flex: 1; min-width: 0;",
+                                            title: "Editer" do %>
+                                    <i class="fas fa-pen"></i>
+                                <% end %>
+
+                                <%= button_to member_path(member),
+                                              method: :delete,
+                                              form: {
+                                                  style: 'flex: 1; min-width: 0;',
+                                                  onsubmit: "return confirm('Supprimer ce member ?')"
+                                              },
+                                              class: "btn btn-outline-dark btn-sm w-100",
+                                              title: "Supprimer" do %>
+                                    <i class="fas fa-trash"></i>
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <!-- Desktop View (Table) -->
+        <div class="d-none d-md-block">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Téléphone</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% @members.each do |member| %>
+                        <tr>
+                            <td><%= member.name %></td>
+                            <td><%= member.phone %></td>
+                            <td><%= member.email %></td>
+                            <td><%= member.role&.name %></td>
+                            <td class="text-nowrap">
+                                <div class="btn-group">
+                                    <% show_if_authorized('Member', 'edit') do %>
+                                        <%= link_to edit_member_path(member), class: "btn btn-outline-dark btn-sm", title: "Editer" do %>
+                                            <i class="fas fa-pen"></i>
+                                        <% end %>
+                                    <% end %>
+
+                                    <% show_if_authorized('Member', 'destroy') do %>
+                                        <%= button_to member_path(member),
+                                                      method: :delete,
+                                                      class: "btn btn-outline-dark btn-sm delete-hike",
+                                                      title: "Supprimer",
+                                                      form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event)" },
+                                                      form_class: 'button_to' do %>
+                                            <i class="fas fa-trash"></i>
+                                        <% end %>
+
+                                        <script>
+                                            function confirmDelete(event) {
+                                                event.preventDefault();
+                                                if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
+                                                    event.target.submit();
+                                                }
+                                                return false;
+                                            }
+                                        </script>
+                                    <% end %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <% else %>
+        <div class="alert alert-info">Aucun member trouvé</div>
+    <% end %>
+</div>
+
+<style>
+    @media (max-width: 767.98px) {
+        .card {
+            border-radius: 8px;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+        }
+
+        /* Action buttons */
+        .btn-sm {
+            padding: 0.4rem;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-outline-dark {
+            border-width: 1px;
+            background-color: white;
+        }
+
+        .btn-outline-dark:active {
+            background-color: #f8f9fa;
+        }
+    }
+</style>

@@ -39,11 +39,17 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <% end %>
-<%= render partial: 'layouts/topbar' %>
 
+<% if browser.device.mobile? %>
+    <%= render partial: "layouts/topbar_mobile" %>
+<% else %>
+    <%= render partial: "layouts/topbar" %>
+<% end %>
 
+<div style="margin-bottom: 4rem;"></div>
 <%= render partial: 'layouts/no_organisation' %>
 <%= render partial: 'layouts/next_hike' %>
+
 <div id="feedback-message" style="display: none; margin-top: 10px; color: green;"></div>
 <button id="install-pwa" style="display: none;">Installer l'App</button>
 
@@ -94,9 +100,9 @@
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
-            .then(function(registration) {
+            .then(function (registration) {
                 console.log('Service Worker registered with scope:', registration.scope);
-            }).catch(function(error) {
+            }).catch(function (error) {
             console.log('Service Worker registration failed:', error);
         });
     }
