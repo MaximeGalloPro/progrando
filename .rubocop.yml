@@ -1,0 +1,20 @@
+require:
+  - rubocop-rails
+  - rubocop-performance
+
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.1
+  Exclude:
+    - 'db/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+
+# Vos préférences d'indentation
+Layout/IndentationWidth:
+  Width: 4
+# ... (les autres configurations d'indentation listées ci-dessus)
