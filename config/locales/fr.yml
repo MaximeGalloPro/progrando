@@ -1,3 +1,4 @@
+# config/locales/fr.yml
 fr:
   time:
     formats:
@@ -53,6 +54,79 @@ fr:
       hard: "Difficile"
       very_hard: "Très difficile"
       undefined: "Non défini"
+  roles:
+    create:
+      success: "Le rôle a été créé avec succès."
+    update:
+      success: "Le rôle a été mis à jour avec succès."
+    destroy:
+      success: "Le rôle a été supprimé avec succès."
+  profiles:
+    create:
+      success: "Profil créé avec succès."
+    update:
+      success: "Profil mis à jour avec succès."
+    destroy:
+      success: "Profil supprimé avec succès."
+  organisations:
+    request_access:
+      already_requested: "Vous avez déjà envoyé une demande pour cette organisation"
+      success: "Votre demande a été envoyée avec succès"
+      error: "Erreur lors de l'envoi de la demande"
+    switch:
+      success: "Vous utilisez maintenant l'organisation %{name}"
+      access_denied: "Vous n'avez pas accès à cette organisation"
+    create:
+      success: "Organisation créée avec succès"
+    update:
+      success: "Organisation mise à jour avec succès"
+    destroy:
+      success: "Organisation supprimée avec succès"
+    check_organisation_access:
+      access_denied: "Vous n'avez pas accès à cette organisation"
+  organisation_access_requests:
+    update:
+      success: "Demande approuvée"
+    reject:
+      success: "Demande rejetée"
+    destroy:
+      success: "Demande annulée"
+      error: "Erreur lors du rejet de la demande"
+  authorization:
+    unauthorized_access: "Accès non autorisé"
+  members:
+    create:
+      success: "Membre ajouté avec succès"
+    update:
+      success: "Membre modifié avec succès"
+    destroy:
+      success: "Membre supprimé avec succès"
+  hikes:
+    create:
+      success: "Parcours ajouté avec succès"
+    update:
+      success: "Parcours mis à jour avec succès"
+    destroy:
+      success: "Parcours supprimé avec succès"
+    refresh_from_openrunner:
+      updating: "La randonnée \"%{name}\" est en cours de mise à jour depuis OpenRunner..."
+  hike_paths:
+    show:
+      not_found: "Le tracé demandé n'existe pas"
+    create:
+      points_required: "Veuillez ajouter des points sur la carte"
+      success: "Tracé sauvegardé avec succès !"
+  hike_histories:
+    create:
+      success: "Randonnée ajoutée à l'historique avec succès"
+      validation_error: "Veuillez corriger les erreurs ci-dessous"
+      invalid_params: "Données de formulaire invalides"
+    update:
+      success: "Historique de randonnée mis à jour avec succès"
+      validation_error: "Veuillez corriger les erreurs ci-dessous"
+      invalid_params: "Données de formulaire invalides"
+    destroy:
+      success: "Historique de randonnée supprimé avec succès"
   devise:
     sessions:
       signed_in: "Connecté avec succès."
@@ -80,3 +154,10 @@ fr:
       send_instructions: "Vous allez recevoir un email avec les instructions pour réinitialiser votre mot de passe dans quelques minutes."
       updated: "Votre mot de passe a été modifié avec succès. Vous êtes maintenant connecté."
       no_token: "Vous ne pouvez pas accéder à cette page sans passer par un email de réinitialisation de mot de passe. Si vous venez d'un email de ce type, veuillez vérifier que vous utilisez l'URL complète fournie."
+  users:
+    update_member:
+      member_update_success: "Informations mise à jour avec succès"
+      member_update_error: "Erreur lors de la mise à jour des informations"
+    update_theme:
+      theme_update_success: "Thème mis à jour avec succès"
+      theme_update_error: "Erreur lors de la mise à jour du thème"

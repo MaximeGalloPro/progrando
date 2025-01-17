@@ -1,6 +1,7 @@
 require:
   - rubocop-rails
   - rubocop-performance
+  - rubocop-capybara
 
 #inherit_from: .rubocop_todo.yml
 
@@ -19,7 +20,10 @@ Layout/IndentationWidth:
   Width: 4
 
 Metrics/ClassLength:
-  Max: 130
+  Max: 200
+
+Metrics/ModuleLength:
+  Max: 200
 
 Layout/LineLength:
   Max: 150

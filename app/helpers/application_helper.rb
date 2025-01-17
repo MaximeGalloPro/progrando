@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Helper methods for application-wide functionality including authorization checks,
+# link generation, and status translation. Provides utilities for managing resource
+# access, path manipulation, and localization support.
 module ApplicationHelper
     def show_if_authorized(resource, action)
         # Retourne true/false au lieu de yield/nil
@@ -22,11 +25,23 @@ module ApplicationHelper
     private
 
     def extract_resource_from_path(options)
-        path = options.is_a?(String) ? options : (options[:controller] || url_for(options))
-        # Extrait le premier segment de l'URL qui n'est pas un nombre
+        case options
+        when String
+            extract_from_string_path(options)
+        else
+            extract_from_options_hash(options)
+        end
+    end
+
+    def extract_from_string_path(path)
         segments = path.split('/')
         resource_name = segments.find { |segment| segment.present? && !segment.match?(/^\d+$/) }
         resource_name&.singularize&.classify || ''
+    end
+
+    def extract_from_options_hash(options)
+        path = options[:controller] || url_for(options)
+        extract_from_string_path(path)
     end
 
     def extract_action_from_path(options)

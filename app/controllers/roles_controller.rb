@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Controller handling the CRUD operations for Role management within an organization.
+# Provides functionality to create, read, update, and delete roles, with proper
+# organization scoping and JSON API support.
 class RolesController < ApplicationController
     before_action :set_role, only: %i[show edit update destroy]
 
@@ -25,7 +28,7 @@ class RolesController < ApplicationController
 
         respond_to do |format|
             if @role.save
-                format.html { redirect_to @role, notice: 'Role was successfully created.' }
+                format.html { redirect_to @role, notice: t('.success') }
                 format.json { render :show, status: :created, location: @role }
             else
                 format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +41,7 @@ class RolesController < ApplicationController
     def update
         respond_to do |format|
             if @role.update(role_params)
-                format.html { redirect_to @role, notice: 'Role was successfully updated.' }
+                format.html { redirect_to @role, notice: t('.success') }
                 format.json { render :show, status: :ok, location: @role }
             else
                 format.html { render :edit, status: :unprocessable_entity }
@@ -52,7 +55,7 @@ class RolesController < ApplicationController
         @role.destroy
 
         respond_to do |format|
-            format.html { redirect_to roles_path, status: :see_other, notice: 'Role was successfully destroyed.' }
+            format.html { redirect_to roles_path, status: :see_other, notice: t('.success') }
             format.json { head :no_content }
         end
     end

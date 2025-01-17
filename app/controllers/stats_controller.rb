@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Controller handling statistical data visualization and analysis for the
+# organization's hiking activities. Provides aggregated metrics including total
+# hikes, distances, elevations, and guide performance statistics.
 class StatsController < ApplicationController
     def dashboard
         @stats = {
@@ -54,19 +57,34 @@ class StatsController < ApplicationController
     end
 
     def fetch_monthly_stats
-        stats = Hike.for_organisation
-                    .joins(:latest_history)
-                    .where(hike_histories: { hiking_date: 1.year.ago.. })
-                    .group("DATE_FORMAT(hike_histories.hiking_date, '%Y-%m')")
-                    .distinct
-                    .count
+        stats = fetch_raw_monthly_stats
+        formatted_stats = format_monthly_stats(stats)
+        generate_complete_monthly_stats(formatted_stats)
+    end
 
-        formatted_stats = stats.transform_keys { |k| Date.parse("#{k}-01").strftime('%b') }
-        last_12_months = Array.new(12) { |i| i.months.ago.strftime('%b') }.reverse
+    def fetch_raw_monthly_stats
+        Hike.for_organisation
+            .joins(:latest_history)
+            .where(hike_histories: { hiking_date: 1.year.ago.. })
+            .group("DATE_FORMAT(hike_histories.hiking_date, '%Y-%m')")
+            .distinct
+            .count
+    end
 
+    def format_monthly_stats(stats)
+        stats.transform_keys do |key|
+            Date.parse("#{key}-01").strftime('%b')
+        end
+    end
+
+    def generate_complete_monthly_stats(formatted_stats)
         last_12_months.index_with do |month|
             formatted_stats[month] || 0
         end
+    end
+
+    def last_12_months
+        Array.new(12) { |i| i.months.ago.strftime('%b') }.reverse
     end
 
     def fetch_guide_stats
