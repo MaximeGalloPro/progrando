@@ -97,9 +97,7 @@ class HikesController < ApplicationController
             :openrunner_ref
         )
 
-        if params_with_converted_distance[:distance_km].present?
-            params_with_converted_distance[:distance_km].tr!(',', '.')
-        end
+        params_with_converted_distance[:distance_km].tr!(',', '.') if params_with_converted_distance[:distance_km].present?
 
         params_with_converted_distance
     end

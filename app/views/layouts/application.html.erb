@@ -42,11 +42,11 @@
 
 <% if browser.device.mobile? %>
     <%= render partial: "layouts/topbar_mobile" %>
+    <div style="margin-bottom: 4rem;"></div>
 <% else %>
     <%= render partial: "layouts/topbar" %>
 <% end %>
 
-<div style="margin-bottom: 4rem;"></div>
 <%= render partial: 'layouts/no_organisation' %>
 <%= render partial: 'layouts/next_hike' %>
 

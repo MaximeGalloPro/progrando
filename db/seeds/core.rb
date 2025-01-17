@@ -188,7 +188,48 @@ organisations.each do |organisation|
     end
 end
 
-puts "CORE Seed finished!"
+puts "Creating cross-organisation access requests..."
+# Pour chaque organisation
+organisations.each do |org|
+    # Récupérer tous les users de cette organisation sauf super_admin
+    org_users = UserOrganisation.where(organisation: org)
+                                .includes(:user)
+                                .reject { |uo| uo.user.super_admin }
+
+    # Pour chaque utilisateur de cette organisation
+    org_users.each do |user_org|
+        user = user_org.user
+        # Trouver le membre correspondant pour obtenir son rôle
+        member = Member.find_by(email: user.email, organisation_id: org.id)
+
+        if member&.role
+            # Faire une demande pour toutes les autres organisations
+            other_orgs = organisations.reject { |other_org| other_org.id == org.id }
+
+            other_orgs.each do |other_org|
+                # Vérifier si l'utilisateur n'a pas déjà accès à cette organisation
+                next if UserOrganisation.exists?(user: user, organisation: other_org)
+                next if OrganisationAccessRequest.exists?(user: user, organisation: other_org)
+
+                begin
+                    OrganisationAccessRequest.create!(
+                        user: user,
+                        organisation: other_org,
+                        status: 'pending',
+                        role: member.role.name, # Utilise le même rôle que dans l'organisation actuelle
+                        message: "Je suis #{member.role.name} de #{org.name} et souhaite rejoindre #{other_org.name}"
+                    )
+                    puts "Created access request for #{user.email} (#{member.role.name}) to join #{other_org.name}"
+                rescue ActiveRecord::RecordInvalid => e
+                    puts "Failed to create access request for #{user.email} to join #{other_org.name}: #{e.message}"
+                end
+            end
+        else
+            puts "Skipping access request for #{user.email} - no member record or role found"
+        end
+    end
+end
+
 puts "Created:"
 puts "- #{Organisation.count} organisations"
 puts "- #{Profile.count} profiles"
@@ -196,3 +237,4 @@ puts "- #{ProfileRight.count} profile rights"
 puts "- #{Role.count} roles"
 puts "- #{User.count} users"
 puts "- #{Member.count} members"
+puts "\n ### CORE Seed finished! ###\n"
