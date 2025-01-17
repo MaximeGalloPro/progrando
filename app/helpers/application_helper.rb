@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
-    def show_if_authorized(resource, action, &block)
+    def show_if_authorized(resource, action)
         # Retourne true/false au lieu de yield/nil
-        if current_user&.super_admin or can?(action, resource)
+        if current_user&.super_admin || can?(action, resource)
             yield if block_given?
             true
         else
@@ -9,12 +11,12 @@ module ApplicationHelper
         end
     end
 
-    def link_to_if_authorized(name, options = {}, html_options = {}, &block)
+    def link_to_if_authorized(name, options = {}, html_options = {}, &)
         resource = extract_resource_from_path(options)
         action = extract_action_from_path(options)
-        if can?(action, resource)
-            link_to(name, options, html_options, &block)
-        end
+        return unless can?(action, resource)
+
+        link_to(name, options, html_options, &)
     end
 
     private
@@ -31,12 +33,13 @@ module ApplicationHelper
         return 'destroy' if options.is_a?(Hash) && options[:method] == :delete
         return 'create' if options.to_s.include?('/new')
         return 'update' if options.to_s.include?('/edit')
+
         'show'
     end
 
     def with_subdomain(organisation, options = {})
         subdomain = organisation.try(:slug)
-        options.merge!(subdomain: subdomain) if subdomain.present?
+        options[:subdomain] = subdomain if subdomain.present?
         options
     end
 

@@ -1,28 +1,35 @@
+# frozen_string_literal: true
+
 class OrganisationsController < ApplicationController
-    before_action :set_organisation, only: [:show, :edit, :update, :destroy]
-    before_action :check_organisation_access, only: [:edit, :update, :destroy]
+    before_action :set_organisation, only: %i[show edit update destroy]
+    before_action :check_organisation_access, only: %i[edit update destroy]
 
     def request_access
         @organisation = Organisation.find_by(id: params[:id])
         @member = current_user&.members&.for_organisation&.first || Member.new
-        if request.post?
-            check_already_requested = OrganisationAccessRequest.where(user: current_user, organisation: @organisation).exists?
-            return redirect_to organisations_path, alert: 'Vous avez déjà envoyé une demande pour cette organisation' if check_already_requested
-            handle_member
-            access_request = OrganisationAccessRequest.new(
-                user: current_user,
-                organisation: @organisation,
-                message: params[:message],
-                role: params[:role],
-            )
+        return unless request.post?
 
-            if access_request.save
-                OrganisationMailer.access_request_notification(access_request).deliver_later
-                redirect_to organisations_path, notice: 'Votre demande a été envoyée avec succès'
-            else
-                flash.now[:error] = 'Erreur lors de l\'envoi de la demande'
-                render :request_access
-            end
+        check_already_requested = OrganisationAccessRequest.exists?(user: current_user,
+                                                                    organisation: @organisation)
+        if check_already_requested
+            return redirect_to organisations_path,
+                               alert: 'Vous avez déjà envoyé une demande pour cette organisation'
+        end
+
+        handle_member
+        access_request = OrganisationAccessRequest.new(
+            user: current_user,
+            organisation: @organisation,
+            message: params[:message],
+            role: params[:role]
+        )
+
+        if access_request.save
+            OrganisationMailer.access_request_notification(access_request).deliver_later
+            redirect_to organisations_path, notice: 'Votre demande a été envoyée avec succès'
+        else
+            flash.now[:error] = 'Erreur lors de l\'envoi de la demande'
+            render :request_access
         end
     end
 
@@ -34,26 +41,25 @@ class OrganisationsController < ApplicationController
     def switch
         @organisations = current_user.super_admin ? Organisation.all : Organisation.where(id: current_user.organisations.pluck(:id))
 
-        if params[:id]
-            @organisation = Organisation.find(params[:id])
-            if current_user.super_admin || current_user.organisations.include?(@organisation)
-                current_user.update(current_organisation_id: @organisation.id)
-                redirect_to authenticated_root_path, notice: "Vous utilisez maintenant l'organisation #{@organisation.name}"
-            else
-                redirect_to organisations_path, alert: "Vous n'avez pas accès à cette organisation"
-            end
+        return unless params[:id]
+
+        @organisation = Organisation.find(params[:id])
+        if current_user.super_admin || current_user.organisations.include?(@organisation)
+            current_user.update(current_organisation_id: @organisation.id)
+            redirect_to authenticated_root_path,
+                        notice: "Vous utilisez maintenant l'organisation #{@organisation.name}"
+        else
+            redirect_to organisations_path, alert: "Vous n'avez pas accès à cette organisation"
         end
     end
 
-    def show
-    end
+    def show; end
 
     def new
         @organisation = Organisation.new
     end
 
-    def edit
-    end
+    def edit; end
 
     def create
         @organisation = Organisation.new(organisation_params)
@@ -85,13 +91,13 @@ class OrganisationsController < ApplicationController
     private
 
     def handle_member
-        if !@member.persisted?
-            @member.update(name: params[:name], email: params[:email],
-                           phone: params[:phone], organisation: @organisation)
-        else
+        if @member.persisted?
             @member = Member.create(name: params[:name], email: params[:email],
                                     phone: params[:phone], organisation: @organisation)
             UserMember.create(user: current_user, member: @member)
+        else
+            @member.update(name: params[:name], email: params[:email],
+                           phone: params[:phone], organisation: @organisation)
         end
     end
 

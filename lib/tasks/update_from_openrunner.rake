@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 # lib/tasks/hikes.rake
 namespace :hikes do
-    desc "Met à jour toutes les randonnées depuis OpenRunner"
+    desc 'Met à jour toutes les randonnées depuis OpenRunner'
     task update_all: :environment do
-        puts "🚀 Démarrage de la mise à jour de toutes les randonnées..."
+        puts '🚀 Démarrage de la mise à jour de toutes les randonnées...'
 
         # Récupère toutes les randonnées avec une référence OpenRunner valide
-        hikes = Hike.where.not(openrunner_ref: [nil, "", "0"])
+        hikes = Hike.where.not(openrunner_ref: [nil, '', '0'])
         total = hikes.count
 
         puts "📋 #{total} randonnées à mettre à jour"
@@ -15,7 +17,7 @@ namespace :hikes do
 
             begin
                 UpdateHikeFromOpenrunnerJob.perform_now(hike)
-            rescue => e
+            rescue StandardError => e
                 puts "❌ Échec pour #{hike.trail_name}: #{e.message}"
             end
 

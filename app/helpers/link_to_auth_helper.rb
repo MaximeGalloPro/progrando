@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LinkToAuthHelper
     def authorized_link_to(*args, model: nil, action: nil, **options, &block)
         if block
@@ -16,7 +18,7 @@ module LinkToAuthHelper
             link_to(text, url, options)
         else
             tag.span(text, class: "unauthorized #{options[:class]}",
-                     title: "Action non autorisée")
+                           title: 'Action non autorisée')
         end
     end
 
@@ -36,6 +38,7 @@ module LinkToAuthHelper
         return :edit if path.include?('/edit')
         return :new if path.include?('/new')
         return :destroy if path.match?(%r{/\d+$}) && options[:method] == :delete
+
         :index
     end
 

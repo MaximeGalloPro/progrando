@@ -1,5 +1,6 @@
-class HikesController < ApplicationController
+# frozen_string_literal: true
 
+class HikesController < ApplicationController
     def index
         @results = fetch_hikes
         @results = @results.sort_by { |hike| hike.last_hiking_date || Date.new(1, 1, 1) }.reverse
@@ -11,7 +12,6 @@ class HikesController < ApplicationController
         UpdateHikeFromOpenrunnerJob.perform_later(@hike)
 
         # Redirection avec les paramètres de recherche
-        redirect_back_options = { notice: "Mise à jour des données depuis OpenRunner en cours..." }
 
         # Si on a un paramètre de recherche, on le conserve
         redirect_back_options = {
@@ -41,17 +41,6 @@ class HikesController < ApplicationController
         @hike_path = @hike.hike_path
     end
 
-    def update
-        @hike = Hike.for_organisation.find_by(id: params[:id])
-        @hike_path = @hike.hike_path || HikePath.new(hike_id: @hike.id)
-        params[:hike][:coordinates] = "" if params[:hike][:coordinates] == "[]"
-        if @hike.update(hike_params) and @hike_path&.update(coordinates: params[:hike][:coordinates])
-            redirect_to hikes_path, notice: 'Parcours mis à jour avec succès.'
-        else
-            render :edit, status: :unprocessable_entity
-        end
-    end
-
     def create
         @hike = Hike.new(hike_params)
         @hike_path = HikePath.new(coordinates: params[:hike][:coordinates])
@@ -61,6 +50,17 @@ class HikesController < ApplicationController
             redirect_to hikes_path, notice: 'Parcours ajouté avec succès.'
         else
             render :new, status: :unprocessable_entity, params: { hike: @hike, coordinates: params[:coordinates] }
+        end
+    end
+
+    def update
+        @hike = Hike.for_organisation.find_by(id: params[:id])
+        @hike_path = @hike.hike_path || HikePath.new(hike_id: @hike.id)
+        params[:hike][:coordinates] = '' if params[:hike][:coordinates] == '[]'
+        if @hike.update(hike_params) && @hike_path&.update(coordinates: params[:hike][:coordinates])
+            redirect_to hikes_path, notice: 'Parcours mis à jour avec succès.'
+        else
+            render :edit, status: :unprocessable_entity
         end
     end
 
@@ -94,11 +94,11 @@ class HikesController < ApplicationController
             :elevation_loss,
             :altitude_min,
             :altitude_max,
-            :openrunner_ref,
+            :openrunner_ref
         )
 
         if params_with_converted_distance[:distance_km].present?
-            params_with_converted_distance[:distance_km].gsub!(',', '.')
+            params_with_converted_distance[:distance_km].tr!(',', '.')
         end
 
         params_with_converted_distance

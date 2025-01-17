@@ -33,11 +33,12 @@
                     <td><%= hike.last_guide_name %></td>
                     <td class="text-nowrap">
                         <div class="btn-group">
-
                             <%= render partial: "roadmap", locals: { hike: hike } %>
+
                             <% show_if_authorized('HikeHistory', 'index') do %>
                                 <%= link_to hike_histories_path(hike_id: hike.id),
-                                            class: "btn btn-outline-dark btn-sm",
+                                            class: "btn btn-outline-dark btn-sm d-inline-flex align-items-center justify-content-center",
+                                            style: "width: 32px; height: 32px;",
                                             title: "Voir l'historique" do %>
                                     <i class="fas fa-history"></i>
                                 <% end %>
@@ -45,51 +46,48 @@
 
                             <% show_if_authorized('Hike', 'edit') do %>
                                 <%= link_to edit_hike_path(hike),
-                                            class: "btn btn-outline-dark btn-sm",
+                                            class: "btn btn-outline-dark btn-sm d-inline-flex align-items-center justify-content-center",
+                                            style: "width: 32px; height: 32px;",
                                             title: "Editer" do %>
                                     <i class="fas fa-pen"></i>
+                                <% end %>
+                            <% end %>
+
+                            <% show_if_authorized('Hike', 'update') do %>
+                                <% if hike.updating? %>
+                                    <button class="btn btn-outline-dark btn-sm d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            disabled>
+                                        <i class="fas fa-sync-alt fa-spin"></i>
+                                    </button>
+                                <% elsif hike.openrunner_ref.blank? || hike.openrunner_ref == 0 || hike.openrunner_ref == "0" %>
+                                    <button class="btn btn-outline-dark btn-sm d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            disabled
+                                            title="Pas de référence OpenRunner">
+                                        <i class="fas fa-ban text-danger"></i>
+                                    </button>
+                                <% else %>
+                                    <%= button_to refresh_from_openrunner_hike_path(hike, redirect_path: hikes_path),
+                                                  class: "btn btn-outline-dark btn-sm d-inline-flex align-items-center justify-content-center",
+                                                  style: "width: 32px; height: 32px;",
+                                                  title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
+                                                  data: { turbo: false },
+                                                  params: { search: params[:search] } do %>
+                                        <i class="fas fa-sync-alt"></i>
+                                    <% end %>
                                 <% end %>
                             <% end %>
 
                             <% show_if_authorized('Hike', 'destroy') do %>
                                 <%= button_to hike_path(hike),
                                               method: :delete,
-                                              class: "btn btn-outline-dark btn-sm delete-hike",
+                                              class: "btn btn-outline-dark btn-sm d-inline-flex align-items-center justify-content-center",
+                                              style: "width: 32px; height: 32px;",
                                               title: "Supprimer",
                                               form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event)" },
                                               form_class: 'button_to' do %>
                                     <i class="fas fa-trash"></i>
-                                <% end %>
-
-                                <script>
-                                    function confirmDelete(event) {
-                                        event.preventDefault();
-                                        if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
-                                            event.target.submit();
-                                        }
-                                        return false;
-                                    }
-                                </script>
-                            <% end %>
-
-
-                            <% show_if_authorized('Hike', 'update') do %>
-                                <% if hike.updating? %>
-                                    <button class="btn btn-outline-dark btn-sm" disabled>
-                                        <i class="fas fa-sync-alt fa-spin"></i>
-                                    </button>
-                                <% elsif hike.openrunner_ref.blank? or hike.openrunner_ref == 0 or hike.openrunner_ref == "0" %>
-                                    <button class="btn btn-outline-dark btn-sm" disabled title="Pas de référence OpenRunner">
-                                        <i class="fas fa-ban text-danger"></i>
-                                    </button>
-                                <% else %>
-                                    <%= button_to refresh_from_openrunner_hike_path(hike, redirect_path: hikes_path),
-                                                  class: "btn btn-outline-dark btn-sm",
-                                                  title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
-                                                  data: { turbo: false },
-                                                  params: { search: params[:search] } do %>
-                                        <i class="fas fa-sync-alt"></i>
-                                    <% end %>
                                 <% end %>
                             <% end %>
                         </div>

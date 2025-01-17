@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 # app/controllers/organisation_access_requests_controller.rb
 class OrganisationAccessRequestsController < ApplicationController
-    before_action :set_request, only: [:edit, :update, :reject, :destroy]
+    before_action :set_request, only: %i[edit update reject destroy]
 
     def index
         @access_requests = OrganisationAccessRequest.where(status: 'pending')
@@ -34,10 +36,10 @@ class OrganisationAccessRequestsController < ApplicationController
 
     def destroy
         if @request&.destroy
-         redirect_to organisations_path, notice: 'Demande annulée'
+            redirect_to organisations_path, notice: 'Demande annulée'
         else
             redirect_to organisations_path, alert: 'Erreur lors du rejet de la demande'
-            end
+        end
     end
 
     private

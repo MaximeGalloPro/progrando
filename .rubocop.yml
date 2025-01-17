@@ -2,7 +2,7 @@ require:
   - rubocop-rails
   - rubocop-performance
 
-inherit_from: .rubocop_todo.yml
+#inherit_from: .rubocop_todo.yml
 
 AllCops:
   NewCops: enable
@@ -14,7 +14,16 @@ AllCops:
     - 'node_modules/**/*'
     - 'tmp/**/*'
 
-# Vos préférences d'indentation
 Layout/IndentationWidth:
   Width: 4
-# ... (les autres configurations d'indentation listées ci-dessus)
+
+Metrics/ClassLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/BlockLength:
+  Exclude:
+    - 'config/routes.rb'
+    - 'config/environments/*.rb'

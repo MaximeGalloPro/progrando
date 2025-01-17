@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HikeHistoriesController < ApplicationController
     before_action :get_members
 
@@ -8,26 +10,6 @@ class HikeHistoriesController < ApplicationController
                               .joins(:member)
                               .select('hike_histories.*, members.name as member_name')
                               .order(hiking_date: :desc)
-    end
-
-    def destroy
-        @hike_history = HikeHistory.for_organisation.find_by(id: params[:id])
-        @hike_history.destroy
-        redirect_to hikes_path, notice: 'Historique de randonnée supprimé avec succès.'
-    end
-
-    def update
-        @hike_history = HikeHistory.for_organisation.find_by(id: params[:id])
-
-        if @hike_history.update(hike_history_params)
-            redirect_to hikes_path, notice: 'Historique de randonnée mis à jour avec succès.'
-        else
-            @hikes = Hike.for_organisation.order(:trail_name)
-            flash.now[:alert] = 'Veuillez corriger les erreurs ci-dessous.'
-            render :edit, status: :unprocessable_entity
-        end
-    rescue ActionController::ParameterMissing
-        flash.now[:alert] = 'Données de formulaire invalid es.'
     end
 
     def new
@@ -57,10 +39,30 @@ class HikeHistoriesController < ApplicationController
         render :new, status: :unprocessable_entity
     end
 
+    def update
+        @hike_history = HikeHistory.for_organisation.find_by(id: params[:id])
+
+        if @hike_history.update(hike_history_params)
+            redirect_to hikes_path, notice: 'Historique de randonnée mis à jour avec succès.'
+        else
+            @hikes = Hike.for_organisation.order(:trail_name)
+            flash.now[:alert] = 'Veuillez corriger les erreurs ci-dessous.'
+            render :edit, status: :unprocessable_entity
+        end
+    rescue ActionController::ParameterMissing
+        flash.now[:alert] = 'Données de formulaire invalid es.'
+    end
+
+    def destroy
+        @hike_history = HikeHistory.for_organisation.find_by(id: params[:id])
+        @hike_history.destroy
+        redirect_to hikes_path, notice: 'Historique de randonnée supprimé avec succès.'
+    end
+
     private
 
     def get_members
-        @members = Member.for_organisation.all.where(role_id: 1).order(:name)
+        @members = Member.for_organisation.where(role_id: 1).order(:name)
     end
 
     def hike_history_params

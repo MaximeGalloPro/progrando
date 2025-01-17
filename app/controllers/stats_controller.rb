@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StatsController < ApplicationController
     def dashboard
         @stats = {
@@ -6,7 +8,7 @@ class StatsController < ApplicationController
             total_elevation: fetch_total_elevation,
             active_guides: fetch_active_guides,
             monthly_stats: fetch_monthly_stats,
-            guide_stats: fetch_guide_stats,
+            guide_stats: fetch_guide_stats
         }
         @last_hikes = fetch_last_hikes
     end
@@ -18,7 +20,7 @@ class StatsController < ApplicationController
             .joins(:latest_history)
             .select('hikes.*, hike_histories.hiking_date, members.name as member_name')
             .joins('LEFT JOIN members ON members.id = hike_histories.member_id')
-            .where('hike_histories.hiking_date < ?', Date.current)
+            .where(hike_histories: { hiking_date: ...Date.current })
             .order('hike_histories.hiking_date DESC')
             .limit(10)
     end
@@ -26,7 +28,7 @@ class StatsController < ApplicationController
     def fetch_total_hikes
         Hike.for_organisation
             .joins(:latest_history)
-            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_year)
+            .where(hike_histories: { hiking_date: Date.current.beginning_of_year.. })
             .distinct
             .count
     end
@@ -46,7 +48,7 @@ class StatsController < ApplicationController
     def fetch_active_guides
         Hike.for_organisation
             .joins(:latest_history)
-            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_month)
+            .where(hike_histories: { hiking_date: Date.current.beginning_of_month.. })
             .distinct
             .count
     end
@@ -54,23 +56,23 @@ class StatsController < ApplicationController
     def fetch_monthly_stats
         stats = Hike.for_organisation
                     .joins(:latest_history)
-                    .where('hike_histories.hiking_date >= ?', 1.year.ago)
+                    .where(hike_histories: { hiking_date: 1.year.ago.. })
                     .group("DATE_FORMAT(hike_histories.hiking_date, '%Y-%m')")
                     .distinct
                     .count
 
-        formatted_stats = stats.transform_keys { |k| Date.parse(k + '-01').strftime('%b') }
-        last_12_months = 12.times.map { |i| i.months.ago.strftime('%b') }.reverse
+        formatted_stats = stats.transform_keys { |k| Date.parse("#{k}-01").strftime('%b') }
+        last_12_months = Array.new(12) { |i| i.months.ago.strftime('%b') }.reverse
 
-        last_12_months.each_with_object({}) { |month, hash|
-            hash[month] = formatted_stats[month] || 0
-        }
+        last_12_months.index_with do |month|
+            formatted_stats[month] || 0
+        end
     end
 
     def fetch_guide_stats
         HikeHistory.for_organisation
                    .joins(:member)
-                   .where('hiking_date >= ?', 1.year.ago)
+                   .where(hiking_date: 1.year.ago..)
                    .where.not(members: { name: nil })
                    .group('members.name')
                    .order('count_all DESC')

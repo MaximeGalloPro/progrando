@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Tracks individual hike participations, recording details such as dates,
+# times, costs, and references for each member's hiking activity
 class HikeHistory < ApplicationRecord
     belongs_to :organisation
     belongs_to :hike
@@ -9,9 +13,9 @@ class HikeHistory < ApplicationRecord
 
     # Validations numériques avec contraintes spécifiques
     validates :carpooling_cost,
-              numericality: { greater_than_or_equal_to: 0, message: "doit être un nombre positif" },
+              numericality: { greater_than_or_equal_to: 0 },
               allow_blank: true
     validates :openrunner_ref,
-              numericality: { only_integer: true, message: "doit être un nombre entier" },
+              numericality: { only_integer: true },
               allow_blank: true
 end

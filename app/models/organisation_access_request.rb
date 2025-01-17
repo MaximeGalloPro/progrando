@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Manages access requests from users wanting to join an organisation
+# with a specific role. Requests can be pending, approved, or rejected
 class OrganisationAccessRequest < ApplicationRecord
     belongs_to :user
     belongs_to :organisation

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # app/controllers/concerns/authorization_concern.rb
 module AuthorizationConcern
     extend ActiveSupport::Concern
@@ -15,17 +17,17 @@ module AuthorizationConcern
 
     def exclude_actions
         {
-            'Organisation' => ['index', 'show', 'new', 'create'],
-            'OrganisationAccessRequest' => ['edit', 'destroy'],
-            'User' => ['index', 'show', 'edit', 'update'],
+            'Organisation' => %w[index show new create],
+            'OrganisationAccessRequest' => %w[edit destroy],
+            'User' => %w[index show edit update]
         }
     end
 
     def check_authorization!
-        Rails.logger.debug "\n --- \e[36mCurrent user: \e[1m#{current_user&.email}\e[0m --- \n"
-        Rails.logger.debug "\n --- \e[35mCurrent user profile: \e[1m#{current_user&.profile&.name}\e[0m --- \n"
-        Rails.logger.debug "\n --- \e[33mController: \e[1m#{controller_path}\e[0m --- "
-        Rails.logger.debug "\n --- \e[33mAction: \e[1m#{action_name}\e[0m --- \n"
+        Rails.logger.debug { "\n --- \e[36mCurrent user: \e[1m#{current_user&.email}\e[0m --- \n" }
+        Rails.logger.debug { "\n --- \e[35mCurrent user profile: \e[1m#{current_user&.profile&.name}\e[0m --- \n" }
+        Rails.logger.debug { "\n --- \e[33mController: \e[1m#{controller_path}\e[0m --- " }
+        Rails.logger.debug { "\n --- \e[33mAction: \e[1m#{action_name}\e[0m --- \n" }
 
         return if skip_authorization?
 
@@ -36,19 +38,21 @@ module AuthorizationConcern
         status_color = authorized ? "\e[32m" : "\e[31m"
         model_dont_have_to_be_checked = exclude_models.include?(resource)
         action_dont_have_to_be_checked = exclude_actions[resource]&.include?(action)
-        if model_dont_have_to_be_checked or action_dont_have_to_be_checked
-            Rails.logger.debug "\n --- \e[33mNo need to check authorization for #{resource}##{action}\e[0m --- \n"
+        if model_dont_have_to_be_checked || action_dont_have_to_be_checked
+            Rails.logger.debug { "\n --- \e[33mNo need to check authorization for #{resource}##{action}\e[0m --- \n" }
             return
         else
-            Rails.logger.debug "\n --- \e[35mNeed to check authorization for #{resource}##{action}\e[0m --- \n"
+            Rails.logger.debug { "\n --- \e[35mNeed to check authorization for #{resource}##{action}\e[0m --- \n" }
         end
 
-        Rails.logger.debug "\n --- #{status_color}Authorization check: \e[1m#{authorized}\e[0m#{status_color} for #{resource}##{action}\e[0m --- \n"
-
-        unless authorized
-            flash[:error] = "Accès non autorisé"
-            redirect_to "http://localhost:3000", allow_other_host: true
+        Rails.logger.debug do
+            "\n --- #{status_color}Authorization check: \e[1m#{authorized}\e[0m#{status_color} for #{resource}##{action}\e[0m --- \n"
         end
+
+        return if authorized
+
+        flash[:error] = 'Accès non autorisé'
+        redirect_to 'http://localhost:3000', allow_other_host: true
     end
 
     def skip_authorization?
@@ -63,8 +67,11 @@ module AuthorizationConcern
         return true if current_user&.super_admin
         return false unless current_user.user_organisations.any?(&:profile)
         return true if current_user.user_organisations.for_organisation&.first&.creator
-        current_user.user_organisations.find_by(organisation_id: current_user.current_organisation_id).profile.authorized_for?(resource, action)
-    rescue
+
+        current_user.user_organisations.find_by(organisation_id: current_user.current_organisation_id).profile.authorized_for?(
+            resource, action
+        )
+    rescue StandardError
         false
     end
 

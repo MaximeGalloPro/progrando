@@ -1,0 +1,45 @@
+fr:
+  activerecord:
+    errors:
+      models:
+        hike_history:
+          attributes:
+            carpooling_cost:
+              greater_than_or_equal_to: "doit être un nombre positif"
+            openrunner_ref:
+              not_an_integer: "doit être un nombre entier"
+  hike:
+    difficulty:
+      very_easy: "Très facile"
+      easy: "Facile"
+      medium: "Moyen"
+      hard: "Difficile"
+      very_hard: "Très difficile"
+      undefined: "Non défini"
+  devise:
+    sessions:
+      signed_in: "Connecté avec succès."
+      signed_out: "Déconnecté avec succès."
+      already_signed_out: "Déconnecté avec succès."
+    failure:
+      already_authenticated: "Vous êtes déjà connecté."
+      inactive: "Votre compte n'est pas encore activé."
+      invalid: "Email ou mot de passe incorrect."
+      locked: "Votre compte est verrouillé."
+      last_attempt: "Il vous reste une tentative avant que votre compte soit verrouillé."
+      not_found_in_database: "Email ou mot de passe incorrect."
+      timeout: "Votre session a expiré. Veuillez vous reconnecter pour continuer."
+      unauthenticated: "Vous devez vous connecter ou vous inscrire pour continuer."
+    confirmations:
+      confirmed: "Votre compte a été confirmé avec succès."
+      send_instructions: "Vous allez recevoir un email avec les instructions pour confirmer votre compte dans quelques minutes."
+      send_paranoid_instructions: "Si votre email existe dans notre base de données, vous allez recevoir un email avec les instructions pour confirmer votre compte dans quelques minutes."
+    registrations:
+      signed_up: "Bienvenue ! Vous vous êtes inscrit avec succès."
+      signed_up_but_unconfirmed: "Un message avec un lien de confirmation a été envoyé à votre adresse email. Veuillez suivre ce lien pour activer votre compte."
+      updated: "Votre compte a été mis à jour avec succès."
+      destroyed: "Au revoir ! Votre compte a été supprimé avec succès. Nous espérons vous revoir bientôt."
+    passwords:
+      send_instructions: "Vous allez recevoir un email avec les instructions pour réinitialiser votre mot de passe dans quelques minutes."
+      updated: "Votre mot de passe a été modifié avec succès. Vous êtes maintenant connecté."
+      no_token: "Vous ne pouvez pas accéder à cette page sans passer par un email de réinitialisation de mot de passe. Si vous venez d'un email de ce type, veuillez vérifier que vous utilisez l'URL complète fournie."

@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Middleware handling organisation context based on user sessions and managing
+# subdomain-based access to organisations. Supports redirections and authentication flows
 class SubdomainMiddleware
     def initialize(app)
         @app = app
@@ -7,7 +11,7 @@ class SubdomainMiddleware
         request = Rack::Request.new(env)
         current_user = env['warden']&.user
 
-        # TODO manage subdomain
+        # TODO: manage subdomain
         # if devise_route?(request.path) or !current_user
         #             return @app.call(env)
         #         end
@@ -30,7 +34,9 @@ class SubdomainMiddleware
         if user.current_organisation_id.present?
             Organisation.find_by(id: user.current_organisation_id)
         elsif user.organisations.present?
+            # rubocop:disable Rails/SkipsModelValidations
             user.update_column(:current_organisation_id, user.organisations.first.id)
+            # rubocop:enable Rails/SkipsModelValidations
         end
         Organisation.find_by(id: user.current_organisation_id)
     end
@@ -49,11 +55,13 @@ class SubdomainMiddleware
         if host.include?('localhost')
             parts = host.split('.')
             return parts.first if parts.length > 1
+
             return nil
         end
 
         parts = host.split('.')
         return nil if parts.size <= 2
+
         subdomain = parts.first
         subdomain unless subdomain == 'www'
     end

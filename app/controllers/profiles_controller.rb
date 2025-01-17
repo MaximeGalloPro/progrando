@@ -1,21 +1,27 @@
+# frozen_string_literal: true
+
 class ProfilesController < ApplicationController
-    before_action :set_profile, only: [:show, :edit, :update, :destroy]
+    before_action :set_profile, only: %i[show edit update destroy]
     before_action :set_organisation
 
-    MODELS = ['User',
-              'Organisation',
-              'Profile',
-              'Role',
-              'Member',
-              'Hike',
-              'HikeHistory',
-              'HikePath']
+    MODELS = %w[User
+                Organisation
+                Profile
+                Role
+                Member
+                Hike
+                HikeHistory
+                HikePath].freeze
 
-    ACTION = %w[index show create update destroy edit new]
+    ACTION = %w[index show create update destroy edit new].freeze
 
     SPECIAL_ACTIONS = {
         'ProfileRight' => %w[toggle_authorization]
-    }
+    }.freeze
+
+    def index
+        @profiles = @organisation.profiles
+    end
 
     def show
         MODELS.each do |resource|
@@ -42,10 +48,6 @@ class ProfilesController < ApplicationController
         end
     end
 
-    def index
-        @profiles = @organisation.profiles
-    end
-
     def toggle_authorization
         @profile_right = ProfileRight.find(params[:id])
         @profile_right.update(authorized: !@profile_right.authorized)
@@ -59,8 +61,7 @@ class ProfilesController < ApplicationController
         @profile = @organisation.profiles.build
     end
 
-    def edit
-    end
+    def edit; end
 
     def create
         @profile = @organisation.profiles.build(profile_params)
