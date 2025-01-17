@@ -1,172 +1,214 @@
+# frozen_string_literal: true
+
+# lib/tasks/hike_histories.rake
 require 'csv'
 require 'date'
 
 namespace :hike_histories do
     desc 'Import hike histories from CSV file'
     task import: :environment do
-        log_file = Rails.root.join('log', 'hike_histories_import.log')
-        csv_file = Rails.root.join('lib', 'data', 'progrando_progs.csv')
+        HikeHistoriesImporter.new.import
+    end
+end
 
-        FRENCH_MONTHS = {
-            'janvier' => 1,
-            'fevrier' => 2,
-            'février' => 2,
-            'mars' => 3,
-            'avril' => 4,
-            'mai' => 5,
-            'juin' => 6,
-            'juillet' => 7,
-            'aout' => 8,
-            'août' => 8,
-            'septembre' => 9,
-            'octobre' => 10,
-            'novembre' => 11,
-            'decembre' => 12,
-            'décembre' => 12
-        }.freeze
+# lib/services/hike_histories_importer.rb
+class HikeHistoriesImporter
+    def initialize
+        @log_file = Rails.root.join('log/hike_histories_import.log')
+        @csv_file = Rails.root.join('lib/data/progrando_progs.csv')
+        @date_parser = DateParser.new
+        @number_converter = NumberConverter.new
+    end
 
-        def normalize_string(str)
-            # Convertir en minuscules et retirer les accents
-            str = str.to_s.downcase
-            {
-                'é' => 'e', 'è' => 'e', 'ê' => 'e',
-                'à' => 'a', 'â' => 'a',
-                'ï' => 'i', 'î' => 'i',
-                'û' => 'u', 'ù' => 'u',
-                'ô' => 'o',
-                'ç' => 'c'
-            }.each do |accent, sans_accent|
-                str = str.gsub(accent, sans_accent)
-            end
-            str
+    def import
+        File.open(@log_file, 'a') do |log|
+            log_import_process(log) { process_csv_file(log) }
+        end
+    end
+
+    private
+
+    def log_import_process(log)
+        log.puts "\n=== Import started at #{Time.current} ==="
+        yield
+        log.puts "=== Import finished at #{Time.current} ==="
+    rescue StandardError => e
+        log.puts "Fatal error during import: #{e.message}"
+        log.puts e.backtrace
+        puts e.message # Pour debug
+    end
+
+    def process_csv_file(log)
+        rows = read_csv_file
+        process_rows(rows, log)
+    end
+
+    def read_csv_file
+        CSV.read(@csv_file,
+                 headers: true,
+                 encoding: 'utf-8',
+                 col_sep: ',')
+    end
+
+    def process_rows(rows, log)
+        rows.each { |row| process_row(row, log) }
+    end
+
+    def process_row(row, log)
+        hiking_date = @date_parser.parse(row['Dates'])
+        unless hiking_date
+            log.puts "Skipping row: Invalid date format in Dates column: #{row['Dates']}"
+            return
         end
 
-        def parse_date(date_value)
-            return nil if date_value.blank?
-            return date_value if date_value.is_a?(Date)
+        member = create_or_update_member(row)
+        history = create_or_update_history(row, hiking_date, member)
+        log_result(history, row, log)
+    rescue StandardError => e
+        log.puts "Error processing row: #{e.message}"
+    end
 
-            begin
-                # Regex modifiée pour accepter les caractères accentués
-                if date_value =~ /([[:alpha:]]+),\s+([[:alpha:]]+)\s+(\d{2}),\s+(\d{4})/
-                    month_name = normalize_string($2)
-                    day = $3.to_i
-                    year = $4.to_i
+    def create_or_update_member(row)
+        member = Member.find_or_initialize_by(phone: row['Tel.']&.strip)
+        member.assign_attributes(name: row['Animateur']&.strip)
+        member.save(validate: false)
+        member
+    end
 
-                    # Debug
-                    # puts "Original date: #{date_value}"
-                    # puts "Normalized month: #{month_name}"
-                    # puts "Month number: #{FRENCH_MONTHS[month_name]}"
-                    # puts "Day: #{day}"
-                    # puts "Year: #{year}"
+    def create_or_update_history(row, hiking_date, member)
+        history = find_or_initialize_history(row, hiking_date)
+        history.assign_attributes(history_attributes(row, member))
+        history.save(validate: false)
+        history
+    end
 
-                    # Convert French month name to number
-                    month = FRENCH_MONTHS[month_name]
+    def find_or_initialize_history(row, hiking_date)
+        HikeHistory.find_or_initialize_by(
+            hiking_date: hiking_date,
+            openrunner_ref: @number_converter.convert(row['Ref']&.strip)
+        )
+    end
 
-                    if month
-                        begin
-                            return Date.new(year, month, day)
-                        rescue ArgumentError => e
-                            puts "Error creating date object: #{e.message}"
-                            nil
-                        end
-                    else
-                        puts "Month not found in dictionary: #{month_name}"
-                    end
-                else
-                    puts "Date format doesn't match pattern: #{date_value}"
-                end
+    def history_attributes(row, member)
+        {
+            departure_time: row['Depart']&.strip,
+            day_type: row['Journee']&.strip,
+            carpooling_cost: @number_converter.convert(row['* C.V.']),
+            member_id: member&.id,
+            hike_id: find_hike_id(row)
+        }
+    end
 
-                # Fallback to default parsing
-                Date.parse(date_value.to_s)
-            rescue ArgumentError, TypeError => e
-                puts "Error parsing date '#{date_value}': #{e.message}"
-                nil
-            end
+    def find_hike_id(row)
+        hike_id = Hike.find_by(number: @number_converter.convert(row['Ref']))&.id
+        hike_id || Hike.find_by(number: @number_converter.convert(row['N°']))&.id
+    end
+
+    def log_result(history, row, log)
+        if history.persisted?
+            success_message = "Successfully imported history for hike ##{history.hike_id} on #{history.hiking_date}"
+            puts success_message
+            log.puts success_message
+        else
+            log.puts(
+                "Error importing history for hike ##{row['N°']}: " \
+                "#{history.errors.full_messages.join(', ')}"
+            )
         end
+    end
+end
 
-        def clean_number(str)
-            return nil if str.blank?
-            str.gsub(',', '.').strip
+# lib/services/date_parser.rb
+class DateParser
+    FRENCH_MONTHS = {
+        'janvier' => 1,
+        'fevrier' => 2,
+        'février' => 2,
+        'mars' => 3,
+        'avril' => 4,
+        'mai' => 5,
+        'juin' => 6,
+        'juillet' => 7,
+        'aout' => 8,
+        'août' => 8,
+        'septembre' => 9,
+        'octobre' => 10,
+        'novembre' => 11,
+        'decembre' => 12,
+        'décembre' => 12
+    }.freeze
+
+    def parse(date_value)
+        return nil if date_value.blank?
+        return date_value if date_value.is_a?(Date)
+
+        parse_french_date(date_value) || parse_default_date(date_value)
+    rescue ArgumentError, TypeError => e
+        puts "Error parsing date '#{date_value}': #{e.message}"
+        nil
+    end
+
+    private
+
+    def parse_french_date(date_value)
+        match = date_value.match(/([[:alpha:]]+),\s+([[:alpha:]]+)\s+(\d{2}),\s+(\d{4})/)
+        return nil unless match
+
+        month_name = normalize_string(match[2])
+        day = match[3].to_i
+        year = match[4].to_i
+        month = FRENCH_MONTHS[month_name]
+
+        create_date(year, month, day) if month
+    end
+
+    def create_date(year, month, day)
+        Date.new(year, month, day)
+    rescue ArgumentError => e
+        puts "Error creating date object: #{e.message}"
+        nil
+    end
+
+    def parse_default_date(date_value)
+        Date.parse(date_value.to_s)
+    end
+
+    def normalize_string(str)
+        str = str.to_s.downcase
+        ACCENTS_MAP.each do |accent, sans_accent|
+            str = str.gsub(accent, sans_accent)
         end
+        str
+    end
 
-        def convert_num(value)
-            return nil if value.nil? || value.to_s.strip.empty?
+    ACCENTS_MAP = {
+        'é' => 'e', 'è' => 'e', 'ê' => 'e',
+        'à' => 'a', 'â' => 'a',
+        'ï' => 'i', 'î' => 'i',
+        'û' => 'u', 'ù' => 'u',
+        'ô' => 'o',
+        'ç' => 'c'
+    }.freeze
+end
 
-            # Première tentative : conversion directe en integer
-            begin
-                return value.to_i
-            rescue ArgumentError, TypeError
-                # Continue si la conversion directe échoue
-            end
+# lib/services/number_converter.rb
+class NumberConverter
+    def convert(value)
+        return nil if value.nil? || value.to_s.strip.empty?
 
-            # Deuxième tentative : extraire uniquement les chiffres
-            digits_only = value.to_s.gsub(/[^\d]/, '')
+        convert_to_integer(value) || extract_digits(value)
+    end
 
-            # Vérifier si on a des chiffres après le nettoyage
-            return digits_only.to_i if digits_only.present?
+    private
 
-            # En dernier recours
-            nil
-        end
+    def convert_to_integer(value)
+        value.to_i
+    rescue ArgumentError, TypeError
+        nil
+    end
 
-        File.open(log_file, 'a') do |log|
-            log.puts "\n=== Import started at #{Time.current} ==="
-
-            begin
-                rows = CSV.read(csv_file,
-                                headers: true,
-                                encoding: 'utf-8',
-                                col_sep: ',')
-
-                rows.each do |row|
-                    begin
-                        # Utilise uniquement la colonne "Dates" pour hiking_date
-                        hiking_date = parse_date(row['Dates'])
-
-                        unless hiking_date
-                            log.puts "Skipping row: Invalid date format in Dates column: #{row['Dates']}"
-                            next
-                        end
-
-                        # Clean numbers
-                        carpooling_cost = convert_num(row['* C.V.'])
-
-                        member = Member.find_or_initialize_by(phone: row['Tel.']&.strip)
-
-                        member.assign_attributes(name: row['Animateur']&.strip)
-                        member.save(validate: false)
-                        history = HikeHistory.find_or_initialize_by(
-                            hiking_date: parse_date(hiking_date),
-                            openrunner_ref: convert_num(row['Ref']&.strip))
-                        hike_id = Hike.find_by(number: convert_num(row['Ref']))&.id
-                        hike_id = Hike.find_by(number: convert_num(row['N°']))&.id if hike_id.nil?
-                        history.assign_attributes(
-                            departure_time: row['Depart']&.strip,
-                            day_type: row['Journee']&.strip,
-                            carpooling_cost: carpooling_cost,
-                            member_id: member&.id,
-                            hike_id: hike_id,
-                        )
-
-                        if history.save(validate: false)
-                            puts "Successfully imported history for hike ##{history.hike_id} on #{history.hiking_date}"
-                            log.puts "Successfully imported history for hike ##{history.hike_id} on #{history.hiking_date}"
-                        else
-                            log.puts "Error importing history for hike ##{row['N°']}: #{history.errors.full_messages.join(', ')}"
-                        end
-                    rescue StandardError => e
-                        log.puts "Error processing row: #{e.message}"
-                        puts e.message # Pour debug
-                    end
-                end
-
-            rescue StandardError => e
-                log.puts "Fatal error during import: #{e.message}"
-                log.puts e.backtrace
-                puts e.message # Pour debug
-            end
-
-            log.puts "=== Import finished at #{Time.current} ==="
-        end
+    def extract_digits(value)
+        digits_only = value.to_s.gsub(/[^\d]/, '')
+        digits_only.present? ? digits_only.to_i : nil
     end
 end

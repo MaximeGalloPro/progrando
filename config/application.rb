@@ -1,24 +1,20 @@
-require_relative "boot"
-require "rails/all"
-require_relative "../app/middleware/subdomain_middleware"
+# frozen_string_literal: true
 
-# Require the gems listed in Gemfile, including any gems
-# you've limited to :test, :development, or :production.
+require_relative 'boot'
+require 'rails/all'
+require_relative '../app/middleware/subdomain_middleware'
+
 Bundler.require(*Rails.groups)
 
 module Rails7WithDocker
-  class Application < Rails::Application
-    # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
-    config.active_job.queue_adapter = :sidekiq
-    config.middleware.use SubdomainMiddleware
-
-    # Configuration for the application, engines, and railties goes here.
-    #
-    # These settings can be overridden in specific environments using the files
-    # in config/environments, which are processed later.
-    #
-    # config.time_zone = "Central Time (US & Canada)"
-    # config.eager_load_paths << Rails.root.join("extras")
-  end
+    # Main application class for Rails7WithDocker
+    # Configures core application settings including middleware and job processing
+    class Application < Rails::Application
+        # Initialize configuration defaults for originally generated Rails version.
+        config.load_defaults 7.0
+        config.active_job.queue_adapter = :sidekiq
+        config.middleware.use SubdomainMiddleware
+        config.i18n.default_locale = :fr
+        config.i18n.available_locales = %i[fr en]
+    end
 end

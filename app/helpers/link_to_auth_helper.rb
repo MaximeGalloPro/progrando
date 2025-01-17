@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+# Provides helper methods for authorization-aware link generation.
+# Extends Rails' link_to helper by checking user permissions before
+# rendering links. Unauthorized links are rendered as spans with
+# appropriate styling and tooltips.
 module LinkToAuthHelper
     def authorized_link_to(*args, model: nil, action: nil, **options, &block)
         if block
@@ -16,7 +22,7 @@ module LinkToAuthHelper
             link_to(text, url, options)
         else
             tag.span(text, class: "unauthorized #{options[:class]}",
-                     title: "Action non autorisée")
+                           title: 'Action non autorisée')
         end
     end
 
@@ -36,16 +42,25 @@ module LinkToAuthHelper
         return :edit if path.include?('/edit')
         return :new if path.include?('/new')
         return :destroy if path.match?(%r{/\d+$}) && options[:method] == :delete
+
         :index
     end
 
     def authorized_for?(model_class, action)
-        return true unless model_class # Si pas de modèle trouvé, on autorise
+        return true if model_class.nil? # Early return if no model
 
-        klass = model_class.is_a?(String) ? model_class.constantize : model_class
+        klass = resolve_class(model_class)
         return false unless klass.respond_to?(:authorized_actions)
 
         role = current_user&.role&.to_sym || :viewer
-        klass.authorized_actions[role]&.include?(action.to_sym)
+        klass.authorized_actions.dig(role, action.to_sym).present?
+    end
+
+    def resolve_class(model_class)
+        return model_class unless model_class.is_a?(String)
+
+        model_class.constantize
+    rescue NameError
+        nil
     end
 end

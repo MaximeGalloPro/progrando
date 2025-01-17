@@ -1,163 +1,141 @@
+# frozen_string_literal: true
+
 # app/services/openrunner_fetch_service.rb
 require 'capybara'
 require 'selenium-webdriver'
 
+# Service to fetch hiking trail details from Openrunner.com
+# This service uses Capybara with headless Selenium to scrape trail information
+# including distance, elevation, and route details.
 class OpenrunnerFetchService
+    TECHNICAL_ELEMENTS = {
+        distance_km: ['Distance', :to_f],
+        elevation_gain: ['Dénivelé +', :to_i],
+        elevation_loss: ['Dénivelé -', :to_i],
+        altitude_min: ['Altitude min.', :to_i],
+        altitude_max: ['Altitude max.', :to_i]
+    }.freeze
+
     def self.fetch_details(openrunner_ref)
-        puts "\n🚀 Starting OpenrunnerFetchService for ref: #{openrunner_ref}"
+        Rails.logger.debug { "\n🚀 Starting OpenrunnerFetchService for ref: #{openrunner_ref}" }
         new(openrunner_ref).fetch_details
     end
 
     def initialize(openrunner_ref)
         @openrunner_ref = openrunner_ref
         @url = "https://www.openrunner.com/route-details/#{openrunner_ref}"
-        puts "📌 Initialized with URL: #{@url}"
+        Rails.logger.debug { "📌 Initialized with URL: #{@url}" }
     end
 
     def fetch_details
-        puts "\n🔧 Setting up Capybara..."
-        setup_capybara
-        puts "🔍 Starting data fetch..."
+        setup_browser
         result = fetch_data
-        puts "✅ Fetch completed successfully"
-        puts "📊 Retrieved data: #{result.inspect}"
+        Rails.logger.debug { "📊 Retrieved data: #{result.inspect}" }
         result
     rescue StandardError => e
-        puts "❌ Error occurred: #{e.class}"
-        puts "❌ Error message: #{e.message}"
-        puts "❌ Backtrace: #{e.backtrace.join("\n")}"
-        { error: e.message }
+        handle_error(e)
     ensure
-        if @browser
-            puts "🧹 Cleaning up browser session..."
-            @browser.quit
-            puts "👋 Browser session closed"
-        end
+        cleanup_browser
     end
 
     private
 
-    def setup_capybara
-        puts "🔧 Configuring Capybara drivers..."
+    def setup_browser
+        Rails.logger.debug "\n🔧 Setting up Capybara..."
+        configure_capybara
+        create_browser_session
+        Rails.logger.debug '✅ Capybara setup completed'
+    end
+
+    def configure_capybara
         Capybara.default_driver = :selenium_headless
         Capybara.javascript_driver = :selenium_headless
         Capybara.app_host = 'https://www.openrunner.com'
+    end
 
-        puts "🌐 Creating new browser session..."
+    def create_browser_session
+        Rails.logger.debug '🌐 Creating new browser session...'
         @browser = Capybara::Session.new(:selenium_headless)
-        puts "✅ Capybara setup completed"
     end
 
     def fetch_data
-        puts "\n🌐 Visiting URL: #{@url}"
+        load_page
+        collect_trail_data
+    end
+
+    def load_page
+        Rails.logger.debug { "\n🌐 Visiting URL: #{@url}" }
         @browser.visit(@url)
-        puts "⏳ Waiting 5 seconds for page load..."
+        Rails.logger.debug '⏳ Waiting 5 seconds for page load...'
         sleep 5
-        puts "✅ Page loaded"
-
-        result = {}
-
-        # Récupération du titre de la randonnée
-        puts "\n🔍 Fetching trail name..."
-        begin
-            trail_name = @browser.find('h1.text-route-detail-header').text.strip
-            result[:trail_name] = trail_name
-            puts "✅ Found trail name: #{trail_name}"
-        rescue Capybara::ElementNotFound => e
-            puts "⚠️ Could not find trail name: #{e.message}"
-        end
-
-        # Récupération du point de départ
-        puts "\n🔍 Fetching starting point..."
-        begin
-            location_element = @browser.all('.text-nav.font-semibold span.truncate').first
-            if location_element
-                starting_point = location_element.text.strip
-                result[:starting_point] = starting_point
-                puts "✅ Found starting point: #{starting_point}"
-            end
-        rescue Capybara::ElementNotFound => e
-            puts "⚠️ Could not find starting point: #{e.message}"
-        end
-
-        # Autres éléments techniques (existants)
-        elements_to_fetch = {
-            distance_km: ['Distance', :to_f],
-            elevation_gain: ['Dénivelé +', :to_i],
-            elevation_loss: ['Dénivelé -', :to_i],
-            altitude_min: ['Altitude min.', :to_i],
-            altitude_max: ['Altitude max.', :to_i]
-        }
-
-        puts "\n🔍 Starting to fetch technical elements..."
-        elements_to_fetch.each do |key, (text, conversion)|
-            puts "\n👉 Fetching #{key}..."
-            value = fetch_element(text, conversion)
-            if value
-                result[key] = value
-                puts "✅ Found #{key}: #{value}"
-            else
-                puts "⚠️ Could not find #{key}"
-            end
-        end
-
-        # Log final results
-        puts "\n📊 Final data collected:"
-        result.each { |k, v| puts "  #{k}: #{v}" }
-
-        result.compact
+        Rails.logger.debug '✅ Page loaded'
     end
 
-    def fetch_element(text, conversion_method)
-        puts "  🔍 Looking for element with text: '#{text}'"
+    def collect_trail_data
+        {}.tap do |result|
+            result.merge!(fetch_trail_name)
+            result.merge!(fetch_starting_point)
+            result.merge!(fetch_technical_elements)
+        end.compact
+    end
 
-        element = @browser.find('.or-parcours-info-block', text: text)
-        puts "  ✅ Found block element for '#{text}'"
-
-        value_element = element.find('.or-parcours-info-text')
-        puts "  ✅ Found value element"
-
-        raw_value = value_element.text
-        puts "  📝 Raw value: #{raw_value}"
-
-        cleaned_value = raw_value.gsub(',', '.')
-        puts "  🧹 Cleaned value: #{cleaned_value}"
-
-        final_value = cleaned_value.send(conversion_method)
-        puts "  🎯 Converted value: #{final_value}"
-
-        final_value
+    def fetch_trail_name
+        Rails.logger.debug "\n🔍 Fetching trail name..."
+        { trail_name: @browser.find('h1.text-route-detail-header').text.strip }
     rescue Capybara::ElementNotFound => e
-        puts "  ⚠️ Element not found: #{e.message}"
-        nil
-    rescue StandardError => e
-        puts "  ❌ Other error while fetching element: #{e.message}"
+        Rails.logger.debug { "⚠️ Could not find trail name: #{e.message}" }
+        {}
+    end
+
+    def fetch_starting_point
+        Rails.logger.debug "\n🔍 Fetching starting point..."
+        location_element = @browser.all('.text-nav.font-semibold span.truncate').first
+        return {} unless location_element
+
+        { starting_point: location_element.text.strip }
+    rescue Capybara::ElementNotFound => e
+        Rails.logger.debug { "⚠️ Could not find starting point: #{e.message}" }
+        {}
+    end
+
+    def fetch_technical_elements
+        Rails.logger.debug "\n🔍 Starting to fetch technical elements..."
+        TECHNICAL_ELEMENTS.each_with_object({}) do |(key, (text, conversion)), result|
+            value = fetch_single_element(text, conversion)
+            result[key] = value if value
+        end
+    end
+
+    def fetch_single_element(text, conversion_method)
+        element = @browser.find('.or-parcours-info-block', text: text)
+        value_element = element.find('.or-parcours-info-text')
+        process_element_value(value_element.text, conversion_method)
+    rescue Capybara::ElementNotFound => e
+        log_element_error(text, e)
         nil
     end
 
-    def log_page_content
-        puts "\n📄 Current page content:"
-        puts "URL: #{@browser.current_url}"
-        puts "Title: #{@browser.title}"
+    def process_element_value(raw_value, conversion_method)
+        cleaned_value = raw_value.tr(',', '.')
+        cleaned_value.send(conversion_method)
+    end
 
-        puts "\n📄 Important elements found:"
-        begin
-            title = @browser.find('h1.text-route-detail-header')&.text
-            puts "Title: #{title}"
-        rescue
-            puts "Title not found"
+    def handle_error(error)
+        Rails.logger.debug do
+            "❌ Error: #{error.class}\n#{error.message}\n#{error.backtrace.join("\n")}"
         end
+        { error: error.message }
+    end
 
-        begin
-            locations = @browser.all('.text-nav.font-semibold span.truncate').map(&:text)
-            puts "Locations found: #{locations.join(' -> ')}"
-        rescue
-            puts "Locations not found"
-        end
+    def cleanup_browser
+        return unless @browser
 
-        puts "\n📄 Full HTML preview:"
-        puts @browser.html[0..1000]
-    rescue StandardError => e
-        puts "❌ Error while logging page content: #{e.message}"
+        Rails.logger.debug '🧹 Cleaning up browser session...'
+        @browser.quit
+        Rails.logger.debug '👋 Browser session closed'
+    end
+
+    def log_element_error(element_name, error)
+        Rails.logger.debug { "⚠️ Could not find #{element_name}: #{error.message}" }
     end
 end

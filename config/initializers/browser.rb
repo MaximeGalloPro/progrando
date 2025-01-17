@@ -1,4 +1,6 @@
-require "browser"
+# frozen_string_literal: true
+
+require 'browser'
 
 Rails.application.config.middleware.use(Browser::Middleware) do
     false # Retourne false pour continuer la chaîne de middleware

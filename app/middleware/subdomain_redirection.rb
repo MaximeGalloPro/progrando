@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # app/controllers/concerns/subdomain_redirection.rb
 module SubdomainRedirection
     extend ActiveSupport::Concern
@@ -12,8 +14,8 @@ module SubdomainRedirection
         return unless devise_controller? && action_name == 'new' && controller_name == 'sessions'
 
         subdomain = request.subdomains.first
-        if subdomain.present?
-            redirect_to new_user_session_url(subdomain: nil), allow_other_host: true
-        end
+        return if subdomain.blank?
+
+        redirect_to new_user_session_url(subdomain: nil), allow_other_host: true
     end
 end

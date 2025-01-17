@@ -1,46 +1,52 @@
-class MembersController < ApplicationController
-    before_action :get_roles
+# frozen_string_literal: true
 
-    def destroy
-        @member = Member.for_organisation.find_by(id: params[:id])
-        @member.destroy
-        redirect_to members_path, notice: 'Membre supprimé avec succès.'
-    end
+# Manages members within an organization, including creation, updates, and deletion.
+# Handles the assignment of roles to members and maintains member information.
+class MembersController < ApplicationController
+    before_action :set_roles
+    before_action :set_member, only: %i[edit update destroy]
 
     def index
-        @members = Member.for_organisation.all.includes(:role)
+        @members = Member.for_organisation.includes(:role)
     end
 
     def new
         @member = Member.new
     end
 
-    def edit
-        @member = Member.for_organisation.find_by(id: params[:id])
-    end
-
-    def update
-        @member = Member.for_organisation.find_by(id: params[:id])
-        if @member.update(member_params)
-            redirect_to members_path, notice: 'Membre modifié avec succès.'
-        else
-            render :edit, status: :unprocessable_entity
-        end
-    end
+    def edit; end
 
     def create
         @member = Member.new(member_params)
+
         if @member.save
-            redirect_to members_path, notice: 'Membe ajouté avec succès.'
+            redirect_to members_path, notice: t('.success')
         else
             render :new, status: :unprocessable_entity
         end
     end
 
+    def update
+        if @member.update(member_params)
+            redirect_to members_path, notice: t('.success')
+        else
+            render :edit, status: :unprocessable_entity
+        end
+    end
+
+    def destroy
+        @member.destroy
+        redirect_to members_path, notice: t('.success')
+    end
+
     private
 
-    def get_roles
+    def set_roles
         @roles = Role.for_organisation.all
+    end
+
+    def set_member
+        @member = Member.for_organisation.find_by(id: params[:id])
     end
 
     def member_params

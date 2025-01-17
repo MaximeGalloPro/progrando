@@ -1,5 +1,6 @@
-module ModalHelper
+# frozen_string_literal: true
 
+module ModalHelper
     def modal_header(title)
         raw("<div class='modal-header' style='width: 100%;'>
             <div class='modal-title'>#{title}</div>
@@ -10,7 +11,7 @@ module ModalHelper
     end
 
     def open_modal(url, button_text, class_names = nil)
-        url_idfied = "#{url.sub(/^\//, '').gsub('/', '_')}"
+        url_idfied = url.sub(%r{^/}, '').tr('/', '_').to_s
         content = "<button class='btn #{class_names}' id='#{url_idfied}'>#{button_text}</button>"
         content += "<script type='module'>"
         content += "$(document).ready(function() {
@@ -18,13 +19,13 @@ module ModalHelper
         button.addEventListener('click', () => {
             #{js_call(url)}
         });});"
-        content += "</script>"
+        content += '</script>'
         raw(content)
     end
 
     def js_call(url)
         # log = "console.log(data);" if Rails.env.development?
-        log = ""
+        log = ''
         "fetch('#{url}').then(response => response.text()).then(data => {
          #{log}
          $('.modal-content').html(data);
@@ -35,7 +36,7 @@ module ModalHelper
     end
 
     def open_modal_icon(url, icon_type, style = '', class_names = nil)
-        url_idfied = "#{url.sub(/^\//, '').gsub('/', '_')}-icon"
+        url_idfied = "#{url.sub(%r{^/}, '').tr('/', '_')}-icon"
         content = "<i class='material-icons clickable #{class_names}' id='#{url_idfied}' style='#{style}'>#{icon_type}</i>"
         content += "<script type='module'>"
         content += "$(document).ready(function() {
@@ -43,7 +44,7 @@ module ModalHelper
         icon.addEventListener('click', () => {
             #{js_call(url)}
         });});"
-        content += "</script>"
+        content += '</script>'
         raw(content)
     end
 end
