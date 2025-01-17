@@ -18,6 +18,13 @@ fr:
       - :day
       - :month
       - :year
+  errors:
+    messages:
+      not_saved: "Impossible d'enregistrer %{resource}: %{count} erreur(s)"
+      not_found: "n'a pas été trouvé(e)"
+    attributes:
+      email:
+        not_found: "n'a pas été trouvé"
   activerecord:
     errors:
       messages:
@@ -40,6 +47,10 @@ fr:
         too_short: "est trop court (minimum: %{count} caractères)"
         wrong_length: "n'a pas la bonne longueur (doit avoir %{count} caractères)"
       models:
+        user:
+          attributes:
+            email:
+              not_found: "n'a pas été trouvé"
         hike_history:
           attributes:
             carpooling_cost:
