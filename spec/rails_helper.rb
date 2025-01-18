@@ -2,11 +2,14 @@
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
+require_relative '../config/initializers/global_config'
+
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 require 'capybara/rspec'
 require 'shoulda/matchers'
 require 'selenium-webdriver'
+
 
 # Configuration pour Chrome Headless
 Capybara.register_driver :selenium_chrome_headless do |app|
