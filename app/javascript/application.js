@@ -19,6 +19,14 @@ $(document).ready(function () {
     });
 });
 
+window.confirmDelete = function(event, element_name) {
+    event.preventDefault();
+    if (confirm("Êtes-vous sûr de vouloir supprimer " + element_name + " ?")) {
+        event.target.submit();
+    }
+    return false;
+}
+
 function initSelect2() {
     $('.select2').not('.modal .select2').select2({
         language: 'fr',

@@ -61,27 +61,6 @@
                                     <% end %>
                                 <% end %>
 
-                                <% show_if_authorized('Hike', 'destroy') do %>
-                                    <%= button_to hike_path(hike),
-                                                  method: :delete,
-                                                  class: "btn btn-outline-dark btn-sm delete-hike",
-                                                  title: "Supprimer",
-                                                  form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event)" },
-                                                  form_class: 'button_to' do %>
-                                        <i class="fas fa-trash"></i>
-                                    <% end %>
-                                <% end %>
-
-                                <script>
-                                    function confirmDelete(event) {
-                                        event.preventDefault();
-                                        if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
-                                            event.target.submit();
-                                        }
-                                        return false;
-                                    }
-                                </script>
-
                                 <% show_if_authorized('Hike', 'update') do %>
                                     <% if hike.updating? %>
                                         <button class="btn btn-outline-dark btn-sm" disabled>

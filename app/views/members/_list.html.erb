@@ -45,20 +45,10 @@
                                                   method: :delete,
                                                   class: "btn btn-outline-dark btn-sm delete-hike",
                                                   title: "Supprimer",
-                                                  form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event)" },
+                                                  form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event, 'ce membre')" },
                                                   form_class: 'button_to' do %>
                                         <i class="fas fa-trash"></i>
                                     <% end %>
-
-                                    <script>
-                                        function confirmDelete(event) {
-                                            event.preventDefault();
-                                            if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
-                                                event.target.submit();
-                                            }
-                                            return false;
-                                        }
-                                    </script>
                                 <% end %>
                             </div>
                         </td>

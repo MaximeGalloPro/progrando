@@ -1,7 +1,7 @@
 # spec/factories/users.rb
 FactoryBot.define do
     factory :user do
-        email { 'test@exemple.com' }
+        sequence(:email) { |n| "user#{n}@exemple.com" }
         password { 'password123' }
         password_confirmation { 'password123' }
 
@@ -12,12 +12,16 @@ FactoryBot.define do
         end
 
         factory :admin do
-            email { 'admin@exemple.com' }
+            sequence(:email) { |n| "admin#{n}@exemple.com" }
+            password { 'password123' }
+            password_confirmation { 'password123' }
             super_admin { true }
         end
 
         factory :guide do
-            email { 'guide@exemple.com' }
+            sequence(:email) { |n| "guide#{n}@exemple.com" }
+            password { 'password123' }
+            password_confirmation { 'password123' }
         end
     end
 end

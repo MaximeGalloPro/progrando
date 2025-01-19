@@ -102,7 +102,7 @@
                             <%= button_to destroy_user_session_path,
                                           method: :delete,
                                           class: "dropdown-item text-danger",
-                                          form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event)" } do %>
+                                          form: { style: 'display: inline-block' } do %>
                                 <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
                             <% end %>
                         </ul>

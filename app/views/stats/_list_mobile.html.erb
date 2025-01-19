@@ -74,25 +74,6 @@
                             </div>
                         <% end %>
 
-                        <% show_if_authorized('Hike', 'destroy') do %>
-                            <div class="flex-grow-1">
-                                <%= form_with url: hike_path(hike), method: :delete, class: "h-100" do |f| %>
-                                    <%= f.button type: :submit,
-                                                 class: button_classes,
-                                                 title: "Supprimer",
-                                                 data: { confirm: "Êtes-vous sûr de vouloir supprimer cette randonnée ?" },
-                                                 onclick: "return confirmDelete(event)" do %>
-                                        <i class="fas fa-trash"></i>
-                                    <% end %>
-                                <% end %>
-                            </div>
-                            <script>
-                                function confirmDelete(event) {
-                                    return confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?");
-                                }
-                            </script>
-                        <% end %>
-
                         <% show_if_authorized('Hike', 'update') do %>
                             <div class="flex-grow-1">
                                 <% if hike.updating? %>

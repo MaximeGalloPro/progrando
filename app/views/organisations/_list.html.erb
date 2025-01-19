@@ -34,10 +34,17 @@
                                 <%= link_to "Voir", organisation_path(organisation), class: "btn btn-sm btn-outline-primary" %>
                                 <%= link_to "Demander à rejoindre", request_access_organisation_path(organisation), class: "btn btn-sm btn-outline-primary" %>
                                 <%= link_to "Modifier", edit_organisation_path(organisation), class: "btn btn-sm btn-outline-secondary" if can? :update, organisation %>
-                                <%= link_to "Supprimer",
-                                            organisation_path(organisation),
-                                            class: "btn btn-sm btn-outline-danger",
-                                            data: { turbo_method: :delete, turbo_confirm: "Êtes-vous sûr ?" } if can? :destroy, organisation %>
+                                <% show_if_authorized('Organisation', 'destroy') do %>
+                                    <%= button_to organisation_path(organisation),
+                                                  method: :delete,
+                                                  class: "btn btn-outline-dark btn-sm d-inline-flex align-items-center justify-content-center",
+                                                  style: "width: 32px; height: 32px;",
+                                                  title: "Supprimer",
+                                                  form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event, 'cette organisation')" },
+                                                  form_class: 'button_to' do %>
+                                        <i class="fas fa-trash"></i>
+                                    <% end %>
+                                <% end %>
                             </td>
                         </tr>
                     <% end %>

@@ -44,25 +44,14 @@
                                 <% end %>
 
                                 <% show_if_authorized('Profile', 'destroy') do %>
-                                    <%= link_to profile_path(profile),
-                                                class: "btn btn-outline-dark btn-sm flex-grow-1",
-                                                title: "Supprimer",
-                                                data: {
-                                                    turbo_method: :delete,
-                                                    turbo_confirm: "Êtes-vous sûr de vouloir supprimer ce profil ?"
-                                                } do %>
+                                    <%= button_to profile_path(profile),
+                                                  method: :delete,
+                                                  class: "btn btn-outline-dark btn-sm delete-hike",
+                                                  title: "Supprimer",
+                                                  form: { style: 'display: inline-block', onsubmit: "return confirmDelete(event, 'ce profil')" },
+                                                  form_class: 'button_to' do %>
                                         <i class="fas fa-trash"></i>
                                     <% end %>
-
-                                    <script>
-                                        function confirmDelete(event) {
-                                            event.preventDefault();
-                                            if (confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?")) {
-                                                event.target.submit();
-                                            }
-                                            return false;
-                                        }
-                                    </script>
                                 <% end %>
                             </div>
                         </div>
