@@ -104,6 +104,9 @@ module AuthorizationConcern
         return true if super_admin_access?
         return false unless user_has_profile?
         return true if creator_access?
+        if resource == 'Organisation' && @organisation.present?
+            return false unless current_user.user_organisations.exists?(organisation: @organisation)
+        end
 
         check_profile_authorization(action, resource)
     rescue StandardError

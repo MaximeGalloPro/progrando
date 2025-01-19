@@ -91,9 +91,12 @@ fr:
       success: "Organisation créée avec succès"
     update:
       success: "Organisation mise à jour avec succès"
+      access_denied: "Vous n'avez pas accès à cette organisation"
     destroy:
       success: "Organisation supprimée avec succès"
     check_organisation_access:
+      access_denied: "Vous n'avez pas accès à cette organisation"
+    edit:
       access_denied: "Vous n'avez pas accès à cette organisation"
   organisation_access_requests:
     update:
@@ -105,6 +108,7 @@ fr:
       error: "Erreur lors du rejet de la demande"
   authorization:
     unauthorized_access: "Accès non autorisé"
+    unauthorized_organization_access: "Vous n'avez pas accès à cette organisation"
   members:
     create:
       success: "Membre ajouté avec succès"

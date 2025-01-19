@@ -186,14 +186,14 @@ class OrganisationsController < ApplicationController
     end
 
     def set_organisation
-        @organisation = Organisation.find(params[:id])
+        @organisation = Organisation.find_by(id: params[:id])
     end
 
     def check_organisation_access
         return if current_user.super_admin
 
         organisation_id = current_user.user_organisations.for_organisation&.first&.organisation_id
-        return if @organisation.id == organisation_id
+        return if @organisation&.id == organisation_id
 
         flash[:error] = t('.access_denied')
         redirect_to organisations_path
