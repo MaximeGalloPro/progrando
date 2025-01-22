@@ -1,7 +1,7 @@
 # spec/factories/organisations.rb
 FactoryBot.define do
     factory :organisation do
-        sequence(:name) { |n| "Organisation#{Time.now}#{n}" }
+        sequence(:name) { |n| "Organisation#{n}" }
         sequence(:slug) { |n| "org-#{n}" }
         sequence(:email) { |n| "contact#{n}@example.com" }
         url { "http://www.example.com" }

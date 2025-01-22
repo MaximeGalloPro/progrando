@@ -1,14 +1,14 @@
 # spec/factories/profiles.rb
 FactoryBot.define do
     factory :profile do
-        name { "Member" }
+        sequence(:name) { |n| "Member-#{n}" }
         description { 'Peut voir et s\'inscrire aux randonnées' }
         active { true }
         organisation
 
         # Différents types de profils
         trait :creator do
-            name { "Createur" }
+            name { |n| "Createur - #{organisation.name}" }
             description { 'Créateur et a donc accès complet à toutes les fonctionnalités' }
 
             after(:create) do |profile|
@@ -27,7 +27,7 @@ FactoryBot.define do
         end
 
         trait :admin do
-            name { "Admin" }
+            name { |n| "Admin - #{organisation.name}" }
             description { 'Accès complet à toutes les fonctionnalités' }
 
             after(:create) do |profile|
@@ -58,7 +58,7 @@ FactoryBot.define do
         end
 
         trait :member do
-            name { "Membre" }
+            name { |n| "Membre - #{organisation.name}" }
 
             after(:create) do |profile|
                 GlobalConfig::MEMBER_RIGHTS.each do |resource, actions|
