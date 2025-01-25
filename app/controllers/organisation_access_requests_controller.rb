@@ -11,7 +11,7 @@ class OrganisationAccessRequestsController < ApplicationController
     end
 
     def edit
-        @profiles = Profile.for_organisation.all
+        @profiles = Profile.where(organisation_id: params[:organisation_id])
         render layout: false
     end
 

@@ -33,6 +33,11 @@ class ProfilesController < ApplicationController
 
     def toggle_authorization
         @profile_right = ProfileRight.find(params[:id])
+        if current_user.user_organisations.for_organisation&.first&.profile&.id == @profile_right.profile_id
+            render json: { error: t('.cannot_modify_own_profile') }, status: :forbidden
+            return
+        end
+
         @profile_right.update(authorized: !@profile_right.authorized)
 
         respond_to do |format|

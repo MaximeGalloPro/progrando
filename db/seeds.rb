@@ -1,8 +1,5 @@
 # db/seeds.rb
 
-# Load config first
-load File.join(Rails.root, 'db', 'seeds', 'config', 'global_config.rb')
-
 # Load core
 load File.join(Rails.root, 'db', 'seeds', 'core.rb')
 

@@ -5,7 +5,6 @@
 # and browser detection capabilities.
 class ApplicationController < ActionController::Base
     include AuthorizationConcern
-    include SubdomainRedirection
 
     helper_method :browser
 

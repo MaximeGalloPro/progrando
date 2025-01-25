@@ -79,6 +79,8 @@ fr:
       success: "Profil mis à jour avec succès."
     destroy:
       success: "Profil supprimé avec succès."
+    toggle_authorization:
+      cannot_modify_own_profile: "Vous ne pouvez pas modifier les autorisations de votre propre profil"
   organisations:
     request_access:
       already_requested: "Vous avez déjà envoyé une demande pour cette organisation"

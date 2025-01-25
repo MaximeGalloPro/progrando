@@ -59,4 +59,8 @@ Rails.application.configure do
 
     # Annotate rendered view with file names.
     # config.action_view.annotate_rendered_view_with_filenames = true
+    config.hosts.clear
+    # config.hosts << 'localhost'
+    # config.hosts << '127.0.0.1'
+    # config.hosts << "#{IPAddr.new(Socket.ip_address_list.detect{|intf| intf.ipv4_private?}.ip_address).mask(24).to_s.sub(/\/\d+$/,'')}" rescue nil
 end

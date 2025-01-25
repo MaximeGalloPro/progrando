@@ -86,5 +86,23 @@ FactoryBot.define do
                 end
             end
         end
+
+        trait :can_see_profiles do
+            name { |n| "Profile Viewer - #{organisation.name}" }
+
+            after(:create) do |profile|
+                GlobalConfig::MEMBER_CAN_SEE_PROFILES.each do |resource, actions|
+                    actions.each do |action|
+                        create(:profile_right,
+                               profile: profile,
+                               resource: resource,
+                               action: action,
+                               authorized: true,
+                               organisation: profile.organisation
+                        )
+                    end
+                end
+            end
+        end
     end
 end

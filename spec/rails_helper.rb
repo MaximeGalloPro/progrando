@@ -63,6 +63,12 @@ RSpec.configure do |config|
     config.before(:each, type: :system) do
         driven_by :selenium_chrome_headless
     end
+
+    config.include Module.new {
+        def wait_for_ajax
+            sleep(0.5)
+        end
+    }, type: :system
 end
 
 # Configuration Shoulda Matchers

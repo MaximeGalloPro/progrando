@@ -71,6 +71,12 @@ organisations.each do |organisation|
             description: 'Peut voir et s\'inscrire aux randonnées',
             active: true,
             organisation_id: organisation.id
+        ),
+        member_with_profiles: Profile.create!(
+            name: "Membre avec accès profils - #{organisation.name}",
+            description: 'Peut voir et gérer les profils en plus des fonctionnalités de membre',
+            active: true,
+            organisation_id: organisation.id
         )
     }
 
@@ -133,7 +139,7 @@ organisations.each do |organisation|
             phone: "012345678#{i + 1}",
             role: roles[:member],
             organisation_id: organisation.id,
-        )
+            )
         puts "Member #{member.name} created in organisation #{organisation.slug.upcase} with id: #{organisation.id}!"
     end
 
@@ -175,10 +181,11 @@ organisations.each do |organisation|
         end
     end
 
-    GlobalConfig::SPECIAL_ACTIONS.each do |resource, actions|
+    puts "Creating 'Member with Profiles' rights for #{organisation.name}..."
+    GlobalConfig::MEMBER_CAN_SEE_PROFILES.each do |resource, actions|
         actions.each do |action|
-            ProfileRight.find_or_create_by(
-                profile: profiles[:member],
+            ProfileRight.create!(
+                profile: profiles[:member_with_profiles],
                 resource: resource,
                 action: action,
                 authorized: true,
@@ -186,28 +193,34 @@ organisations.each do |organisation|
             )
         end
     end
+
+    # GlobalConfig::SPECIAL_ACTIONS.each do |resource, actions|
+    #     actions.each do |action|
+    #         ProfileRight.find_or_create_by(
+    #             profile: profiles[:member_with_profiles],
+    #             resource: resource,
+    #             action: action,
+    #             authorized: true,
+    #             organisation_id: organisation.id
+    #         )
+    #     end
+    # end
 end
 
 puts "Creating cross-organisation access requests..."
-# Pour chaque organisation
 organisations.each do |org|
-    # Récupérer tous les users de cette organisation sauf super_admin
     org_users = UserOrganisation.where(organisation: org)
                                 .includes(:user)
                                 .reject { |uo| uo.user.super_admin }
 
-    # Pour chaque utilisateur de cette organisation
     org_users.each do |user_org|
         user = user_org.user
-        # Trouver le membre correspondant pour obtenir son rôle
         member = Member.find_by(email: user.email, organisation_id: org.id)
 
         if member&.role
-            # Faire une demande pour toutes les autres organisations
             other_orgs = organisations.reject { |other_org| other_org.id == org.id }
 
             other_orgs.each do |other_org|
-                # Vérifier si l'utilisateur n'a pas déjà accès à cette organisation
                 next if UserOrganisation.exists?(user: user, organisation: other_org)
                 next if OrganisationAccessRequest.exists?(user: user, organisation: other_org)
 
@@ -216,7 +229,7 @@ organisations.each do |org|
                         user: user,
                         organisation: other_org,
                         status: 'pending',
-                        role: member.role.name, # Utilise le même rôle que dans l'organisation actuelle
+                        role: member.role.name,
                         message: "Je suis #{member.role.name} de #{org.name} et souhaite rejoindre #{other_org.name}"
                     )
                     puts "Created access request for #{user.email} (#{member.role.name}) to join #{other_org.name}"

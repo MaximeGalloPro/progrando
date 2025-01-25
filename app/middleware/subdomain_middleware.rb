@@ -27,6 +27,7 @@ class SubdomainMiddleware
     private
 
     def set_current_organisation(current_user, _request)
+        Current.user = current_user
         Current.organisation = find_current_organisation(current_user)
     end
 

@@ -39,7 +39,7 @@ module AuthorizationConcern
 
     def log_authorization_context
         Rails.logger.debug { "\n --- \e[36mCurrent user: \e[1m#{current_user&.email}\e[0m --- \n" }
-        Rails.logger.debug { "\n --- \e[35mCurrent user profile: \e[1m#{current_user&.profile&.name}\e[0m --- \n" }
+        Rails.logger.debug { "\n --- \e[35mCurrent user profile: \e[1m#{current_user&.user_organisations&.for_organisation&.first&.profile&.name}\e[0m --- \n" }
         Rails.logger.debug { "\n --- \e[33mController: \e[1m#{controller_path}\e[0m --- " }
         Rails.logger.debug { "\n --- \e[33mAction: \e[1m#{action_name}\e[0m --- \n" }
     end
