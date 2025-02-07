@@ -1,18 +1,27 @@
+# frozen_string_literal: true
+
+# Represents a hiking trail with its characteristics, history, and associated statistics.
+# Manages trail information, difficulty levels, and hiking events tracking
 class Hike < ApplicationRecord
+    belongs_to :organisation
+
     # Associations
-    has_many :hike_histories, foreign_key: :hike_id
+    has_many :hike_histories, dependent: :destroy
     has_many :members, through: :hike_histories
-    has_one :latest_history, -> { order(hiking_date: :desc) },
+    has_one :latest_history,
+            -> { order(hiking_date: :desc) },
             class_name: 'HikeHistory',
-            foreign_key: :hike_id
-    has_one :hike_path
+            foreign_key: :hike_id,
+            dependent: :destroy,
+            inverse_of: :hike
+    has_one :hike_path, dependent: :destroy
 
     # Callbacks
     before_validation :convert_distance_separator
 
     # Validations
     validates :difficulty, presence: true,
-              numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
+                           numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
     validates :starting_point, presence: true
     validates :trail_name, presence: true
 
@@ -22,36 +31,36 @@ class Hike < ApplicationRecord
 
     # Scopes avec latest_history
     scope :with_latest_history, -> { includes(:latest_history) }
-    scope :order_by_latest_date, -> {
+    scope :order_by_latest_date, lambda {
         left_joins(:latest_history)
             .order('hike_histories.hiking_date DESC')
     }
 
     # Scopes temporels
-    scope :this_year, -> {
+    scope :this_year, lambda {
         joins(:latest_history)
-            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_year)
+            .where(hike_histories: { hiking_date: Date.current.beginning_of_year.. })
             .distinct
     }
 
-    scope :this_month, -> {
+    scope :this_month, lambda {
         joins(:latest_history)
-            .where('hike_histories.hiking_date >= ?', Date.current.beginning_of_month)
+            .where(hike_histories: { hiking_date: Date.current.beginning_of_month.. })
             .distinct
     }
 
-    scope :past_hikes, -> {
+    scope :past_hikes, lambda {
         joins(:latest_history)
-            .where('hike_histories.hiking_date < ?', Date.current)
+            .where(hike_histories: { hiking_date: ...Date.current })
             .order('hike_histories.hiking_date DESC')
     }
 
     # Scope de recherche
-    scope :search_by_term, ->(term) {
+    scope :search_by_term, lambda { |term|
         return all if term.blank?
 
         normalized_term = term.strip
-        date_pattern = normalized_term.match(/(\d{1,2})\/(\d{4})/)
+        date_pattern = normalized_term.match(%r{(\d{1,2})/(\d{4})})
 
         if date_pattern
             month = date_pattern[1].to_i
@@ -60,13 +69,13 @@ class Hike < ApplicationRecord
             end_date = start_date.end_of_month
 
             joins(:latest_history)
-                .where("hike_histories.hiking_date BETWEEN ? AND ?", start_date, end_date)
+                .where('hike_histories.hiking_date BETWEEN ? AND ?', start_date, end_date)
         else
             wild_term = "%#{normalized_term}%"
             where(
                 "hikes.trail_name LIKE :term OR
-         hikes.starting_point LIKE :term OR
-         CAST(hikes.number AS CHAR) LIKE :term",
+        hikes.starting_point LIKE :term OR
+        CAST(hikes.number AS CHAR) LIKE :term",
                 term: wild_term
             )
         end
@@ -80,12 +89,14 @@ class Hike < ApplicationRecord
     # Méthodes de classe
     def self.todays_hike
         today_query = joins(:hike_histories)
-                          .select('hikes.*, hike_histories.departure_time, hike_histories.hiking_date, members.name as member_name')
-                          .joins('LEFT JOIN members ON members.id = hike_histories.member_id')
+                      .select('hikes.*, hike_histories.departure_time,
+                             hike_histories.hiking_date,
+                             members.name as guide_name')
+                      .joins('LEFT JOIN members ON members.id = hike_histories.member_id')
 
         today_hike = today_query
-                         .where('hike_histories.hiking_date = ?', Date.current)
-                         .first
+                     .where(hike_histories: { hiking_date: Date.current })
+                     .first
 
         return today_hike if today_hike.present?
 
@@ -102,12 +113,12 @@ class Hike < ApplicationRecord
     # Méthodes d'instance
     def difficulty_text
         case difficulty
-        when 1 then "Facile"
-        when 2 then "Moyen"
-        when 3 then "Difficile"
-        when 4 then "Très difficile"
-        when 5 then "Extrême"
-        else "Non défini"
+        when 1 then I18n.t('hike.difficulty.very_easy')
+        when 2 then I18n.t('hike.difficulty.easy')
+        when 3 then I18n.t('hike.difficulty.medium')
+        when 4 then I18n.t('hike.difficulty.hard')
+        when 5 then I18n.t('hike.difficulty.very_hard')
+        else I18n.t('hike.difficulty.undefined')
         end
     end
 
@@ -122,7 +133,6 @@ class Hike < ApplicationRecord
     private
 
     def convert_distance_separator
-        self.distance_km = distance_km.to_s.gsub(',', '.') if distance_km.present?
+        self.distance_km = distance_km.to_s.tr(',', '.') if distance_km.present?
     end
-
 end

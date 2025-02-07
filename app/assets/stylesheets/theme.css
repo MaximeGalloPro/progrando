@@ -1,0 +1,458 @@
+:root {
+    /* Default Light Theme */
+    --bg-color: #F5F7FA;
+    --container-bg: #FFFFFF;
+    --item-bg: #EDF2F7;
+    --item-hover: #E2E8F0;
+    --border-color: #CBD5E1;
+    --text-color: #2D3748;
+    --accent-color: #3182CE;
+    --input-bg: #FFFFFF;
+}
+
+.ocean-theme {
+    --bg-color: #0B162C;
+    --container-bg: #1C2942;
+    --item-bg: #3B556D;
+    --item-hover: #5FC2BA;
+    --border-color: #5FC2BA;
+    --text-color: #FFFFFF;
+    --accent-color: #5FC2BA;
+    --input-bg: #1C2942;
+}
+
+.midnight-theme {
+    --bg-color: #121212;
+    --container-bg: #1E1E1E;
+    --item-bg: #2D2D2D;
+    --item-hover: #3D3D3D;
+    --border-color: #4D4D4D;
+    --text-color: #E0E0E0;
+    --accent-color: #BB86FC;
+    --input-bg: #1E1E1E;
+}
+
+.max-theme {
+    --bg-color: #1A202C;
+    --container-bg: #2D3748;
+    --item-bg: #4A5568;
+    --item-hover: #718096;
+    --border-color: #A0AEC0;
+    --text-color: #F7FAFC;
+    --accent-color: #8268af;
+    --input-bg: #2D3748;
+}
+
+[class*="theme-"],
+.ocean-theme,
+.midnight-theme,
+.max-theme {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Text colors */
+[class*="theme-"] h1, [class*="theme-"] h2, [class*="theme-"] h3,
+[class*="theme-"] h4, [class*="theme-"] h5, [class*="theme-"] h6,
+[class*="theme-"] p, [class*="theme-"] span, [class*="theme-"] a,
+[class*="theme-"] div, [class*="theme-"] label,
+.ocean-theme h1, .ocean-theme h2, .ocean-theme h3,
+.ocean-theme h4, .ocean-theme h5, .ocean-theme h6,
+.ocean-theme p, .ocean-theme span, .ocean-theme a,
+.ocean-theme div, .ocean-theme label,
+.midnight-theme h1, .midnight-theme h2, .midnight-theme h3,
+.midnight-theme h4, .midnight-theme h5, .midnight-theme h6,
+.midnight-theme p, .midnight-theme span, .midnight-theme a,
+.midnight-theme div, .midnight-theme label,
+.max-theme h1, .max-theme h2, .max-theme h3,
+.max-theme h4, .max-theme h5, .max-theme h6,
+.max-theme p, .max-theme span, .max-theme a,
+.max-theme div, .max-theme label {
+    color: var(--text-color);
+}
+
+/* Navbar styles */
+[class*="theme-"] .navbar,
+.ocean-theme .navbar,
+.midnight-theme .navbar,
+.max-theme .navbar {
+    background-color: var(--container-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+[class*="theme-"] .navbar-brand,
+[class*="theme-"] .nav-link,
+[class*="theme-"] .navbar-text,
+.ocean-theme .navbar-brand,
+.ocean-theme .nav-link,
+.ocean-theme .navbar-text,
+.midnight-theme .navbar-brand,
+.midnight-theme .nav-link,
+.midnight-theme .navbar-text,
+.max-theme .navbar-brand,
+.max-theme .nav-link,
+.max-theme .navbar-text {
+    color: var(--text-color) !important;
+}
+
+[class*="theme-"] .navbar-toggler,
+.ocean-theme .navbar-toggler,
+.midnight-theme .navbar-toggler,
+.max-theme .navbar-toggler {
+    background-color: var(--item-bg);
+    border-color: var(--border-color);
+}
+
+/* Button styles */
+[class*="theme-"] .btn-primary,
+.ocean-theme .btn-primary,
+.midnight-theme .btn-primary,
+.max-theme .btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+[class*="theme-"] .btn-outline-primary,
+.ocean-theme .btn-outline-primary,
+.midnight-theme .btn-outline-primary,
+.max-theme .btn-outline-primary {
+    color: var(--text-color);
+    border-color: var(--accent-color);
+    background-color: transparent;
+}
+
+[class*="theme-"] .btn-outline-primary:hover,
+.ocean-theme .btn-outline-primary:hover,
+.midnight-theme .btn-outline-primary:hover,
+.max-theme .btn-outline-primary:hover {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+    border-color: var(--accent-color);
+}
+
+[class*="theme-"] .btn-outline-secondary,
+.ocean-theme .btn-outline-secondary,
+.midnight-theme .btn-outline-secondary,
+.max-theme .btn-outline-secondary {
+    color: var(--text-color);
+    border-color: var(--border-color);
+    background-color: transparent;
+}
+
+[class*="theme-"] .btn-outline-secondary:hover,
+.ocean-theme .btn-outline-secondary:hover,
+.midnight-theme .btn-outline-secondary:hover,
+.max-theme .btn-outline-secondary:hover {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* Dropdown styles */
+[class*="theme-"] .dropdown-menu,
+.ocean-theme .dropdown-menu,
+.midnight-theme .dropdown-menu,
+.max-theme .dropdown-menu {
+    background-color: var(--container-bg);
+    border-color: var(--border-color);
+}
+
+[class*="theme-"] .dropdown-item,
+.ocean-theme .dropdown-item,
+.midnight-theme .dropdown-item,
+.max-theme .dropdown-item {
+    color: var(--text-color);
+}
+
+[class*="theme-"] .dropdown-item:hover,
+.ocean-theme .dropdown-item:hover,
+.midnight-theme .dropdown-item:hover,
+.max-theme .dropdown-item:hover {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+}
+
+[class*="theme-"] .dropdown-divider,
+.ocean-theme .dropdown-divider,
+.midnight-theme .dropdown-divider,
+.max-theme .dropdown-divider {
+    border-color: var(--border-color);
+}
+
+/* Form elements */
+[class*="theme-"] .form-control,
+[class*="theme-"] .form-select,
+.ocean-theme .form-control,
+.ocean-theme .form-select,
+.midnight-theme .form-control,
+.midnight-theme .form-select,
+.max-theme .form-control,
+.max-theme .form-select {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[class*="theme-"] .form-control:focus,
+[class*="theme-"] .form-select:focus,
+.ocean-theme .form-control:focus,
+.ocean-theme .form-select:focus,
+.midnight-theme .form-control:focus,
+.midnight-theme .form-select:focus,
+.max-theme .form-control:focus,
+.max-theme .form-select:focus {
+    background-color: var(--input-bg);
+    border-color: var(--accent-color);
+    color: var(--text-color);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+[class*="theme-"] .form-control::placeholder,
+[class*="theme-"] .form-select::placeholder,
+.ocean-theme .form-control::placeholder,
+.ocean-theme .form-select::placeholder,
+.midnight-theme .form-control::placeholder,
+.midnight-theme .form-select::placeholder,
+.max-theme .form-control::placeholder,
+.max-theme .form-select::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Card styles */
+[class*="theme-"] .card,
+.ocean-theme .card,
+.midnight-theme .card,
+.max-theme .card {
+    background-color: var(--container-bg);
+    border-color: var(--border-color);
+}
+
+[class*="theme-"] .card-header,
+.ocean-theme .card-header,
+.midnight-theme .card-header,
+.max-theme .card-header {
+    background-color: var(--item-bg);
+    border-bottom-color: var(--border-color);
+}
+
+/* Table styles */
+body[class*="theme-"] .table,
+body.ocean-theme .table,
+body.midnight-theme .table,
+body.max-theme .table {
+    color: var(--text-color) !important;
+    background-color: var(--container-bg);
+}
+
+body[class*="theme-"] .table > thead,
+body.ocean-theme .table > thead,
+body.midnight-theme .table > thead,
+body.max-theme .table > thead {
+    background-color: var(--item-bg);
+}
+
+body[class*="theme-"] .table td,
+body[class*="theme-"] .table th,
+body.ocean-theme .table td,
+body.ocean-theme .table th,
+body.midnight-theme .table td,
+body.midnight-theme .table th,
+body.max-theme .table td,
+body.max-theme .table th {
+    color: var(--text-color) !important;
+    border-color: var(--border-color);
+    background-color: var(--container-bg);
+}
+
+body[class*="theme-"] .table thead th,
+body.ocean-theme .table thead th,
+body.midnight-theme .table thead th,
+body.max-theme .table thead th {
+    color: var(--text-color) !important;
+    background-color: var(--item-bg);
+}
+
+body[class*="theme-"] .table-hover tbody tr:hover,
+body.ocean-theme .table-hover tbody tr:hover,
+body.midnight-theme .table-hover tbody tr:hover,
+body.max-theme .table-hover tbody tr:hover {
+    background-color: var(--item-hover) !important;
+    color: var(--text-color);
+}
+
+/* Pour les boutons d'action */
+body[class*="theme-"] .table .btn-outline-dark,
+body.ocean-theme .table .btn-outline-dark,
+body.midnight-theme .table .btn-outline-dark,
+body.max-theme .table .btn-outline-dark {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Modal styles */
+[class*="theme-"] .modal-content,
+.ocean-theme .modal-content,
+.midnight-theme .modal-content,
+.max-theme .modal-content {
+    background-color: var(--container-bg);
+    border-color: var(--border-color);
+}
+
+[class*="theme-"] .modal-header,
+[class*="theme-"] .modal-footer,
+.ocean-theme .modal-header,
+.ocean-theme .modal-footer,
+.midnight-theme .modal-header,
+.midnight-theme .modal-footer,
+.max-theme .modal-header,
+.max-theme .modal-footer {
+    border-color: var(--border-color);
+}
+
+/* Alert styles */
+[class*="theme-"] .alert-success,
+.ocean-theme .alert-success,
+.midnight-theme .alert-success,
+.max-theme .alert-success {
+    background-color: rgba(72, 187, 120, 0.1);
+    border-color: #358556;
+    color: #428759;
+}
+
+[class*="theme-"] .alert-danger,
+.ocean-theme .alert-danger,
+.midnight-theme .alert-danger,
+.max-theme .alert-danger {
+    background-color: rgba(229, 62, 62, 0.1);
+    border-color: #E53E3E;
+    color: #b15454;
+}
+
+[class*="theme-"] .btn-close,
+.ocean-theme .btn-close,
+.midnight-theme .btn-close,
+.max-theme .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Select2 styles */
+[class*="theme-"] .select2-container--default .select2-selection--single,
+.ocean-theme .select2-container--default .select2-selection--single,
+.midnight-theme .select2-container--default .select2-selection--single,
+.max-theme .select2-container--default .select2-selection--single {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[class*="theme-"] .select2-container--default .select2-results__option--highlighted[aria-selected],
+.ocean-theme .select2-container--default .select2-results__option--highlighted[aria-selected],
+.midnight-theme .select2-container--default .select2-results__option--highlighted[aria-selected],
+.max-theme .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+}
+
+/* Theme toggle button */
+.form-switch {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    margin: 0;
+}
+
+.form-switch .form-check-input {
+    height: 1.5rem;
+    width: 2.75rem;
+    margin: 0 0.5rem;
+    cursor: pointer;
+}
+
+[class*="theme-"] .form-switch .bi-sun-fill,
+.ocean-theme .form-switch .bi-sun-fill,
+.midnight-theme .form-switch .bi-sun-fill,
+.max-theme .form-switch .bi-sun-fill {
+    display: none;
+}
+
+[class*="theme-"] .form-switch::after,
+.ocean-theme .form-switch::after,
+.max-theme .form-switch::after,
+.midnight-theme .form-switch::after {
+    content: "\F0C8";
+    font-family: "bootstrap-icons";
+    color: var(--text-color);
+}
+
+.form-switch .form-check-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-switch:hover {
+    background-color: var(--item-hover);
+}
+
+/* List group styles */
+[class*="theme-"] .list-group-item,
+.ocean-theme .list-group-item,
+.midnight-theme .list-group-item,
+.max-theme .list-group-item {
+    background-color: var(--container-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[class*="theme-"] .list-group-item-action:hover,
+.ocean-theme .list-group-item-action:hover,
+.midnight-theme .list-group-item-action:hover,
+.max-theme .list-group-item-action:hover {
+    background-color: var(--item-hover);
+    color: var(--text-color);
+}
+
+/* Button reset styles for list items */
+[class*="theme-"] button.p-0.border-0,
+.ocean-theme button.p-0.border-0,
+.midnight-theme button.p-0.border-0,
+.max-theme button.p-0.border-0 {
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+/* Badge styles */
+[class*="theme-"] .badge.bg-success,
+.ocean-theme .badge.bg-success,
+.midnight-theme .badge.bg-success,
+.max-theme .badge.bg-success {
+    background-color: var(--accent-color) !important;
+    color: var(--text-color);
+}
+
+/* Icon colors */
+[class*="theme-"] .text-secondary,
+.ocean-theme .text-secondary,
+.midnight-theme .text-secondary,
+.max-theme .text-secondary {
+    color: var(--border-color) !important;
+}
+
+/* Focus styles for buttons */
+[class*="theme-"] button.p-0.border-0:focus,
+.ocean-theme button.p-0.border-0:focus,
+.midnight-theme button.p-0.border-0:focus,
+.max-theme button.p-0.border-0:focus {
+    outline: none;
+}
+
+[class*="theme-"] button.p-0.border-0:focus .list-group-item,
+.ocean-theme button.p-0.border-0:focus .list-group-item,
+.midnight-theme button.p-0.border-0:focus .list-group-item,
+.max-theme button.p-0.border-0:focus .list-group-item {
+    background-color: var(--item-hover);
+}

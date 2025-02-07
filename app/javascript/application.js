@@ -6,11 +6,42 @@ import "bootstrap"
 // import "chart"
 
 $(document).ready(function () {
-    console.log('Select2 is ready!');
-    $('.select2').select2({
+    initSelect2();
+
+    $('#myModal').on('shown.bs.modal', function () {
+        initSelect2InModal();
+    });
+
+    document.addEventListener('modalContentLoaded', function() {
+        setTimeout(() => {
+            initSelect2InModal();
+        }, 100);
+    });
+});
+
+window.confirmDelete = function(event, element_name) {
+    event.preventDefault();
+    if (confirm("Êtes-vous sûr de vouloir supprimer " + element_name + " ?")) {
+        event.target.submit();
+    }
+    return false;
+}
+
+function initSelect2() {
+    $('.select2').not('.modal .select2').select2({
         language: 'fr',
         width: '100%',
         placeholder: 'Rechercher...',
         allowClear: true
     });
-});
+}
+
+function initSelect2InModal() {
+    $('.modal .select2').select2({
+        language: 'fr',
+        width: '100%',
+        placeholder: 'Rechercher...',
+        allowClear: true,
+        dropdownParent: $('#myModal')
+    });
+}

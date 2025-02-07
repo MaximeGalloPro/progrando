@@ -1,0 +1,44 @@
+<%# app/views/organisation_access_requests/index.html.erb %>
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Demandes d'accès en attente</h2>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Organisation</th>
+                        <th>Rôle demandé</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% @access_requests.each do |request| %>
+                        <tr>
+                            <td><%= request.user.email %></td>
+                            <td><%= request.organisation.name %></td>
+                            <td><%= request.role %></td>
+                            <td><%= request.message %></td>
+                            <td><%= l request.created_at, format: :short %></td>
+                            <td>
+                                <div class="d-flex justify-content-between">
+                                    <%= open_modal(edit_organisation_access_request_path(request, organisation_id: request.organisation.id), "Accepter", class_names = 'btn-sm btn-success') %>
+                                    <%= button_to "Refuser", reject_organisation_access_request_path(request),
+                                                  method: :patch,
+                                                  class: "btn btn-sm btn-danger" %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

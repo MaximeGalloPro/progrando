@@ -1,0 +1,7 @@
+<% content_for :title, "Organisations" %>
+
+<% if browser.device.mobile? %>
+    <%= render partial: "list_mobile" %>
+<% else %>
+    <%= render partial: "list" %>
+<% end %>

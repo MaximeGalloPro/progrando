@@ -7,9 +7,14 @@ RUN apt-get update -qq && \
                        nodejs \
                        default-libmysqlclient-dev \
                        git \
-                       curl && \
-    apt-get update && apt-get install -y chromium chromium-driver
-
+                       curl \
+                       chromium \
+                       chromium-driver && \
+    curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | apt-key add - && \
+    echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list && \
+    apt-get update && apt-get install -y ngrok && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Création du répertoire de l'application
 WORKDIR /app
@@ -17,7 +22,6 @@ WORKDIR /app
 # Configuration des permissions bundle
 RUN mkdir -p /usr/local/bundle && \
     chmod -R 777 /usr/local/bundle
-
 
 # Copie et installation des gems
 COPY Gemfile Gemfile.lock ./
@@ -30,10 +34,6 @@ COPY . .
 RUN chmod +x /app/bin/* && \
     chmod -R 777 /app/tmp /app/log /app/public
 
-# Nettoyage
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 # Create start script
 COPY <<-"EOF" /app/start.sh
 #!/bin/bash
@@ -44,8 +44,11 @@ if [ "$RAILS_ENV" = "production" ]; then
     SECRET_KEY_BASE=dummy bundle exec rails assets:precompile
 fi
 
-# Démarrage du serveur avec l'environnement approprié
-exec bundle exec rails server -b 0.0.0.0 -e ${RAILS_ENV:-development}
+# Démarrage du serveur Rails
+bundle exec rails server -b 0.0.0.0 -e ${RAILS_ENV:-development} &
+
+# Lancer ngrok pour exposer l'application Rails
+ngrok http 3000 --log=stdout
 EOF
 
 RUN chmod +x /app/start.sh

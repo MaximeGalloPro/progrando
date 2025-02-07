@@ -1,0 +1,163 @@
+<%= form_with(model: @organisation) do |form| %>
+    <% if @organisation.errors.any? %>
+        <div class="alert alert-danger">
+            <h2 class="h6"><%= pluralize(@organisation.errors.count, "erreur") %> :</h2>
+            <ul class="mb-0">
+                <% @organisation.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                <% end %>
+            </ul>
+        </div>
+    <% end %>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :name, "Nom", class: "form-label " %>
+                <%= form.text_field :name, class: "form-control #{'is-invalid' if @organisation.errors[:name].any?}" %>
+                <% if @organisation.errors[:name].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:name].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :url, "Site web", class: "form-label" %>
+                <%= form.text_field :url, class: "form-control #{'is-invalid' if @organisation.errors[:url].any?}" %>
+                <% if @organisation.errors[:url].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:url].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :logo_url, "URL du logo", class: "form-label" %>
+                <%= form.text_field :logo_url, class: "form-control #{'is-invalid' if @organisation.errors[:logo_url].any?}" %>
+                <% if @organisation.errors[:logo_url].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:logo_url].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :description, "Description", class: "form-label" %>
+                <%= form.text_area :description, class: "form-control #{'is-invalid' if @organisation.errors[:description].any?}" %>
+                <% if @organisation.errors[:description].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:description].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :location, "Localisation", class: "form-label" %>
+                <%= form.text_field :location, class: "form-control #{'is-invalid' if @organisation.errors[:location].any?}" %>
+                <% if @organisation.errors[:location].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:location].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :email, "Email", class: "form-label " %>
+                <%= form.email_field :email, class: "form-control #{'is-invalid' if @organisation.errors[:email].any?}" %>
+                <% if @organisation.errors[:email].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:email].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :phone, "Téléphone", class: "form-label " %>
+                <%= form.telephone_field :phone, class: "form-control #{'is-invalid' if @organisation.errors[:phone].any?}" %>
+                <% if @organisation.errors[:phone].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:phone].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :contact_name, "Nom du contact", class: "form-label " %>
+                <%= form.text_field :contact_name, class: "form-control #{'is-invalid' if @organisation.errors[:contact_name].any?}" %>
+                <% if @organisation.errors[:contact_name].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:contact_name].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :contact_email, "Email du contact", class: "form-label " %>
+                <%= form.email_field :contact_email, class: "form-control #{'is-invalid' if @organisation.errors[:contact_email].any?}" %>
+                <% if @organisation.errors[:contact_email].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:contact_email].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :contact_phone, "Téléphone du contact", class: "form-label" %>
+                <%= form.telephone_field :contact_phone, class: "form-control #{'is-invalid' if @organisation.errors[:contact_phone].any?}" %>
+                <% if @organisation.errors[:contact_phone].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:contact_phone].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :contact_position, "Poste du contact", class: "form-label" %>
+                <%= form.text_field :contact_position, class: "form-control #{'is-invalid' if @organisation.errors[:contact_position].any?}" %>
+                <% if @organisation.errors[:contact_position].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:contact_position].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :contact_language, "Langue du contact", class: "form-label" %>
+                <%= form.text_field :contact_language, class: "form-control #{'is-invalid' if @organisation.errors[:contact_language].any?}" %>
+                <% if @organisation.errors[:contact_language].any? %>
+                    <div class="invalid-feedback">
+                        <%= @organisation.errors[:contact_language].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <%= link_to "Retour", organisations_path, class: "btn btn-outline-secondary ms-2" %>
+        <%= form.submit "Enregistrer", class: "btn btn-primary", style: "float: right" %>
+    </div>
+<% end %>

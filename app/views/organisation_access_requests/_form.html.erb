@@ -1,0 +1,32 @@
+<%= form_with model: @request, local: true do |f| %>
+    <% if @request.errors.any? %>
+        <div class="alert alert-danger">
+            <h2 class="h6"><%= pluralize(@request.errors.count, "erreur") %> :</h2>
+            <ul class="mb-0">
+                <% @request.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                <% end %>
+            </ul>
+        </div>
+    <% end %>
+
+    <div class="mb-3">
+        <%= f.label :role_id, "Affectez un profil à ce nouveau membre", class: "form-label required" %>
+        <div class="d-flex gap-2">
+            <%= f.collection_select :profile_id,
+                                    @profiles,
+                                    :id,
+                                    ->(profile) { "#{profile.name}" },
+                                    { prompt: "Rechercher un rôle..." },
+                                    { class: "select2 #{'is-invalid' if @request.errors[:profile_id].any?}" } %>
+        </div>
+        <% if @request.errors[:profile_id].any? %>
+            <div class="invalid-feedback">
+                <%= @request.errors[:role_id].join(', ') %>
+            </div>
+        <% end %>
+    </div>
+
+    <%= f.submit "Accepter la demande", class: "btn btn-outline-primary", style: "float: right" %>
+
+<% end %>

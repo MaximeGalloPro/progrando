@@ -1,0 +1,53 @@
+<%= form_with(model: @profile, local: true) do |form| %>
+    <% if @profile.errors.any? %>
+        <div class="alert alert-danger">
+            <h2 class="h6"><%= pluralize(@profile.errors.count, "erreur") %> :</h2>
+            <ul class="mb-0">
+                <% @profile.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                <% end %>
+            </ul>
+        </div>
+    <% end %>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :name, "Nom", class: "form-label required" %>
+                <%= form.text_field :name, class: "form-control #{'is-invalid' if @profile.errors[:name].any?}" %>
+                <% if @profile.errors[:name].any? %>
+                    <div class="invalid-feedback">
+                        <%= @profile.errors[:name].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <%= form.label :active, "Statut", class: "form-label" %>
+                <div class="form-check form-switch">
+                    <%= form.check_box :active, class: "form-check-input" %>
+                    <label class="form-check-label" for="profile_active">Actif</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="mb-3">
+                <%= form.label :description, "Description", class: "form-label" %>
+                <%= form.text_area :description, class: "form-control #{'is-invalid' if @profile.errors[:description].any?}", rows: 3 %>
+                <% if @profile.errors[:description].any? %>
+                    <div class="invalid-feedback">
+                        <%= @profile.errors[:description].join(', ') %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <%= link_to "Retour", profiles_path, class: "btn btn-outline-secondary ms-2" %>
+        <%= form.submit "Enregistrer", class: "btn btn-primary", style: "float: right" %>
+    </div>
+<% end %>

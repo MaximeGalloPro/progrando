@@ -9,10 +9,9 @@ services:
       rm -f /app/tmp/pids/server.pid &&
       bundle exec rails s -p 3000 -b "0.0.0.0"'
     ports:
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     environment:
       - RAILS_ENV=${RAILS_ENV:-development}
-      - DATABASE_URL=mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}
       - RAILS_SERVE_STATIC_FILES=${RAILS_SERVE_STATIC_FILES:-false}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_key}
       - REDIS_URL=redis://redis:6379/0
@@ -26,7 +25,7 @@ services:
         condition: service_started
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -39,7 +38,6 @@ services:
     command: bundle exec sidekiq
     environment:
       - RAILS_ENV=${RAILS_ENV:-development}
-      - DATABASE_URL=mysql2://root:${DB_PASSWORD:-password}@db:3306/${DB_NAME:-progrando_${RAILS_ENV:-development}}
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_key}
     volumes:
@@ -51,7 +49,7 @@ services:
     restart: unless-stopped
     user: root
     healthcheck:
-      test: ["CMD-SHELL", "ps aux | grep '[s]idekiq'"]
+      test: [ "CMD-SHELL", "ps aux | grep '[s]idekiq'" ]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -62,7 +60,7 @@ services:
       - redis_data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -91,6 +89,20 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025" # Port SMTP
+      - "8025:8025" # Port interface web
+
+  ngrok:
+    image: ngrok/ngrok
+    command: http web:3000 --log=stdout
+    depends_on:
+      - web
+    environment:
+      - NGROK_AUTHTOKEN=1Re4c1fq2Mp1klHeiJi63hnZlJq_TUFo4MvJQa98GjPzLKyn
 
 volumes:
   mariadb_data:

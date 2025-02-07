@@ -1,0 +1,67 @@
+<% action_explanations = {
+    'index' => "Permet d'afficher la liste complète des éléments disponibles",
+    'show' => "Permet de consulter le détail d'un élément spécifique",
+    'create' => "Permet de créer un nouvel élément dans le système",
+    'update' => "Permet de modifier les informations d'un élément existant",
+    'destroy' => "Permet de supprimer définitivement un élément",
+    'edit' => "Permet d'accéder au formulaire de modification d'un élément",
+    'new' => "Permet d'accéder au formulaire de création d'un nouvel élément"
+} %>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Permissions du profil</h5>
+        <small class="text-muted">
+            <i class="fas fa-info-circle"></i> Cliquer sur le statut pour changer l'autorisation
+        </small>
+        <small class="text-muted">
+            <i class="fas fa-info-circle"></i> Survolez les actions pour plus de détails
+        </small>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">Ressource</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Dernière modification</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% @profile.profile_rights.order(:resource, :action).group_by(&:resource).each do |resource, rights| %>
+                    <tr class="table-secondary">
+                        <td colspan="4" class="fw-bold"><%= resource %></td>
+                    </tr>
+                    <% rights.each do |right| %>
+                        <tr>
+                            <td class="ps-4"><%#= right.resource %></td>
+                            <td>
+                                                <span data-bs-toggle="tooltip"
+                                                      data-bs-placement="top"
+                                                      title="<%= action_explanations[right.action] %>">
+                                                    <%= right.action %>
+                                                    <i class="fas fa-info-circle ms-1 text-muted small"></i>
+                                                </span>
+                            </td>
+                            <td>
+                                <% if show_if_authorized('ProfileRight', 'toggle_authorization') %>
+                                                  <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>"
+                                                        role="button"
+                                                        data-controller="permission"
+                                                        data-permission-url="<%= toggle_authorization_profile_path(right) %>"
+                                                        data-action="click->permission#toggle"><%= right.authorized ? 'Autorisé' : 'Non autorisé' %></span>
+                                <% else %>
+                                    <span class="badge <%= right.authorized ? 'bg-success' : 'bg-danger' %>"><%= right.authorized ? 'Autorisé' : 'Non autorisé' %></span>
+                                <% end %>
+                            </td>
+                            <td><%= l(right.updated_at, format: :short) %></td>
+                        </tr>
+                    <% end %>
+                <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

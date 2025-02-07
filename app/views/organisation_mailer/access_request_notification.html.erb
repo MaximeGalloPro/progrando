@@ -1,0 +1,14 @@
+<%# app/views/organisation_mailer/access_request_notification.html.erb %>
+<h1>Nouvelle demande d'accès</h1>
+
+<p>
+    <%= @user.email %> souhaite rejoindre l'organisation <%= @organisation.name %>
+    en tant que <%= @access_request.role %>.
+</p>
+
+<h2>Message de l'utilisateur :</h2>
+<p><%= @access_request.message %></p>
+
+<p>
+    Vous pouvez gérer cette demande en vous connectant à l'application.
+</p>

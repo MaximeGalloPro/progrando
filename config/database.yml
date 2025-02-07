@@ -9,7 +9,7 @@ default: &default
 
 development:
   <<: *default
-  database: progrando
+  database: progrando_development
 
 test:
   <<: *default

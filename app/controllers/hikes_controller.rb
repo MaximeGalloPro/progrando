@@ -1,34 +1,18 @@
-class HikesController < ApplicationController
+# frozen_string_literal: true
 
+# Manages hiking trails and routes within the application. Handles CRUD operations
+# for hikes, OpenRunner integration for trail details, and associated path data.
+# Provides search functionality and history tracking for hikes.
+class HikesController < ApplicationController
     def index
         @results = fetch_hikes
-        @results = @results.sort_by { |hike| hike.last_hiking_date || Date.new(1, 1, 1) }.reverse
+        @results = sort_hikes_by_date(@results)
     end
 
     def refresh_from_openrunner
-        @hike = Hike.find(params[:id])
-        @hike.update(updating: true)
-        UpdateHikeFromOpenrunnerJob.perform_later(@hike)
-
-        # Redirection avec les paramètres de recherche
-        redirect_back_options = { notice: "Mise à jour des données depuis OpenRunner en cours..." }
-
-        # Si on a un paramètre de recherche, on le conserve
-        redirect_back_options = {
-            notice: "La randonnée \"#{@hike.trail_name}\" est en cours de mise à jour depuis OpenRunner..."
-        }
-
-        # Gestion des paramètres de redirection
-        if params[:search].present?
-            redirect_back_options[:search] = params[:search]
-        elsif params[:redirect_path].present?
-            redirect_back_options[:redirect_path] = params[:redirect_path]
-        else
-            redirect_back_options[:search] = nil
-        end
-
-        # Redirection avec les options
-        redirect_back(fallback_location: hikes_path, **redirect_back_options)
+        prepare_hike_for_update
+        schedule_openrunner_update
+        redirect_back_with_update_notice
     end
 
     def new
@@ -37,30 +21,28 @@ class HikesController < ApplicationController
     end
 
     def edit
-        @hike = Hike.find(params[:id])
-        @hike_path = @hike.hike_path
-    end
-
-    def update
-        @hike = Hike.find(params[:id])
-        @hike_path = @hike.hike_path || HikePath.new(hike_id: @hike.id)
-        params[:hike][:coordinates] = "" if params[:hike][:coordinates] == "[]"
-        if @hike.update(hike_params) and @hike_path&.update(coordinates: params[:hike][:coordinates])
-            redirect_to hikes_path, notice: 'Parcours mis à jour avec succès.'
-        else
-            render :edit, status: :unprocessable_entity
-        end
+        set_hike_and_path
     end
 
     def create
-        @hike = Hike.new(hike_params)
-        @hike_path = HikePath.new(coordinates: params[:hike][:coordinates])
-        if @hike.save
-            @hike_path.hike_id = @hike.id
-            @hike_path.save
-            redirect_to hikes_path, notice: 'Parcours ajouté avec succès.'
+        @hike = build_hike
+        @hike_path = build_hike_path
+
+        if save_hike_with_path
+            redirect_to hikes_path, notice: t('.success')
         else
-            render :new, status: :unprocessable_entity, params: { hike: @hike, coordinates: params[:coordinates] }
+            render_new_with_errors
+        end
+    end
+
+    def update
+        set_hike_and_path
+        prepare_coordinates
+
+        if update_hike_with_path
+            redirect_to hikes_path, notice: t('.success')
+        else
+            render :edit, status: :unprocessable_entity
         end
     end
 
@@ -75,12 +57,87 @@ class HikesController < ApplicationController
     end
 
     def destroy
-        @hike = Hike.find_by(id: params[:id])
+        @hike = find_organisation_hike
         @hike.destroy
-        redirect_to hikes_path, notice: 'Parcours supprimé avec succès.'
+        redirect_to hikes_path, notice: t('.success')
     end
 
     private
+
+    def sort_hikes_by_date(hikes)
+        hikes.sort_by { |hike| hike.last_hiking_date || Date.new(1, 1, 1) }.reverse
+    end
+
+    def prepare_hike_for_update
+        @hike = find_organisation_hike
+        @hike.update(updating: true)
+    end
+
+    def schedule_openrunner_update
+        UpdateHikeFromOpenrunnerJob.perform_later(@hike)
+    end
+
+    def redirect_back_with_update_notice
+        redirect_back(
+            fallback_location: hikes_path,
+            **build_redirect_options
+        )
+    end
+
+    def build_redirect_options
+        {
+            notice: t('.updating', name: @hike.trail_name),
+            search: determine_search_param,
+            redirect_path: params[:redirect_path]
+        }.compact
+    end
+
+    def determine_search_param
+        return params[:search] if params[:search].present?
+        return nil if params[:redirect_path].present?
+
+        nil
+    end
+
+    def set_hike_and_path
+        @hike = find_organisation_hike
+        @hike_path = @hike.hike_path
+    end
+
+    def build_hike
+        Hike.new(hike_params)
+    end
+
+    def build_hike_path
+        HikePath.new(coordinates: params[:hike][:coordinates])
+    end
+
+    def save_hike_with_path
+        return false unless @hike.save
+
+        @hike_path.hike_id = @hike.id
+        @hike_path.save
+    end
+
+    def render_new_with_errors
+        render :new, status: :unprocessable_entity,
+                     params: { hike: @hike, coordinates: params[:coordinates] }
+    end
+
+    def find_organisation_hike
+        Hike.for_organisation.find_by(id: params[:id])
+    end
+
+    def prepare_coordinates
+        return unless params[:hike][:coordinates] == '[]'
+
+        params[:hike][:coordinates] = ''
+    end
+
+    def update_hike_with_path
+        @hike_path ||= HikePath.new(hike_id: @hike.id)
+        @hike.update(hike_params) && @hike_path&.update(coordinates: params[:hike][:coordinates])
+    end
 
     def hike_params
         params_with_converted_distance = params.require(:hike).permit(
@@ -94,18 +151,20 @@ class HikesController < ApplicationController
             :elevation_loss,
             :altitude_min,
             :altitude_max,
-            :openrunner_ref,
+            :openrunner_ref
         )
 
-        if params_with_converted_distance[:distance_km].present?
-            params_with_converted_distance[:distance_km].gsub!(',', '.')
-        end
+        convert_distance_format(params_with_converted_distance)
+    end
 
-        params_with_converted_distance
+    def convert_distance_format(params)
+        params[:distance_km].tr!(',', '.') if params[:distance_km].present?
+        params
     end
 
     def fetch_hikes
-        Hike.with_latest_history
+        Hike.for_organisation
+            .with_latest_history
             .then { |scope| apply_search(scope) }
             .order_by_latest_date
             .distinct

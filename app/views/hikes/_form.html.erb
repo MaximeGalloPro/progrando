@@ -184,7 +184,7 @@
         </div>
 
         <script>
-            document.addEventListener('input', function(e) {
+            document.addEventListener('input', function (e) {
                 if (e.target.matches('input[type="range"]')) {
                     const difficulties = {
                         "1": "Très facile",
@@ -204,7 +204,7 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <%= f.label :carpooling_cost, "Coût covoiturage", class: "form-label" %>
-                <%= f.number_field :carpooling_cost,
+                <%= f.number_field :carpooling_cost, step: 0.1,
                                    class: "form-control #{'is-invalid' if @hike.errors[:carpooling_cost].any?}" %>
                 <% if @hike.errors[:carpooling_cost].any? %>
                     <div class="invalid-feedback">
@@ -220,17 +220,11 @@
 
     <div class="mt-4">
         <%= link_to "Retour", hikes_path, class: "btn btn-outline-secondary ms-2" %>
-        <%= f.submit "Enregistrer", class: "btn btn-primary", style: "float: right" %>
+        <% show_if_authorized('Hike', 'update') do %>
+            <%= f.submit "Enregistrer", class: "btn btn-primary", style: "float: right" %>
+        <% end %>
     </div>
 <% end %>
-
-
-<style>
-    .required:after {
-        content: " *";
-        color: red;
-    }
-</style>
 
 <script type="module">
     import "hikes"

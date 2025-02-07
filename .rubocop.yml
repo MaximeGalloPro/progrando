@@ -1,0 +1,37 @@
+require:
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-capybara
+
+#inherit_from: .rubocop_todo.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.1
+  Exclude:
+    - 'db/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+    - "app/helpers/modal_helper.rb"
+
+Layout/IndentationWidth:
+  Width: 4
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/ModuleLength:
+  Max: 200
+
+Layout/LineLength:
+  Max: 150
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/BlockLength:
+  Exclude:
+    - 'config/routes.rb'
+    - 'config/environments/*.rb'

@@ -6,9 +6,9 @@ class CreateHikeHistories < ActiveRecord::Migration[7.0]
                 t.string :departure_time
                 t.string :day_type
                 t.decimal :carpooling_cost, precision: 5, scale: 2
-                t.integer :guide_id
                 t.integer :hike_id
                 t.string :openrunner_ref
+                t.integer :member_id
 
                 t.timestamps
             end

@@ -1,0 +1,72 @@
+<%# app/views/organisations/request_access.html.erb %>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Demande d'accès à <%= @organisation.name %></h2>
+                </div>
+
+                <div class="card-body">
+                    <%= form_with(url: request_access_organisation_path(@organisation), local: true) do |f| %>
+                        <% if flash[:error].present? %>
+                            <div class="alert alert-danger">
+                                <%= flash[:error] %>
+                            </div>
+                        <% end %>
+
+                        <div class="mb-4">
+                            <%= f.label :name, "Nom", class: "form-label required" %>
+                            <%= f.text_field :name,
+                                             value: @member&.name,
+                                             class: "form-control",
+                                             placeholder: "Votre nom complet" %>
+                        </div>
+
+                        <div class="mb-4">
+                            <%= f.label :email, "Email", class: "form-label required" %>
+                            <%= f.email_field :email,
+                                              value: current_user&.email,
+                                              class: "form-control",
+                                              placeholder: "votre@email.com" %>
+                        </div>
+
+                        <div class="mb-4">
+                            <%= f.label :phone, "Téléphone", class: "form-label" %>
+                            <%= f.telephone_field :phone,
+                                                  value: @member&.phone,
+                                                  class: "form-control",
+                                                  placeholder: "Votre numéro de téléphone" %>
+                        </div>
+
+                        <div class="mb-4">
+                            <%= f.label :message, "Message de demande", class: "form-label required" %>
+                            <%= f.text_area :message,
+                                            class: "form-control",
+                                            placeholder: "Expliquez brièvement pourquoi vous souhaitez rejoindre cette organisation",
+                                            rows: 4 %>
+                        </div>
+
+                        <div class="mb-4">
+                            <%= f.label :role, "Rôle souhaité", class: "form-label required" %>
+                            <%= f.select :role,
+                                         [
+                                             ['Membre', 'member'],
+                                             ['Guide', 'guide'],
+                                             ['Administrateur', 'admin']
+                                         ],
+                                         { prompt: 'Sélectionnez un rôle' },
+                                         { class: "form-select" }
+                            %>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <%= link_to "Retour", organisations_path, class: "btn btn-outline-secondary" %>
+                            <%= f.submit "Envoyer la demande", class: "btn btn-primary" %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

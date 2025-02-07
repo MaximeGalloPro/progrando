@@ -30,66 +30,50 @@
 
                     <div class="text-muted mb-3 small">
                         <i class="far fa-calendar me-1"></i>
-                        <%= hike.last_hiking_date&.strftime("%d/%m/%Y") || "<i class='fas fa-ban text-danger'></i>".html_safe %> •
+                        <%= hike.last_hiking_date&.strftime("%d/%m/%Y") || "<i class='fas fa-ban text-danger'></i>".html_safe %>
+                        •
                         <%= hike.last_guide_name.presence || "<i class='fas fa-ban text-danger'></i>".html_safe %>
                     </div>
 
                     <div class="d-flex w-100">
                         <% button_classes = "btn btn-outline-dark w-100" %>
 
-                        <!-- OpenRunner -->
                         <div class="flex-grow-1">
-                            <% if hike.openrunner_ref.blank? || hike.openrunner_ref == "0" || hike.openrunner_ref == 0 %>
-                                <button class="<%= button_classes %>" disabled title="Pas de référence OpenRunner">
-                                    <i class="fas fa-ban text-danger"></i>
-                                </button>
-                            <% else %>
-                                <%= link_to "https://www.openrunner.com/route-details/#{hike.openrunner_ref}",
-                                            target: "_blank",
-                                            title: "Voir sur OpenRunner",
+                            <%= render partial: "roadmap", locals: { hike: hike } %>
+                        </div>
+
+                        <% show_if_authorized('HikeHistory', 'index') do %>
+                            <div class="flex-grow-1">
+                                <%= link_to hike_histories_path(hike_id: hike.id),
+                                            title: "Voir l'historique",
                                             class: button_classes do %>
-                                    <i class="fas fa-mountain"></i>
+                                    <i class="fas fa-history"></i>
+                                <% end %>
+                            </div>
+                        <% end %>
+
+                        <div class="flex-grow-1">
+                            <% show_if_authorized('Hike', 'edit') do %>
+                                <%= link_to edit_hike_path(hike),
+                                            title: "Editer",
+                                            class: button_classes do %>
+                                    <i class="fas fa-pen"></i>
                                 <% end %>
                             <% end %>
                         </div>
 
-                        <!-- Historique -->
                         <div class="flex-grow-1">
-                            <%= link_to hike_histories_path(hike_id: hike.id),
-                                        title: "Voir l'historique",
-                                        class: button_classes do %>
-                                <i class="fas fa-history"></i>
-                            <% end %>
-                        </div>
-
-                        <!-- Edition -->
-                        <div class="flex-grow-1">
-                            <%= link_to edit_hike_path(hike),
-                                        title: "Editer",
-                                        class: button_classes do %>
-                                <i class="fas fa-pen"></i>
-                            <% end %>
-                        </div>
-
-                        <!-- Suppression -->
-                        <!-- Suppression -->
-                        <div class="flex-grow-1">
-                            <%= form_with url: hike_path(hike), method: :delete, class: "h-100" do |f| %>
-                                <%= f.button type: :submit,
-                                             class: button_classes,
-                                             title: "Supprimer",
-                                             data: { confirm: "Êtes-vous sûr de vouloir supprimer cette randonnée ?" },
-                                             onclick: "return confirmDelete(event)" do %>
-                                    <i class="fas fa-trash"></i>
+                            <% show_if_authorized('Hike', 'destroy') do %>
+                                <%= form_with url: hike_path(hike), method: :delete, class: "h-100" do |f| %>
+                                    <%= f.button type: :submit,
+                                                 class: button_classes,
+                                                 title: "Supprimer",
+                                                 onclick: "return confirmDelete(event, 'ce parcours')" do %>
+                                        <i class="fas fa-trash"></i>
+                                    <% end %>
                                 <% end %>
                             <% end %>
                         </div>
-
-                        <script>
-                            function confirmDelete(event) {
-                                return confirm("Êtes-vous sûr de vouloir supprimer cette randonnée ?");
-                            }
-                        </script>
 
                         <!-- Mise à jour -->
                         <div class="flex-grow-1">
@@ -102,14 +86,16 @@
                                     <i class="fas fa-ban text-danger"></i>
                                 </button>
                             <% else %>
-                                <%= form_with url: refresh_from_openrunner_hike_path(hike), method: :post, class: "h-100" do |f| %>
-                                    <%= f.hidden_field :redirect_path, value: hikes_path %>
-                                    <%= f.hidden_field :search, value: params[:search] %>
-                                    <%= f.button type: :submit,
-                                                 class: button_classes,
-                                                 title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
-                                                 data: { turbo: false } do %>
-                                        <i class="fas fa-sync-alt"></i>
+                                <% show_if_authorized('Hike', 'update') do %>
+                                    <%= form_with url: refresh_from_openrunner_hike_path(hike), method: :post, class: "h-100" do |f| %>
+                                        <%= f.hidden_field :redirect_path, value: hikes_path %>
+                                        <%= f.hidden_field :search, value: params[:search] %>
+                                        <%= f.button type: :submit,
+                                                     class: button_classes,
+                                                     title: "Dernière mise à jour: #{hike.last_update_attempt&.strftime('%d/%m/%Y %H:%M') || 'Jamais'}",
+                                                     data: { turbo: false } do %>
+                                            <i class="fas fa-sync-alt"></i>
+                                        <% end %>
                                     <% end %>
                                 <% end %>
                             <% end %>

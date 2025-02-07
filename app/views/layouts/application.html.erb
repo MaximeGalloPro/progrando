@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ProgRando</title>
+    <title>ProgIt</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <!-- Définir l'icône de l'application -->
+    <link rel="apple-touch-icon" href="/icons/icon_192.png">
+
+    <!-- Définir la couleur de la barre de statut -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <!-- Activer le mode plein écran -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- Définir le nom affiché sous l'icône de l'application -->
+    <meta name="apple-mobile-web-app-title" content="Nom de votre App">
+
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-    <%# Multiples sources pour Font Awesome %>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -18,34 +32,81 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"/>
 </head>
 
-<body>
+<body class="<%= current_user&.theme %>">
 <% flash.each do |type, message| %>
     <div class="alert <%= type == 'notice' ? 'alert-success' : 'alert-danger' %> alert-dismissible fade show" role="alert">
         <%= message %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 <% end %>
-<%= render partial: 'layouts/topbar' %>
+
+<% if browser.device.mobile? %>
+    <%= render partial: "layouts/topbar_mobile" %>
+    <div style="margin-bottom: 4rem;"></div>
+<% else %>
+    <%= render partial: "layouts/topbar" %>
+<% end %>
+
+<%= render partial: 'layouts/no_organisation' %>
 <%= render partial: 'layouts/next_hike' %>
 
+<div id="feedback-message" style="display: none; margin-top: 10px; color: green;"></div>
+<button id="install-pwa" style="display: none;">Installer l'App</button>
 
-<style>
-    /* Ajustements pour petits écrans */
-    @media (max-width: 768px) {
-        .card-body .gap-2 {
-            gap: 0.75rem !important;
-        }
+<script type="text/javascript" charset="utf-8">
+    let deferredPrompt;
 
-        .d-flex.flex-wrap {
-            justify-content: space-between;
-        }
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
 
-        /* Optionnel: ajuster la taille du texte sur mobile */
-        .card-body {
-            font-size: 0.9rem;
-        }
-    }
-</style>
+        const installButton = document.getElementById('install-pwa');
+        const feedbackMessage = document.getElementById('feedback-message');
+        installButton.style.display = 'block';
+
+        installButton.addEventListener('click', () => {
+            deferredPrompt.prompt();
+
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    feedbackMessage.style.color = 'green';
+                    feedbackMessage.innerText = 'Merci ! L’application est en cours d’installation.';
+                } else {
+                    feedbackMessage.style.color = 'red';
+                    feedbackMessage.innerText = 'Installation annulée. Vous pouvez réessayer plus tard.';
+                }
+                feedbackMessage.style.display = 'block';
+                deferredPrompt = null;
+            });
+        });
+    });
+</script>
 <%= yield %>
+<%= render partial: 'layouts/modal' %>
+
+
+
+<script>
+    // Détection d'iOS
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    // Détection de Safari (évite les autres navigateurs comme Chrome sur iOS)
+    const isSafari = !!navigator.userAgent.match(/Safari/) && !navigator.userAgent.match(/Chrome/);
+
+    if (isIos && isSafari) {
+        // Afficher une bannière personnalisée avec les instructions
+        document.getElementById('ios-install-banner').style.display = 'block';
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(function (registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(function (error) {
+            console.log('Service Worker registration failed:', error);
+        });
+    }
+</script>
+
 </body>
 </html>
