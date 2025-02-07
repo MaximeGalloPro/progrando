@@ -1,8 +1,9 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Profils</h1>
+        <h1>Profils - <%= @organisation&.name %></h1>
         <%= link_to "Nouveau profil", new_profile_path(@organisation), class: "btn btn-primary" %>
     </div>
+    <i>Votre profil est : <%= current_user.current_profile.name %></i>
 
     <div class="card">
         <div class="card-body">
